@@ -726,6 +726,165 @@ body {
 .trainer-topbar .btn-new:hover{background:rgba(76,175,80,.28);}
 .trainer-topbar .btn-stats{padding:8px 16px;font-size:13px;font-weight:bold;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;font-family:Arial,Helvetica,sans-serif;}
 .trainer-topbar .btn-stats:hover{border-color:#888;color:#fff;}
+
+/* ══════════════════════════════
+   MOBILE RESPONSIVE — max 640px
+   Nur additions, nichts überschrieben
+══════════════════════════════ */
+@media (max-width: 640px) {
+
+  /* NAV: scrollbar statt wrapping */
+  .topnav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    padding: 0 8px;
+    gap: 0;
+  }
+  .nav-logo { font-size: 13px; padding: 10px 10px 10px 0; white-space: nowrap; }
+  .nav-tab  { padding: 10px 10px; font-size: 12px; white-space: nowrap; }
+
+  /* PAGES */
+  .page { padding: 12px 10px 50px; }
+
+  /* TITLES */
+  .sec-title { font-size: 16px; }
+  .sec-sub   { font-size: 12px; margin-bottom: 14px; }
+
+  /* SUBTABS: scroll horizontal */
+  .subtabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    gap: 0;
+  }
+  .subtab { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
+
+  /* DIFF-BAR: wrap + smaller */
+  .diff-bar { flex-wrap: wrap; gap: 4px; padding: 8px 0 10px; }
+  .diff-btn, .filter-btn { padding: 4px 8px; font-size: 11px; }
+
+  /* SCORE BAR */
+  .scorebar { gap: 10px; padding: 6px 10px; }
+  .score-item { font-size: 12px; }
+
+  /* GRIDS: immer 1 Spalte auf Mobile */
+  .row2, .row3 { grid-template-columns: 1fr; }
+
+  /* BOX padding kleiner */
+  .box { padding: 12px 10px; }
+  .box-label { font-size: 10px; }
+
+  /* BUTTONS kleiner */
+  .opt { padding: 5px 10px; font-size: 12px; }
+
+  /* RESULT BOX */
+  .result { padding: 12px 12px 12px 14px; }
+  .result-title { font-size: 15px; }
+  .result-why   { font-size: 12px; }
+  .acts-row { flex-direction: column; }
+  .act-box  { min-width: 0; }
+
+  /* ── PREFLOP RANGE GRID ──
+     Kleinere Zellen + horizontales Scrollen */
+  .range-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .rg td   { width: 36px; height: 28px; font-size: 9px; }
+  .rg th.rl, .rg th.ct { font-size: 9px; width: 16px; min-width: 16px; }
+
+  /* POS BANNER */
+  .pos-info { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+  .pos-name-big { font-size: 20px; }
+  .pos-pct-big  { font-size: 18px; }
+  .pos-combos   { font-size: 11px; }
+
+  /* POS BUTTONS */
+  .pos-btns { gap: 4px; }
+  .pos-btn  { padding: 6px 10px; font-size: 12px; min-width: 44px; }
+
+  /* POS OVERVIEW 6er Grid bleibt 6 Spalten aber kompakter */
+  .pos-overview { gap: 4px; }
+  .pov-card { padding: 6px 2px; }
+  .pov-pos  { font-size: 10px; }
+  .pov-pct  { font-size: 15px; }
+
+  /* LEGEND */
+  .legend { gap: 8px; }
+  .legend .leg { font-size: 11px; }
+  .legend .leg-sq { width: 12px; height: 12px; }
+
+  /* BOARD GRID */
+  .board-grid { grid-template-columns: repeat(2, 1fr); }
+  .bc-board   { font-size: 14px; }
+  .bc-lbl     { font-size: 10px; }
+
+  /* BOARD INFO */
+  .bi-grid { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: 1fr; gap: 6px; }
+
+  /* CARDS (trainer) */
+  .card { width: 40px; height: 56px; font-size: 14px; }
+  .card-rank { font-size: 15px; }
+  .card-suit { font-size: 12px; }
+  .cards-row { gap: 12px; }
+
+  /* ACTION BUTTONS (trainer) */
+  .action-grid { grid-template-columns: 1fr 1fr; }
+  .action-btn  { padding: 10px 10px; }
+  .action-btn .ab-name { font-size: 13px; }
+  .action-btn .ab-desc { font-size: 10px; }
+
+  /* TRAINER TOPBAR */
+  .trainer-topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .trainer-topbar .btn-new   { width: 100%; text-align: center; padding: 10px; }
+  .trainer-topbar .btn-stats { width: 100%; text-align: center; padding: 10px; }
+  .scorebar { flex-wrap: wrap; }
+
+  /* FEEDBACK */
+  .fb-text   { font-size: 12px; }
+  .fb-detail { font-size: 11px; }
+
+  /* NEXT BUTTON */
+  .next-btn { padding: 12px; font-size: 13px; }
+
+  /* REFERENCE TABLE: scroll */
+  .ref-tbl { font-size: 11px; }
+  .ref-tbl th, .ref-tbl td { padding: 5px 6px; }
+
+  /* EQ GRID */
+  .eq-grid    { grid-template-columns: repeat(2, 1fr); }
+  .cbref-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* STATS */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* POT INFO */
+  .pot-info { gap: 10px; font-size: 12px; flex-wrap: wrap; }
+
+  /* HAND TIP */
+  .hand-tip { font-size: 12px; padding: 6px 10px; }
+
+  /* BAR */
+  .bar-marks { font-size: 9px; }
+
+  /* TAGS */
+  .tag { font-size: 10px; padding: 2px 6px; }
+  .tags { gap: 4px; }
+  .btag { font-size: 10px; padding: 2px 6px; }
+  .board-tags { gap: 4px; }
+
+  /* HAND ANALYSIS */
+  .hand-analysis { padding: 8px 10px; }
+  .ha-strength { font-size: 14px; }
+}
+
+/* Extra klein (z.B. iPhone SE, 375px) */
+@media (max-width: 400px) {
+  .rg td   { width: 28px; height: 24px; font-size: 8px; }
+  .rg th.rl, .rg th.ct { width: 13px; min-width: 13px; font-size: 8px; }
+  .action-grid { grid-template-columns: 1fr; }
+  .card { width: 36px; height: 50px; }
+  .card-rank { font-size: 13px; }
+}
 </style>
 </head>
 <body>
