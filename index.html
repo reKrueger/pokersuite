@@ -477,6 +477,8 @@ body {
 .sit-badge.ip     { border-color: var(--blue); color: var(--blue); }
 .sit-badge.oop    { border-color: #aaa; color: #aaa; }
 .sit-badge.pos    { border-color: var(--purple); color: var(--purple); }
+.sit-badge.opp   { border-color: var(--amber);  color: var(--amber); }
+.sit-badge.multi { border-color: var(--red);    color: var(--red); }
 
 /* CARDS */
 .cards-row {
@@ -1245,9 +1247,15 @@ function renderF() {
       acts=[{l:'Primär',v:'Bet 25–40%',p:true},{l:'Manchmal',v:'Check (slow play)'}]; sz='25–40% des Pots'; sv=33;
     } else if (top && wet && raised) {
       v='Entscheidung: Call oder Fold'; c='amber';
-      w='Top Pair + Raise auf nassem Board ist ein Warnsignal. Gegner hat oft Sets, 2-Pair oder starke Draws. Board genau analysieren.';
-      tags=[['tag-a','Spot prüfen'],['tag-b','Meist Call'],['tag-r','Vs Nit: Fold']];
-      acts=[{l:'Meist',v:'Call',p:true},{l:'Vs Nit',v:'Fold'}];
+      w = oppTight
+        ? `Gegner (${opp.label}) hat sehr enge Range — ein Raise auf nassem Board bedeutet meist Set oder 2-Pair. Eher folden oder sehr vorsichtig callen.`
+        : `Gegner (${opp.label}) hat weite Range — er raistet öfter mit Draws oder schwächeren Händen. Call ist hier meistens richtig.`;
+      tags = oppTight
+        ? [['tag-r','Vs Tight: Fold'],['tag-a','Range nur Sets/2P']]
+        : [['tag-b','Meist Call'],['tag-a','Vs Wide: Call sicher']];
+      acts = oppTight
+        ? [{l:'Vs Tight',v:'Fold/Vorsicht',p:true},{l:'Vs Wide',v:'Call'}]
+        : [{l:'Meist',v:'Call',p:true},{l:'Vs Tight (UTG)',v:'Fold'}];
     } else if (top && wet) {
       v='Bet 50–66% — Wert + Schutz'; c='green';
       w='Top Pair auf nassem Board: Wert aufbauen UND Draws teuer machen. Kleiner Bet gibt Draws zu gute Odds.';
@@ -1273,9 +1281,9 @@ function renderF() {
       w='Starker Draw + Initiative = perfekter Semi-Bluff Spot. Zwei Gewinnwege: Fold-Equity (Gegner foldet) + Equity-Backup (du triffst).';
       tags=[['tag-g','Semi-Bluff'],['tag-g','Doppelte Equity'],['tag-b','50–66% Pot']];
       acts=[{l:'Primär',v:'Bet 50–66%',p:true},{l:'Dry Board',v:'Bet 33%'}]; sz='50–66% des Pots'; sv=58;
-    } else if (air && multi) {
+    } else if (air && (multi || numOpponents > 1)) {
       v='Check — kein Bluff Multiway'; c='red';
-      w='Luft gegen mehrere Gegner: Alle müssen folden. Statistisch fast unmöglich. EV stark negativ. Check immer.';
+      w=`Luft gegen ${numOpponents||1} Gegner: Alle müssen folden — statistisch fast unmöglich. EV stark negativ. Check immer.`;
       tags=[['tag-r','Kein Bluff'],['tag-r','Multiway']];
       acts=[{l:'Standard',v:'Check',p:true}];
     } else if (air && hu && (dry||paired)) {
@@ -1904,7 +1912,7 @@ function getHoleHandStrength(hole, board) {
     const window = [low,low+1,low+2,low+3,low+4];
     const have = uniqueVals.filter(v=>window.includes(v));
     const boardHave = boardVals.filter(v=>window.includes(v));
-    if (have.length===4 && !hasStraight) {
+    if (have.length===4 && !(made.rank >= 4)) {
       const missing = window.filter(v=>!have.includes(v))[0];
       const holeCont = have.filter(v=>[h1,h2].includes(v)).length;
       if (holeCont>0) {
@@ -1966,9 +1974,15 @@ function analyzeBoard(board) {
 // ══════════════════════════════════
 // CORRECT ACTION ENGINE
 // ══════════════════════════════════
-function getCorrectAction(role, position, ip, boardInfo, handStrength, vs3bet) {
+function getCorrectAction(role, position, ip, boardInfo, handStrength, vs3bet, oppPosition, numOpponents) {
   const {texture, paired, connected, monotone} = boardInfo;
   const {madeStrength, drawStrength, madeLabel, draws, goodKicker} = handStrength;
+
+  // Opponent range info — used to adjust advice
+  const opp = oppRangeLabel(oppPosition || 'BTN');
+  const oppTight = opp.tightness === 'very_tight' || opp.tightness === 'tight';
+  const oppWide  = opp.tightness === 'very_wide'  || opp.tightness === 'wide';
+  const multi    = (numOpponents || 1) > 1;
 
   const wet = texture === 'wet';
   const dry = texture === 'dry';
@@ -2077,6 +2091,47 @@ const ACTIONS_CALLER = [
 ];
 
 // ══════════════════════════════════
+// OPPONENT POSITION HELPER
+// ══════════════════════════════════
+const OPP_RANGE_WIDTH = {UTG:14, MP:20, CO:28, BTN:48, SB:37, BB:65};
+
+function pickOppPosition() {
+  // BB is defending vs a raiser — realistic raiser positions
+  const opts = ['UTG','MP','CO','BTN','SB'];
+  const weights = [1, 1.5, 2, 3, 1.5]; // BTN raises most often
+  let total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for (let i=0; i<opts.length; i++) { r -= weights[i]; if (r<=0) return opts[i]; }
+  return 'BTN';
+}
+
+function pickCallerPosition(heroPos) {
+  // Who calls hero's open? Positions that act AFTER hero (plus BB always possible)
+  // Weighted: late positions and BB call most often
+  const callerMap = {
+    UTG: {opts:['MP','CO','BTN','SB','BB'], weights:[1,1.5,2,1,2.5]},
+    MP:  {opts:['CO','BTN','SB','BB'],      weights:[1.5,2,1,2.5]},
+    CO:  {opts:['BTN','SB','BB'],           weights:[2,1,2.5]},
+    BTN: {opts:['SB','BB'],                 weights:[1,3]},
+    SB:  {opts:['BB'],                      weights:[1]},
+  };
+  const map = callerMap[heroPos] || callerMap['BTN'];
+  let total = map.weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for (let i=0; i<map.opts.length; i++) { r -= map.weights[i]; if (r<=0) return map.opts[i]; }
+  return map.opts[map.opts.length-1];
+}
+
+function oppRangeLabel(pos) {
+  const w = OPP_RANGE_WIDTH[pos] || 25;
+  if (w <= 14) return {label:'Sehr eng (UTG)', tightness:'very_tight', width:w};
+  if (w <= 20) return {label:'Eng (MP)',       tightness:'tight',      width:w};
+  if (w <= 28) return {label:'Mittel (CO)',    tightness:'medium',     width:w};
+  if (w <= 37) return {label:'Weit (SB)',      tightness:'wide',       width:w};
+  return              {label:'Sehr weit (BTN)',tightness:'very_wide',  width:w};
+}
+
+// ══════════════════════════════════
 // GAME STATE
 // ══════════════════════════════════
 let scores = {correct:0, wrong:0, streak:0, bestStreak:0, total:0};
@@ -2156,22 +2211,29 @@ function dealNew() {
   const deck = shuffleDeck(holeCards);
   const flop = [deck[0], deck[1], deck[2]];
 
-  // Position details
-  const ip = role === 'pfr' ? (position === 'BTN' || position === 'CO') : false;
+  // Opponent position — declared FIRST, needed for ip calculation
+  const oppPosition  = role === 'pfr' ? pickCallerPosition(position) : pickOppPosition();
+  const numOpponents = (role === 'pfr' && Math.random() < 0.2) ? 2 : 1;
+
+  // IP postflop: hero acts after opp = hero has higher seat index
+  const POST_ORDER = {SB:0, BB:1, UTG:2, MP:3, CO:4, BTN:5};
+  const ip = role === 'pfr'
+    ? (POST_ORDER[position] || 0) > (POST_ORDER[oppPosition] || 0)
+    : false;
 
   // Analyze
   const boardInfo = analyzeBoard(flop);
   const handStrength = getHoleHandStrength(holeCards, flop);
-  const correctAct = getCorrectAction(role, position, ip, boardInfo, handStrength, false);
+  const correctAct = getCorrectAction(role, position, ip, boardInfo, handStrength, false, oppPosition, numOpponents);
 
   // Pot info
   const bbSize = 0.25;
   const openSize = role === 'pfr' ? 3 * bbSize : bbSize;
   const pot = role === 'pfr'
-    ? (position === 'BTN' ? 2.2 : 2.5)
+    ? (position === 'BTN' ? 2.2 : 2.5) + (numOpponents > 1 ? 0.6 : 0)
     : 1.4;
 
-  currentSituation = {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, bbSize, handNotation};
+  currentSituation = {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, bbSize, handNotation, oppPosition, numOpponents};
 
   renderSituation();
 }
@@ -2180,7 +2242,7 @@ function dealNew() {
 // RENDER
 // ══════════════════════════════════
 function renderSituation() {
-  const {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot} = currentSituation;
+  const {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, oppPosition, numOpponents} = currentSituation;
   const {texture, paired, connected, monotone, twoTone} = boardInfo;
   const {madeLabel, draws, madeStrength, drawStrength} = handStrength;
 
@@ -2203,6 +2265,9 @@ function renderSituation() {
     ? draws.map(d=>`<span style="color:${d.strength>=3?'var(--blue)':'var(--purple)'}">${d.label}</span>`).join(' + ')
     : `<span class="ha-nothing">Keine Draws</span>`;
 
+  // Opponent range — declared first so all badges can use it
+  const opp = oppRangeLabel(oppPosition || 'BTN');
+
   // Role/position badges
   const roleBadge = role==='pfr'
     ? `<span class="sit-badge pfr">AGGRESSOR (PFR)</span>`
@@ -2210,12 +2275,15 @@ function renderSituation() {
   const ipBadge = ip
     ? `<span class="sit-badge ip">IN POSITION</span>`
     : `<span class="sit-badge oop">OUT OF POSITION</span>`;
-  const posBadge = `<span class="sit-badge pos">${position}</span>`;
+  const posBadge   = `<span class="sit-badge pos">${position}</span>`;
+  const oppBadge   = `<span class="sit-badge opp">vs ${oppPosition||'BB'} · ${opp.width}%</span>`;
+  const multiBadge = numOpponents > 1 ? `<span class="sit-badge multi">MULTIWAY (${numOpponents} Gegner)</span>` : '';
 
   // Opponent info
+  const multiStr = numOpponents > 1 ? ` + 1 Caller · MULTIWAY` : '';
   const oppInfo = role === 'pfr'
-    ? 'BB hat gecallt · Gegner checkt · Du bist am Zug'
-    : `BTN hat geraist · C-Bet wahrscheinlich · Du bist am Zug`;
+    ? `${oppPosition} hat gecallt${multiStr} · Du bist am Zug`
+    : `${oppPosition||'BTN'} hat geraist (${opp.width}% Range) · C-Bet wahrscheinlich`;
 
   // Action buttons
   const actBtns = actions.map(a => `
@@ -2230,6 +2298,8 @@ function renderSituation() {
         ${roleBadge}
         ${posBadge}
         ${ipBadge}
+        ${oppBadge}
+        ${multiBadge}
         <span style="font-size:12px;color:var(--muted);margin-left:auto">${oppInfo}</span>
       </div>
 
