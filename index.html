@@ -729,6 +729,14 @@ body {
 .trainer-topbar .btn-stats{padding:8px 16px;font-size:13px;font-weight:bold;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;font-family:Arial,Helvetica,sans-serif;}
 .trainer-topbar .btn-stats:hover{border-color:#888;color:#fff;}
 
+
+/* Equity table in hand analysis */
+.eq-table { display:flex; flex-direction:column; gap:5px; margin-bottom:4px; }
+.eq-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; }
+.eq-row.eq-combined { border-top:1px solid var(--border); padding-top:5px; margin-top:2px; }
+.eq-type { font-size:13px; font-weight:bold; color:var(--text); }
+.eq-val  { font-size:12px; font-family:'Courier New', monospace; color:var(--muted); white-space:nowrap; }
+
 /* ══════════════════════════════
    MOBILE RESPONSIVE — max 640px
    Nur additions, nichts überschrieben
@@ -1871,61 +1879,104 @@ function getHoleHandStrength(hole, board) {
     goodKicker = notPaired >= 11; // J or better
   }
 
-  // DRAWS
+  // ── DRAWS ──
   const draws = [];
 
-  // Flush draw: 2 hole cards same suit, or 1 hole + 2 board same suit
-  const suitCounts = {};
-  [...hole,...board].forEach(c=>{const s=cardSuit(c);suitCounts[s]=(suitCounts[s]||0)+1;});
+  // ── 1. FLUSH DRAWS ──
+  // Need 4 cards of same suit = Flush Draw (9 outs, 1 needed)
+  // Need 3 cards of same suit = Backdoor FD (~2 outs, 2 needed)
   if (hS1===hS2) {
-    const holeSuit = hS1;
-    const boardOfSuit = boardSuits.filter(s=>s===holeSuit).length;
-    if (boardOfSuit===2) draws.push({type:'flush_draw',strength:3,label:'Flush Draw (9 Outs)'});
-    if (boardOfSuit===1) draws.push({type:'bdoor_fd',strength:1,label:'Backdoor Flush Draw'});
+    // Suited hole cards: 2 hole + board
+    const boardOfSuit = boardSuits.filter(s=>s===hS1).length;
+    if (boardOfSuit===2) draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
+    else if (boardOfSuit===1) draws.push({type:'bdoor_fd', strength:1, outs:1, label:'Backdoor Flush Draw'});
+    // boardOfSuit===0 → only 2 of suit → no draw
   } else {
-    // Check if one hole card matches 2 board suits
-    if (boardSuits.filter(s=>s===hS1).length>=2) draws.push({type:'flush_draw',strength:3,label:'Flush Draw (♥♦♣♠)'});
-    if (boardSuits.filter(s=>s===hS2).length>=2) draws.push({type:'flush_draw',strength:3,label:'Flush Draw (♥♦♣♠)'});
+    // Offsuit hole cards: at most 1 hole card contributes per suit
+    const fd1 = boardSuits.filter(s=>s===hS1).length; // board cards matching h1 suit
+    const fd2 = boardSuits.filter(s=>s===hS2).length; // board cards matching h2 suit
+    // 1 hole + 3 board = 4 → Flush Draw (monotone board matching one hole card)
+    if (fd1===3) draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
+    else if (fd2===3) draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
+    // 1 hole + 2 board = 3 → Backdoor FD
+    else if (fd1===2) draws.push({type:'bdoor_fd', strength:1, outs:1, label:'Backdoor Flush Draw'});
+    else if (fd2===2) draws.push({type:'bdoor_fd', strength:1, outs:1, label:'Backdoor Flush Draw'});
+    // 1 hole + 1 board = 2 → too weak, ignore
   }
 
-  // Straight draws
-  const allVals = [h1,h2,...boardVals].sort((a,b)=>a-b);
+  // ── 2. STRAIGHT DRAWS ──
+  const allVals    = [h1, h2, ...boardVals];
   const uniqueVals = [...new Set(allVals)];
+  let hasOESD = false, hasGutshot = false, hasBdoorStraight = false;
 
-  // OESD: 4 consecutive cards
-  let hasOESD = false, hasGutshot = false;
-  for (let i=0;i<uniqueVals.length-2;i++) {
-    const window4 = uniqueVals.filter(v=>v>=uniqueVals[i]&&v<=uniqueVals[i]+4);
-    if (window4.length>=4) {
-      // Does our hole card contribute?
-      const boardWindow = boardVals.filter(v=>v>=uniqueVals[i]&&v<=uniqueVals[i]+4);
-      if (window4.length===4 && (boardWindow.length<=2)) {
-        if (uniqueVals[i]>2 && uniqueVals[i]+4<15) { hasOESD=true; }
-        else hasGutshot=true;
-      } else if (window4.length===3 && boardWindow.length<=1) {
-        hasGutshot=true;
+  if (made.rank < 4) {
+    const valsWithAceLow = uniqueVals.includes(14)
+      ? [...new Set([...uniqueVals, 1])]
+      : uniqueVals;
+    const holeValsAceLow = [h1, h2, ...(h1===14||h2===14 ? [1] : [])];
+
+    for (let low = 1; low <= 10; low++) {
+      const hi = low + 4;
+      const inWindow  = valsWithAceLow.filter(v => v >= low && v <= hi);
+      const holeInWin = holeValsAceLow.filter(v => v >= low && v <= hi);
+
+      if (inWindow.length === 4 && holeInWin.length >= 1) {
+        const gap = [low,low+1,low+2,low+3,hi].find(v => !inWindow.includes(v));
+        if (gap === low || gap === hi) hasOESD = true;
+        else hasGutshot = true;
       }
-    }
-  }
-  // Gutshot: 4 in a window of 5 with 1 gap
-  for (let low=2;low<=10;low++) {
-    const window = [low,low+1,low+2,low+3,low+4];
-    const have = uniqueVals.filter(v=>window.includes(v));
-    const boardHave = boardVals.filter(v=>window.includes(v));
-    if (have.length===4 && !(made.rank >= 4)) {
-      const missing = window.filter(v=>!have.includes(v))[0];
-      const holeCont = have.filter(v=>[h1,h2].includes(v)).length;
-      if (holeCont>0) {
-        if (missing===low || missing===low+4) { hasOESD=true; break; }
-        else { hasGutshot=true; }
+      // Backdoor straight: 3 of 5 ranks present, at least 1 hole card
+      if (!hasOESD && !hasGutshot && inWindow.length === 3 && holeInWin.length >= 1) {
+        hasBdoorStraight = true;
       }
     }
   }
 
-  if (hasOESD && !draws.find(d=>d.type==='oesd')) draws.push({type:'oesd',strength:3,label:'OESD (8 Outs)'});
-  if (hasGutshot && !draws.find(d=>d.type==='gutshot') && !hasOESD) draws.push({type:'gutshot',strength:2,label:'Gutshot (4 Outs)'});
+  if (hasOESD)         draws.push({type:'oesd',          strength:3, outs:8,  label:'OESD (beidseitig offen)'});
+  if (hasGutshot && !hasOESD) draws.push({type:'gutshot', strength:2, outs:4,  label:'Gutshot (einseitig)'});
+  if (hasBdoorStraight && !hasOESD && !hasGutshot)
+                        draws.push({type:'bdoor_str',     strength:1, outs:1,  label:'Backdoor Straight Draw'});
 
-  // Overall draw strength
+  // ── 3. COMBO DRAW detection (FD + OESD or FD + Gutshot) ──
+  const hasFD   = draws.some(d=>d.type==='flush_draw');
+  const hasOESDd= draws.some(d=>d.type==='oesd');
+  const hasGutd = draws.some(d=>d.type==='gutshot');
+  if (hasFD && hasOESDd) {
+    // Remove individual entries, replace with combo
+    draws.splice(draws.findIndex(d=>d.type==='flush_draw'),1);
+    draws.splice(draws.findIndex(d=>d.type==='oesd'),1);
+    draws.unshift({type:'combo_draw', strength:4, outs:15, label:'Combo Draw (FD + OESD)'});
+  } else if (hasFD && hasGutd) {
+    draws.splice(draws.findIndex(d=>d.type==='flush_draw'),1);
+    draws.splice(draws.findIndex(d=>d.type==='gutshot'),1);
+    draws.unshift({type:'combo_draw', strength:3, outs:12, label:'Combo Draw (FD + Gutshot)'});
+  }
+
+  // ── 4. IMPROVEMENT OUTS ──
+  // a) Set draw: pocket pair below board → 2 outs to hit set
+  if (h1===h2 && h1 < topBoardCard && made.rank < 3) {
+    draws.push({type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairRankName(h1)})`});
+  }
+  // b) Overcards: unmatched hole cards ABOVE top board card → outs to top pair
+  if (made.rank === 0) { // only if we have nothing
+    const oc1 = !boardVals.includes(h1) && h1 > topBoardCard;
+    const oc2 = !boardVals.includes(h2) && h2 > topBoardCard;
+    if (oc1 && oc2) {
+      draws.push({type:'overcards', strength:2, outs:6, label:`Zwei Overcards (${pairRankName(h1)}+${pairRankName(h2)})`});
+    } else if (oc1) {
+      draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairRankName(h1)})`});
+    } else if (oc2) {
+      draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairRankName(h2)})`});
+    }
+  }
+  // c) If we have top pair but NOT with hole cards above it (e.g. AK on K72):
+  //    The non-paired card is a kicker-improving out counted above.
+  //    If we have a pocket pair ON the board (e.g. 88 on A83), show set-draw
+  if (h1===h2 && boardVals.includes(h1) && made.rank < 3) {
+    draws.push({type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairRankName(h1)})`});
+  }
+
+  // ── 5. OVERALL draw strength ──
   const drawStrength = draws.reduce((m,d)=>Math.max(m,d.strength),0);
 
   return {
@@ -1978,96 +2029,115 @@ function getCorrectAction(role, position, ip, boardInfo, handStrength, vs3bet, o
   const {texture, paired, connected, monotone} = boardInfo;
   const {madeStrength, drawStrength, madeLabel, draws, goodKicker} = handStrength;
 
-  // Opponent range info — used to adjust advice
-  const opp = oppRangeLabel(oppPosition || 'BTN');
+  const opp      = oppRangeLabel(oppPosition || 'BTN');
   const oppTight = opp.tightness === 'very_tight' || opp.tightness === 'tight';
   const oppWide  = opp.tightness === 'very_wide'  || opp.tightness === 'wide';
   const multi    = (numOpponents || 1) > 1;
-
   const wet = texture === 'wet';
   const dry = texture === 'dry';
   const mid = texture === 'mid';
 
+  // Helper: draw label string
+  const strongDraws = draws.filter(d => d.strength >= 3).map(d => d.label).join(' + ');
+
   if (role === 'pfr') {
-    // AS AGGRESSOR (C-BET decision)
-    // Strong made hand
-    if (madeStrength >= 3) { // set, 2pair, overpair, straight, flush
-      if (wet || monotone)     return {action:'bet_big',   label:'Bet 60–75%', reason:`${madeLabel} auf nassem Board — Wert maximieren und Draws teuer machen.`};
-      if (dry || paired)       return {action:'bet_small', label:'Bet 25–40%', reason:`${madeLabel} auf dry Board — kleiner Bet lockt Calls, zu groß schreckt ab.`};
-      return                          {action:'bet_mid',   label:'Bet 50%',    reason:`${madeLabel} — mittlerer Bet auf diesem Board.`};
+    // ── C-BET DECISION ──
+    // Multiway: only bet strong made hands, no bluffs
+    if (multi && madeStrength < 2 && drawStrength < 3) {
+      return {action:'check', label:'Check', reason:`Multiway: ohne starke Hand kein C-Bet — zu viele Gegner (${numOpponents}) müssen alle folden.`};
     }
-    // Top Pair
+
+    // Monster hand (Set, Überpaar, 2-Pair, Straight, Flush)
+    if (madeStrength >= 3) {
+      if (wet || monotone) return {action:'bet_big',   label:'Bet 60–75%', reason:`${madeLabel} auf nassem Board — Wert maximieren und Draws teuer machen. Großer Bet schützt.`};
+      if (dry || paired)   return {action:'bet_small', label:'Bet 25–40%', reason:`${madeLabel} auf dry Board — kleiner Bet lockt Calls. Zu groß schreckt ab.`};
+      return                      {action:'bet_mid',   label:'Bet 50%',    reason:`${madeLabel} — mittlerer Bet auf diesem Board.`};
+    }
+
+    // Top Pair (good or weak kicker)
     if (madeStrength === 2) {
-      if (wet)  return {action:'bet_mid',   label:'Bet 50–66%', reason:`Top Pair auf nassem Board — Wert + Schutz vor Draws. Nicht zu klein betten!`};
-      if (dry || paired) return {action:'bet_small', label:'Bet 25–33%', reason:`Top Pair auf dry Board — kleiner Bet am effizientesten.`};
-      return           {action:'bet_mid',   label:'Bet 50%',    reason:`Top Pair — mittlerer Bet.`};
+      if (wet || monotone) return {action:'bet_mid',   label:'Bet 50–66%', reason:`Top Pair auf nassem Board — Wert + Schutz. Nicht zu klein betten, Draws sind teuer!`};
+      if (dry || paired)   return {action:'bet_small', label:'Bet 25–33%', reason:`Top Pair auf dry Board — kleiner Bet am effizientesten. Lockt Calls von schwächeren Händen.`};
+      return                      {action:'bet_mid',   label:'Bet 50%',    reason:`Top Pair — mittlerer Bet.`};
     }
-    // Weaker pair
-    if (madeStrength === 1) {
-      if (wet)  return {action:'check', label:'Check', reason:`Mittleres/unteres Paar auf nassem Board — zu schwach für C-Bet. Check und Equity realisieren.`};
-      if (dry)  return {action:'check', label:'Check', reason:`Mittleres Paar auf dry Board — Pot-Kontrolle. Reagiere auf Gegner-Bet.`};
-      return           {action:'check', label:'Check', reason:`Mittleres Paar — eher checken und Turn sehen.`};
-    }
-    // Strong draw
+
+    // BUG FIX: Check draws BEFORE checking weak pairs.
+    // Middle pair + flush draw → Semi-Bluff, nicht check!
+    // Strong draw (Flush Draw / OESD) — auch mit schwachem Paar semi-bluffen
     if (drawStrength >= 3) {
-      const drawLabels = draws.filter(d=>d.strength>=3).map(d=>d.label).join(' + ');
-      if (wet || mid) return {action:'bet_mid', label:'Bet 50–66%', reason:`${drawLabels} — Semi-Bluff! Fold-Equity + Equity-Backup. Zwei Gewinnwege.`};
-      return                {action:'bet_small',label:'Bet 33%',    reason:`${drawLabels} auf dry Board — kleiner Semi-Bluff.`};
+      if (wet || monotone) return {action:'bet_big',   label:'Bet 50–66%', reason:`${strongDraws} auf nassem Board — Semi-Bluff mit starkem Draw. Fold-Equity + ~35% Equity-Backup.`};
+      if (mid)             return {action:'bet_mid',   label:'Bet 40–50%', reason:`${strongDraws} — Semi-Bluff. Zwei Gewinnwege: Fold jetzt oder Draw treffen auf Turn/River.`};
+      return                      {action:'bet_small', label:'Bet 25–33%', reason:`${strongDraws} auf dry Board — kleiner Semi-Bluff. Auch ohne Treffer kommt manchmal Fold.`};
     }
-    // Medium draw (gutshot)
+
+    // Weak pair (middle/bottom) — nach Draw-Check, damit pair+draw oben gefangen wird
+    if (madeStrength === 1) {
+      if (wet)           return {action:'check', label:'Check', reason:`Mittleres/unteres Paar auf nassem Board — zu schwach für C-Bet ohne Draw-Backup. Check.`};
+      if (dry || paired) return {action:'check', label:'Check', reason:`Mittleres Paar auf dry Board — Pot-Kontrolle. Check und auf Gegner-Bet reagieren.`};
+      return                    {action:'check', label:'Check', reason:`Mittleres Paar — eher checken und Turn sehen.`};
+    }
+
+    // Gutshot (medium draw, kein starkes Backup)
     if (drawStrength === 2) {
-      if (dry) return {action:'check', label:'Check', reason:`Gutshot allein (4 Outs) — zu schwach für C-Bet. Check und Turn evaluieren.`};
-      return         {action:'check', label:'Check', reason:`Gutshot auf nassem Board — ohne weiteres Backup lieber checken.`};
+      return {action:'check', label:'Check', reason:`Gutshot (4 Outs) — zu wenig Equity für C-Bet. Check und abwarten ob Turn die Situation verbessert.`};
     }
-    // Backdoor
-    if (drawStrength === 1) {
-      if (dry) return {action:'bet_small', label:'Bet 25–33%', reason:`Backdoor Draw + trockenes Board — kleiner C-Bet Bluff. Board trifft BB selten.`};
-      return         {action:'check',     label:'Check',      reason:`Nur Backdoor-Draw auf nassem Board — zu wenig Equity für C-Bet.`};
-    }
-    // Nothing
-    if (madeStrength === 0 && drawStrength === 0) {
-      if ((dry || paired)) return {action:'bet_small', label:'Bet 25–33%', reason:`Luft auf dry/paired Board — klassischer C-Bet Bluff. Board trifft BB sehr selten.`};
-      if (wet)             return {action:'check',     label:'Check',      reason:`Luft auf nassem Board — Gegner callt zu oft mit Draws. Kein Bluff ohne Backup.`};
-      return                      {action:'check',     label:'Check',      reason:`Luft — auf diesem Board lieber checken.`};
-    }
-    return {action:'check', label:'Check', reason:'Unklar — lieber checken und Turn-Entscheidung treffen.'};
+
+    // Backdoor draw oder reine Luft
+    if (dry || paired) return {action:'bet_small', label:'Bet 25–33%', reason:`Luft/Backdoor auf dry/paired Board — klassischer C-Bet Bluff. Board trifft BB-Range selten.`};
+    if (wet)           return {action:'check',     label:'Check',      reason:`Luft auf nassem Board — Gegner callt zu oft mit Draws. Kein Bluff ohne Equity-Backup.`};
+    return                    {action:'check',     label:'Check',      reason:`Luft auf mid Board — lieber checken.`};
 
   } else {
-    // AS CALLER (vs C-Bet or vs check)
-    if (madeStrength >= 4) { // flush, straight, full house
+    // ── CALLER (BB) — vs C-Bet ──
+
+    // Sehr starke Hand (Flush, Straight, Full House, Quads)
+    if (madeStrength >= 4) {
       return ip
-        ? {action:'raise', label:'Raise / Call', reason:`${madeLabel} — maximaler Wert. IP raise für Protection. OOP check-raise.`}
-        : {action:'check_raise', label:'Check-Raise', reason:`${madeLabel} OOP — check und raise den C-Bet. Mehr Wert als direktes Lead.`};
+        ? {action:'raise',       label:'Raise',       reason:`${madeLabel} — maximaler Wert. Als IP direkt raisen.`}
+        : {action:'check_raise', label:'Check-Raise',  reason:`${madeLabel} OOP — check und raise den C-Bet. Holt mehr Wert als direktes Lead.`};
     }
-    if (madeStrength === 3) { // Set, 2pair, overpair
-      if (wet) return {action:'raise', label:'Raise', reason:`${madeLabel} auf nassem Board — Raise für Protection und Wert.`};
-      return          {action:'call',  label:'Call',  reason:`${madeLabel} auf dry Board — call und slow play für mehr Wert auf Turn/River.`};
+
+    // BUG FIX: Set / 2-Pair / Überpaar → raise/check-raise abhängig von Position UND Board
+    if (madeStrength === 3) {
+      if (wet && ip)  return {action:'raise',       label:'Raise',      reason:`${madeLabel} auf nassem Board, IP — Raise für Wert und Schutz vor Draws.`};
+      if (wet && !ip) return {action:'check_raise', label:'Check-Raise', reason:`${madeLabel} auf nassem Board, OOP — check-raise ist profitabler als direktes Lead.`};
+      if (dry && ip)  return {action:'call',        label:'Call',        reason:`${madeLabel} auf dry Board, IP — call und slow play. Auf Turn mehr Wert holen.`};
+      return                 {action:'call',         label:'Call',        reason:`${madeLabel} auf dry Board, OOP — call, Turn abwarten.`};
     }
-    if (madeStrength === 2 && goodKicker) { // TPGK
-      return {action:'call', label:'Call', reason:`Top Pair guter Kicker — call und Turn evaluieren. Gut genug um fortzufahren.`};
+
+    // Top Pair guter Kicker
+    if (madeStrength === 2 && goodKicker) {
+      if (wet && !ip) return {action:'check_raise', label:'Check-Raise (selten)', reason:`TPGK OOP auf nassem Board — gelegentlich check-raise als Semi-Bluff/Wert-Raise. Meistens callen.`};
+      return                 {action:'call',          label:'Call',                reason:`Top Pair guter Kicker — call und Turn evaluieren. Stark genug um fortzufahren.`};
     }
-    if (madeStrength === 2 && !goodKicker) { // TPWK
-      if (wet) return {action:'call',  label:'Call (vorsichtig)', reason:`Top Pair schwacher Kicker auf nassem Board — call aber bei starker Turn-Action oft folden.`};
-      return          {action:'call',  label:'Call', reason:`Top Pair schwacher Kicker — call auf dry Board, Turn evaluieren.`};
+
+    // Top Pair schwacher Kicker
+    if (madeStrength === 2 && !goodKicker) {
+      if (wet) return {action:'call', label:'Call (vorsichtig)', reason:`Top Pair schwacher Kicker auf nassem Board — call, aber bei starker Turn-Action oft folden.`};
+      return          {action:'call', label:'Call',              reason:`Top Pair schwacher Kicker — call auf dry Board, Turn evaluieren.`};
     }
-    if (madeStrength === 1) { // Middle/bottom pair
-      if (wet) return {action:'fold', label:'Fold', reason:`Mittleres/unteres Paar auf nassem Board — zu wenig Equity gegen C-Bet. Fold.`};
-      return          {action:'fold', label:'Fold (vs mittel/groß)', reason:`Mittleres Paar — nur gegen kleinen C-Bet mit guten Pot-Odds weiter.`};
+
+    // BUG FIX: Mittleres Paar — differenzierter (nicht immer fold)
+    if (madeStrength === 1) {
+      if (drawStrength >= 3) return {action:'call', label:'Call', reason:`Mittleres Paar + ${strongDraws} — kombinierte Equity reicht zum Callen. ~50% Equity.`};
+      if (wet)               return {action:'fold', label:'Fold', reason:`Mittleres/unteres Paar auf nassem Board — zu wenig Equity gegen C-Bet. Fold.`};
+      return                        {action:'fold', label:'Fold', reason:`Mittleres Paar — fold gegen Standard C-Bet. Nur gegen sehr kleinen Bet (< 25%) call möglich.`};
     }
-    // Draws
+
+    // Draws (ohne Pair)
     if (drawStrength >= 3) {
-      const drawLabels = draws.filter(d=>d.strength>=3).map(d=>d.label).join('+');
-      if (ip)  return {action:'call',  label:'Call / Raise', reason:`${drawLabels} — Pot-Odds meist gut genug. IP: Semi-Bluff Raise möglich.`};
-      return          {action:'call',  label:'Call',         reason:`${drawLabels} — Call ist Standard. OOP vorsichtiger.`};
+      if (ip)  return {action:'raise', label:'Raise (Semi-Bluff)', reason:`${strongDraws} IP — Semi-Bluff Raise mit ~35% Equity-Backup. Fold-Equity + Draw-Equity kombiniert.`};
+      return          {action:'call',  label:'Call',                reason:`${strongDraws} OOP — Call ist Standard. ~35% Equity bis River rechtfertigt Call.`};
     }
-    if (drawStrength === 2) { // Gutshot
-      return {action:'fold', label:'Fold', reason:`Gutshot (4 Outs, ~17%) — Pot-Odds oft nicht gut genug. Fold gegen mittelgroße/große Bets.`};
+
+    // Gutshot allein
+    if (drawStrength === 2) {
+      if (ip && dry) return {action:'call', label:'Call (tight)', reason:`Gutshot auf dry Board, IP — implizite Odds können Call rechtfertigen. ~17% Equity.`};
+      return                {action:'fold', label:'Fold',          reason:`Gutshot allein (4 Outs, ~17%) — Pot-Odds gegen C-Bet meist nicht gut genug. Fold.`};
     }
-    // Nothing
-    if (ip && madeStrength === 0) {
-      return {action:'bet_small', label:'Probe-Bet (IP)', reason:`Nichts, aber du bist IP und Gegner checkt — kleiner Probe-Bet holt Fold-Equity.`};
-    }
-    return {action:'fold', label:'Fold', reason:'Nichts und keine Draws — fold gegen jeden Bet.'};
+
+    // Nichts (madeStrength=0, drawStrength=0)
+    return {action:'fold', label:'Fold', reason:'Weder Hand noch Draw — fold gegen jeden C-Bet.'};
   }
 }
 
@@ -2265,6 +2335,70 @@ function renderSituation() {
     ? draws.map(d=>`<span style="color:${d.strength>=3?'var(--blue)':'var(--purple)'}">${d.label}</span>`).join(' + ')
     : `<span class="ha-nothing">Keine Draws</span>`;
 
+  // Outs & Equity calculation
+  const MADE_EQUITY = {
+    5: {label:'Flush / Straight',   equity:'~85–95%', outs:'—'},
+    4: {label:'Straight / Flush',   equity:'~80–90%', outs:'—'},
+    3: {label:'Set / 2-Pair / ÜP',  equity:'~70–80%', outs:'—'},
+    2: {label:'Top Pair',           equity:'~60–70%', outs:'—'},
+    1: {label:'Mittleres Paar',     equity:'~45–55%', outs:'—'},
+    0: {label:'High Card',          equity:'~25–35%', outs:'—'},
+  };
+  const DRAW_EQUITY = {
+    flush_draw:  {outs:9,    eq_turn:'19%',  eq_river:'35%'},
+    oesd:        {outs:8,    eq_turn:'17%',  eq_river:'32%'},
+    gutshot:     {outs:4,    eq_turn:'9%',   eq_river:'17%'},
+    bdoor_fd:    {outs:'~1', eq_turn:'—',    eq_river:'~4%'},
+    bdoor_str:   {outs:'~2', eq_turn:'—',    eq_river:'~5%'},
+    combo_draw:  {outs:'12–15', eq_turn:'25–32%', eq_river:'45–54%'},
+    set_draw:    {outs:2,    eq_turn:'4%',   eq_river:'8%'},
+    overcards:   {outs:6,    eq_turn:'13%',  eq_river:'24%'},
+    overcard:    {outs:3,    eq_turn:'6%',   eq_river:'12%'},
+  };
+
+  // Build equity rows
+  let equityRows = '';
+  // Made hand equity
+  const madeEq = MADE_EQUITY[madeStrength] || MADE_EQUITY[0];
+  equityRows += `<div class="eq-row">
+    <span class="eq-type">${madeLabel}</span>
+    <span class="eq-val" style="color:${haStrengthColor}">~${
+      madeStrength>=3?'70–85%':madeStrength===2?'60–70%':madeStrength===1?'45–55%':'25–35%'
+    } Equity</span>
+  </div>`;
+
+  // Draw equities
+  draws.forEach(d => {
+    const de = DRAW_EQUITY[d.type] || {outs: d.outs||'?', eq_turn:'—', eq_river:'—'};
+    const col = d.strength>=4?'#ff9800':d.strength>=3?'var(--blue)':d.strength===2?'#90caf9':'var(--purple)';
+    const isBdoor = d.type==='bdoor_fd'||d.type==='bdoor_str';
+    const isImprove = d.type==='set_draw'||d.type==='overcards'||d.type==='overcard';
+    if (isBdoor || isImprove) {
+      equityRows += `<div class="eq-row">
+        <span class="eq-type" style="color:${col}">${d.label}</span>
+        <span class="eq-val">${de.outs} Outs &nbsp;·&nbsp; ${de.eq_river} Equity</span>
+      </div>`;
+    } else {
+      equityRows += `<div class="eq-row">
+        <span class="eq-type" style="color:${col}">${d.label}</span>
+        <span class="eq-val">${de.outs} Outs &nbsp;·&nbsp; Turn: ${de.eq_turn} &nbsp;·&nbsp; River: ${de.eq_river}</span>
+      </div>`;
+    }
+  });
+
+  // Combined equity if pair + draw
+  if (madeStrength >= 1 && draws.some(d=>d.strength>=3)) {
+    const topDraw = draws.find(d=>d.strength>=3);
+    const de = DRAW_EQUITY[topDraw.type];
+    if (de) {
+      const combined = madeStrength>=2 ? '~65–75%' : '~50–60%';
+      equityRows += `<div class="eq-row eq-combined">
+        <span class="eq-type">Kombiniert (Paar + Draw)</span>
+        <span class="eq-val" style="color:var(--green)">${combined} Equity</span>
+      </div>`;
+    }
+  }
+
   // Opponent range — declared first so all badges can use it
   const opp = oppRangeLabel(oppPosition || 'BTN');
 
@@ -2339,8 +2473,8 @@ function renderSituation() {
 
       <div class="hand-analysis">
         <div class="ha-title">Deine Hand auf diesem Flop</div>
-        <div class="ha-strength" style="color:${haStrengthColor}">${madeLabel}</div>
-        <div style="color:${haDrawColor}">${drawText}</div>
+        <div class="eq-table">${equityRows}</div>
+        <div style="color:${haDrawColor};margin-top:6px;font-size:12px">${drawText}</div>
       </div>
     </div>
 
