@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Poker Strategy Suite – NL6max</title>
 <style>
+/* ══════════════════════════════════════════════════════
+   DESIGN SYSTEM — CSS Variables & Reset
+══════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -29,9 +32,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   line-height: 1.5;
+  min-height: 100vh;
 }
 
-/* ── NAV ── */
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
 .topnav {
   background: #111;
   border-bottom: 2px solid #444;
@@ -68,11 +74,12 @@ body {
 .nav-tab:hover { color: #fff; }
 .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* ── PAGES ── */
+/* ══════════════════════════════════════════════════════
+   PAGE LAYOUT
+══════════════════════════════════════════════════════ */
 .page { display: none; padding: 20px 16px 60px; max-width: 960px; margin: 0 auto; }
 .page.active { display: block; }
 
-/* ── SECTION HEADER ── */
 .sec-title {
   font-size: 20px;
   font-weight: bold;
@@ -87,37 +94,11 @@ body {
   margin-bottom: 18px;
 }
 
-/* ── SUBTABS ── */
-.subtabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 16px;
-  border-bottom: 2px solid var(--border);
-}
-.subtab {
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  color: var(--muted);
-  border: none;
-  background: none;
-  font-family: Arial, Helvetica, sans-serif;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
-  transition: color .1s;
-}
-.subtab:hover { color: #fff; }
-.subtab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.subsection { display: none; }
-.subsection.active { display: block; }
+/* ══════════════════════════════════════════════════════
+   UTILITY COMPONENTS
+══════════════════════════════════════════════════════ */
 
-/* ── LAYOUT ── */
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-@media(max-width:640px) { .row2, .row3 { grid-template-columns: 1fr; } }
-
-/* ── CARDS ── */
+/* Box / Card */
 .box {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -133,58 +114,7 @@ body {
   margin-bottom: 8px;
 }
 
-/* ── BUTTONS ── */
-.btn-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
-.btn-row:last-child { margin-bottom: 0; }
-.opt {
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  background: var(--bg3);
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 13px;
-  font-family: Arial, Helvetica, sans-serif;
-  transition: all .1s;
-}
-.opt:hover { border-color: #888; color: #fff; }
-.opt.sel {
-  background: #1a3a5c;
-  border-color: var(--accent);
-  color: #fff;
-  font-weight: bold;
-}
-
-/* ── RESULT ── */
-.result {
-  border: 2px solid;
-  background: var(--bg2);
-  padding: 16px;
-  margin-top: 8px;
-}
-.result.green { border-color: var(--green); }
-.result.amber { border-color: var(--amber); }
-.result.red   { border-color: var(--red); }
-.result.blue  { border-color: var(--blue); }
-
-.result-title {
-  font-size: 17px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-.result.green .result-title { color: var(--green); }
-.result.amber .result-title { color: var(--amber); }
-.result.red   .result-title { color: var(--red); }
-.result.blue  .result-title { color: var(--blue); }
-
-.result-why {
-  font-size: 13px;
-  color: #ccc;
-  line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
-
+/* Tags */
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .tag {
   font-size: 11px;
@@ -192,44 +122,24 @@ body {
   padding: 2px 8px;
   border: 1px solid;
 }
-.tag-g { border-color: var(--green); color: var(--green); background: rgba(76,175,80,.12); }
-.tag-r { border-color: var(--red);   color: var(--red);   background: rgba(244,67,54,.12); }
-.tag-a { border-color: var(--amber); color: var(--amber); background: rgba(255,152,0,.12); }
-.tag-b { border-color: var(--blue);  color: var(--blue);  background: rgba(100,181,246,.12); }
-.tag-p { border-color: var(--purple);color:var(--purple); background: rgba(206,147,216,.12); }
+.tag-g { border-color: var(--green);  color: var(--green);  background: rgba(76,175,80,.12); }
+.tag-r { border-color: var(--red);    color: var(--red);    background: rgba(244,67,54,.12); }
+.tag-a { border-color: var(--amber);  color: var(--amber);  background: rgba(255,152,0,.12); }
+.tag-b { border-color: var(--blue);   color: var(--blue);   background: rgba(100,181,246,.12); }
+.tag-p { border-color: var(--purple); color: var(--purple); background: rgba(206,147,216,.12); }
 
-.acts-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.act-box {
-  flex: 1; min-width: 130px;
-  border: 1px solid var(--border);
-  background: var(--bg3);
-  padding: 10px 12px;
-}
-.act-box.primary {
-  border-color: var(--accent);
-  background: #1a3a5c;
-}
-.act-lbl { font-size: 11px; color: var(--muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
-.act-val { font-size: 14px; font-weight: bold; color: #fff; }
+/* Divider */
+.divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 
-.size-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
-.size-val { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
-.result.green .size-val { color: var(--green); }
-.result.amber .size-val { color: var(--amber); }
-.result.red   .size-val { color: var(--red); }
-.result.blue  .size-val { color: var(--blue); }
-.bar-bg { height: 8px; background: var(--bg3); border: 1px solid var(--border); margin-bottom: 4px; }
-.bar-fill { height: 8px; transition: width .3s; }
-.result.green .bar-fill { background: var(--green); }
-.result.amber .bar-fill { background: var(--amber); }
-.result.red   .bar-fill { background: var(--red); }
-.result.blue  .bar-fill { background: var(--blue); }
-.bar-marks { display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); }
+/* Reference Table */
+.ref-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ref-tbl th { text-align: left; padding: 7px 10px; background: var(--bg3); color: var(--muted); border: 1px solid var(--border); font-weight: bold; text-transform: uppercase; font-size: 11px; }
+.ref-tbl td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; line-height: 1.5; color: #ccc; }
+.ref-tbl td:first-child { font-weight: bold; color: #fff; white-space: nowrap; }
 
-
-/* ══════════════════════════════
+/* ══════════════════════════════════════════════════════
    PREFLOP RANGE GRID
-══════════════════════════════ */
+══════════════════════════════════════════════════════ */
 .pos-btns { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
 .pos-btn {
   padding: 7px 18px;
@@ -256,10 +166,10 @@ body {
   gap: 16px;
   flex-wrap: wrap;
 }
-.pos-name-big { font-size: 26px; font-weight: bold; color: var(--accent); min-width: 56px; }
-.pos-note-txt { font-size: 13px; color: var(--muted); }
-.pos-pct-big { font-size: 22px; font-weight: bold; color: #fff; margin-left: auto; }
-.pos-combos { font-size: 12px; color: var(--dim); text-align: right; }
+.pos-name-big  { font-size: 26px; font-weight: bold; color: var(--accent); min-width: 56px; }
+.pos-note-txt  { font-size: 13px; color: var(--muted); }
+.pos-pct-big   { font-size: 22px; font-weight: bold; color: #fff; margin-left: auto; }
+.pos-combos    { font-size: 12px; color: var(--dim); text-align: right; }
 
 .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; align-items: center; }
 .leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
@@ -277,19 +187,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 .rg td:hover { outline: 2px solid #fff; }
-.rg th.rl {
-  font-size: 11px; font-weight: bold; color: var(--muted);
-  width: 20px; min-width: 20px;
-  text-align: center; border: none; padding: 0;
-}
-.rg th.ct {
-  font-size: 11px; font-weight: bold; color: var(--muted);
-  text-align: center; border: none; padding: 3px 0;
-}
-.h4 { background: #2a2080; }
-.hc { background: #1b5e20; }
-.hr { background: #e65100; color: #fff; }
-.hf { background: #222; color: #555; font-weight: normal; }
+.rg th.rl { font-size: 11px; font-weight: bold; color: var(--muted); width: 20px; min-width: 20px; text-align: center; border: none; padding: 0; }
+.rg th.ct { font-size: 11px; font-weight: bold; color: var(--muted); text-align: center; border: none; padding: 3px 0; }
+
+/* Range cell colors */
+.h4 { background: #2a2080; }  /* 4-bet / always raise */
+.hc { background: #1b5e20; }  /* raise + call 3-bet */
+.hr { background: #e65100; }  /* raise + fold vs 3-bet */
+.hf { background: #222; color: #555; font-weight: normal; } /* fold */
 
 .hand-tip {
   background: var(--bg2);
@@ -313,145 +218,90 @@ body {
 .pov-pos { font-size: 11px; color: var(--muted); font-weight: bold; margin-bottom: 2px; }
 .pov-pct { font-size: 18px; font-weight: bold; }
 
+/* ══════════════════════════════════════════════════════
+   POSTFLOP TRAINER
+══════════════════════════════════════════════════════ */
 
-/* ══════════════════════════════
-   BOARDS
-══════════════════════════════ */
-.board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-bottom: 12px; }
-.board-card {
-  background: var(--bg2);
-  border: 2px solid var(--border);
-  padding: 12px;
+/* Trainer top bar */
+.trainer-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 0 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.btn-new {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: bold;
+  border: 2px solid var(--green);
+  background: rgba(76,175,80,.15);
+  color: var(--green);
   cursor: pointer;
-}
-.board-card:hover { border-color: #888; }
-.board-card.active { border-color: var(--accent); background: #1a3a5c; }
-.bc-board { font-size: 16px; font-weight: bold; margin-bottom: 4px; font-family: 'Courier New', monospace; }
-.bc-lbl { font-size: 11px; color: var(--muted); }
-
-.board-info { background: var(--bg2); border: 1px solid var(--border); padding: 14px; }
-.bi-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; font-family: 'Courier New', monospace; }
-.bi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-@media(max-width:560px) { .bi-grid { grid-template-columns: 1fr; } }
-.bi-lbl { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-.bi-txt { font-size: 12px; color: #ccc; line-height: 1.5; }
-.stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-.stat-box { background: var(--bg3); border: 1px solid var(--border); padding: 8px 10px; }
-.stat-lbl { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-.stat-bar { height: 6px; background: #333; margin-bottom: 4px; }
-.stat-val { font-size: 13px; font-weight: bold; }
-
-/* ══════════════════════════════
-   REFERENCE TABLE
-══════════════════════════════ */
-.ref-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
-.ref-tbl th { text-align: left; padding: 7px 10px; background: var(--bg3); color: var(--muted); border: 1px solid var(--border); font-weight: bold; text-transform: uppercase; font-size: 11px; }
-.ref-tbl td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; line-height: 1.5; color: #ccc; }
-.ref-tbl td:first-child { font-weight: bold; color: #fff; white-space: nowrap; }
-.badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 2px 8px; border: 1px solid; }
-.bdg-g { border-color: var(--green); color: var(--green); }
-.bdg-r { border-color: var(--red);   color: var(--red); }
-.bdg-a { border-color: var(--amber); color: var(--amber); }
-.bdg-b { border-color: var(--blue);  color: var(--blue); }
-
-/* Equity mini cards */
-.eq-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap: 8px; margin-top: 14px; }
-.eq-box { background: var(--bg2); border: 1px solid var(--border); padding: 10px; }
-.eq-lbl { font-size: 11px; color: var(--muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
-.eq-val { font-size: 16px; font-weight: bold; margin-bottom: 2px; }
-.eq-sub { font-size: 11px; color: var(--dim); }
-
-/* cbet ref row */
-.cbref-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 8px; margin-top: 14px; }
-.cbref-box { background: var(--bg2); border: 1px solid var(--border); padding: 10px; }
-.cbref-top { font-size: 12px; font-weight: bold; margin-bottom: 3px; }
-.cbref-val { font-size: 13px; font-weight: bold; font-family: 'Courier New', monospace; }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg:     #1a1a1a;
-  --bg2:    #242424;
-  --bg3:    #2e2e2e;
-  --border: #444;
-  --text:   #f0f0f0;
-  --muted:  #aaa;
-  --dim:    #555;
-  --green:  #4caf50;
-  --amber:  #ff9800;
-  --red:    #f44336;
-  --blue:   #64b5f6;
-  --purple: #ce93d8;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
 }
+.btn-new:hover { background: rgba(76,175,80,.28); }
+.btn-stats {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: bold;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.btn-stats:hover { border-color: #888; color: #fff; }
 
-/* NAV */
-.topnav {
-  background: #111;
-  border-bottom: 2px solid #444;
-  padding: 0 16px;
+/* Scoreboard */
+.scorebar {
+  background: transparent;
+  border: none;
+  padding: 0;
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 16px;
-}
-.nav-logo {
-  color: #fff;
-  font-size: 15px;
-  font-weight: bold;
-  padding: 12px 16px 12px 0;
-  border-right: 1px solid #444;
-}
-.nav-info {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-/* SCORE BAR */
-.scorebar {
-  background: #111;
-  border-bottom: 1px solid var(--border);
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
   flex-wrap: wrap;
 }
 .score-item { font-size: 13px; }
-.score-item span { font-weight: bold; font-size: 15px; }
-.score-item .correct { color: var(--green); }
-.score-item .wrong   { color: var(--red); }
-.score-item .pct     { color: var(--blue); }
-.score-item .streak  { color: var(--amber); }
+.score-item span           { font-weight: bold; font-size: 15px; }
+.score-item .correct       { color: var(--green); }
+.score-item .wrong         { color: var(--red); }
+.score-item .pct           { color: var(--blue); }
+.score-item .streak        { color: var(--amber); }
 
-.btn-small {
-  padding: 5px 12px;
+/* Mode / Filter bar */
+.mode-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  align-items: center;
+}
+.mode-bar-label { font-size: 12px; font-weight: bold; color: var(--muted); margin-right: 4px; }
+.mode-btn {
+  padding: 4px 12px;
   font-size: 12px;
   font-weight: bold;
   border: 1px solid var(--border);
   background: var(--bg3);
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
   font-family: Arial, Helvetica, sans-serif;
-  margin-left: auto;
 }
-.btn-small:hover { border-color: #888; }
+.mode-btn:hover { color: #fff; border-color: #888; }
+.mode-btn.active { border-color: var(--accent); color: var(--blue); background: rgba(100,181,246,.1); }
 
-/* MAIN LAYOUT */
-.main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px 16px 60px;
-}
+/* Progress bar */
+.prog-bar-wrap { height: 4px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+.prog-bar      { height: 4px; background: var(--green); transition: width .3s; }
 
-/* SITUATION BOX */
+/* Situation box */
 .situation {
   background: var(--bg2);
   border: 2px solid var(--border);
@@ -472,15 +322,15 @@ body {
   border: 1px solid;
   text-transform: uppercase;
 }
-.sit-badge.pfr    { border-color: var(--green); color: var(--green); }
-.sit-badge.caller { border-color: var(--amber); color: var(--amber); }
-.sit-badge.ip     { border-color: var(--blue); color: var(--blue); }
-.sit-badge.oop    { border-color: #aaa; color: #aaa; }
-.sit-badge.pos    { border-color: var(--purple); color: var(--purple); }
-.sit-badge.opp   { border-color: var(--amber);  color: var(--amber); }
-.sit-badge.multi { border-color: var(--red);    color: var(--red); }
+.sit-badge.pfr    { border-color: var(--green);  color: var(--green); }
+.sit-badge.caller { border-color: var(--amber);  color: var(--amber); }
+.sit-badge.ip     { border-color: var(--blue);   color: var(--blue); }
+.sit-badge.oop    { border-color: #aaa;           color: #aaa; }
+.sit-badge.pos    { border-color: var(--purple);  color: var(--purple); }
+.sit-badge.opp    { border-color: var(--amber);   color: var(--amber); }
+.sit-badge.multi  { border-color: var(--red);     color: var(--red); }
 
-/* CARDS */
+/* Playing cards */
 .cards-row {
   display: flex;
   align-items: flex-start;
@@ -495,11 +345,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 6px;
 }
-.cards-display {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+.cards-display { display: flex; gap: 6px; flex-wrap: wrap; }
 .card {
   width: 52px;
   height: 74px;
@@ -515,16 +361,12 @@ body {
   color: #000;
   user-select: none;
 }
-.card.red-card  { color: #cc0000; }
-.card.hidden {
-  background: #2a2a5a;
-  border-color: #444;
-  color: transparent;
-}
+.card.red-card { color: #cc0000; }
+.card.hidden   { background: #2a2a5a; border-color: #444; color: transparent; }
 .card-rank { font-size: 20px; line-height: 1; }
 .card-suit { font-size: 16px; line-height: 1; }
 
-/* POT INFO */
+/* Pot info strip */
 .pot-info {
   display: flex;
   gap: 16px;
@@ -535,30 +377,24 @@ body {
   margin-bottom: 14px;
   font-size: 13px;
 }
-.pot-item { }
 .pot-item b { color: var(--amber); font-size: 15px; }
 
-/* BOARD ANALYSIS */
-.board-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 14px;
-}
+/* Board texture tags */
+.board-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .btag {
   font-size: 11px;
   font-weight: bold;
   padding: 3px 9px;
   border: 1px solid;
 }
-.btag-dry  { border-color: #888; color: #ccc; }
-.btag-wet  { border-color: var(--red); color: var(--red); }
-.btag-mid  { border-color: var(--amber); color: var(--amber); }
+.btag-dry  { border-color: #888;          color: #ccc; }
+.btag-wet  { border-color: var(--red);    color: var(--red); }
+.btag-mid  { border-color: var(--amber);  color: var(--amber); }
 .btag-pair { border-color: var(--purple); color: var(--purple); }
-.btag-fd   { border-color: var(--blue); color: var(--blue); }
-.btag-adv  { border-color: var(--green); color: var(--green); }
+.btag-fd   { border-color: var(--blue);   color: var(--blue); }
+.btag-adv  { border-color: var(--green);  color: var(--green); }
 
-/* HAND ANALYSIS */
+/* Hand analysis panel */
 .hand-analysis {
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -566,12 +402,16 @@ body {
   margin-bottom: 16px;
   font-size: 13px;
 }
-.ha-title { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; margin-bottom:6px; }
-.ha-strength { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
-.ha-draws { color: var(--blue); font-size: 13px; }
-.ha-nothing { color: var(--dim); font-size: 13px; }
+.ha-title    { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
 
-/* ACTION BUTTONS */
+/* Equity table */
+.eq-table  { display: flex; flex-direction: column; gap: 5px; margin-bottom: 4px; }
+.eq-row    { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+.eq-row.eq-combined { border-top: 1px solid var(--border); padding-top: 5px; margin-top: 2px; }
+.eq-type   { font-size: 13px; font-weight: bold; color: var(--text); }
+.eq-val    { font-size: 12px; font-family: 'Courier New', monospace; color: var(--muted); white-space: nowrap; }
+
+/* Action buttons */
 .action-section { margin-bottom: 14px; }
 .action-label {
   font-size: 12px;
@@ -598,15 +438,14 @@ body {
   text-align: left;
   transition: border-color .1s;
 }
-.action-btn:hover { border-color: #888; }
-.action-btn .ab-name { font-size: 14px; font-weight: bold; }
-.action-btn .ab-desc { font-size: 11px; color: var(--muted); margin-top: 3px; }
-
+.action-btn:hover           { border-color: #888; }
+.action-btn .ab-name        { font-size: 14px; font-weight: bold; }
+.action-btn .ab-desc        { font-size: 11px; color: var(--muted); margin-top: 3px; }
 .action-btn.selected-correct { border-color: var(--green); background: rgba(76,175,80,.15); }
 .action-btn.selected-wrong   { border-color: var(--red);   background: rgba(244,67,54,.15); }
 .action-btn.show-correct     { border-color: var(--green); background: rgba(76,175,80,.08); }
 
-/* FEEDBACK */
+/* Feedback panel */
 .feedback {
   display: none;
   border: 2px solid;
@@ -615,33 +454,14 @@ body {
 }
 .feedback.correct { border-color: var(--green); }
 .feedback.wrong   { border-color: var(--red); }
-
-.fb-verdict {
-  font-size: 17px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
+.fb-verdict       { font-size: 17px; font-weight: bold; margin-bottom: 8px; }
 .feedback.correct .fb-verdict { color: var(--green); }
 .feedback.wrong   .fb-verdict { color: var(--red); }
-
-.fb-text {
-  font-size: 13px;
-  color: #ccc;
-  line-height: 1.65;
-  margin-bottom: 12px;
-}
-
-.fb-detail {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  font-size: 12px;
-  color: #bbb;
-  line-height: 1.6;
-}
+.fb-text   { font-size: 13px; color: #ccc; line-height: 1.65; margin-bottom: 12px; }
+.fb-detail { background: var(--bg3); border: 1px solid var(--border); padding: 10px 14px; font-size: 12px; color: #bbb; line-height: 1.6; }
 .fb-detail b { color: var(--text); }
 
-/* NEXT BUTTON */
+/* Next hand button */
 .next-btn {
   display: none;
   padding: 12px 28px;
@@ -656,240 +476,73 @@ body {
 }
 .next-btn:hover { background: rgba(76,175,80,.25); }
 
-/* DIFFICULTY */
-.diff-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-}
-.diff-label { font-size: 12px; font-weight: bold; color: var(--muted); }
-.diff-btn {
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: bold;
-  border: 1px solid var(--border);
-  background: var(--bg3);
-  color: var(--muted);
-  cursor: pointer;
-  font-family: Arial, Helvetica, sans-serif;
-}
-.diff-btn:hover { color: #fff; border-color: #888; }
-.diff-btn.active { border-color: var(--accent, var(--blue)); color: var(--blue); background: rgba(100,181,246,.1); }
-
-/* PROGRESS BAR */
-.prog-bar-wrap {
-  height: 4px;
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-}
-.prog-bar { height: 4px; background: var(--green); transition: width .3s; }
-
-/* STATS MODE */
-.stats-box {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 16px;
-  margin-bottom: 14px;
-}
+/* Stats */
+.stats-box   { background: var(--bg2); border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; }
 .stats-title { font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #fff; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap: 8px; }
-.stat-card { background: var(--bg3); border: 1px solid var(--border); padding: 10px; }
-.stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
-.stat-val { font-size: 20px; font-weight: bold; }
+.stats-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 8px; }
+.stat-card   { background: var(--bg3); border: 1px solid var(--border); padding: 10px; }
+.stat-lbl    { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
+.stat-val    { font-size: 20px; font-weight: bold; }
 
-/* Filter bar */
-.filter-bar {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-  align-items: center;
-}
-.filter-lbl { font-size: 12px; font-weight: bold; color: var(--muted); margin-right: 4px; }
-.filter-btn {
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: bold;
-  border: 1px solid var(--border);
-  background: var(--bg3);
-  color: var(--muted);
-  cursor: pointer;
-  font-family: Arial, Helvetica, sans-serif;
-}
-.filter-btn:hover { color: #fff; }
-.filter-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(100,181,246,.1); }
-
-/* TRAINER additional */
-.trainer-topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px;}
-.trainer-topbar .btn-new{padding:8px 20px;font-size:13px;font-weight:bold;border:2px solid var(--green);background:rgba(76,175,80,.15);color:var(--green);cursor:pointer;font-family:Arial,Helvetica,sans-serif;}
-.trainer-topbar .btn-new:hover{background:rgba(76,175,80,.28);}
-.trainer-topbar .btn-stats{padding:8px 16px;font-size:13px;font-weight:bold;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;font-family:Arial,Helvetica,sans-serif;}
-.trainer-topbar .btn-stats:hover{border-color:#888;color:#fff;}
-
-
-/* Equity table in hand analysis */
-.eq-table { display:flex; flex-direction:column; gap:5px; margin-bottom:4px; }
-.eq-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; }
-.eq-row.eq-combined { border-top:1px solid var(--border); padding-top:5px; margin-top:2px; }
-.eq-type { font-size:13px; font-weight:bold; color:var(--text); }
-.eq-val  { font-size:12px; font-family:'Courier New', monospace; color:var(--muted); white-space:nowrap; }
-
-/* ══════════════════════════════
-   MOBILE RESPONSIVE — max 640px
-   Nur additions, nichts überschrieben
-══════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE — Mobile ≤ 640px
+══════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-
-  /* NAV: scrollbar statt wrapping */
-  .topnav {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    flex-wrap: nowrap;
-    padding: 0 8px;
-    gap: 0;
-  }
-  .nav-logo { font-size: 13px; padding: 10px 10px 10px 0; white-space: nowrap; }
-  .nav-tab  { padding: 10px 10px; font-size: 12px; white-space: nowrap; }
-
-  /* PAGES */
-  .page { padding: 12px 10px 50px; }
-
-  /* TITLES */
+  .topnav { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; padding: 0 8px; gap: 0; }
+  .nav-logo { font-size: 13px; padding: 10px 10px 10px 0; }
+  .nav-tab  { padding: 10px 10px; font-size: 12px; }
+  .page     { padding: 12px 10px 50px; }
   .sec-title { font-size: 16px; }
   .sec-sub   { font-size: 12px; margin-bottom: 14px; }
 
-  /* SUBTABS: scroll horizontal */
-  .subtabs {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    flex-wrap: nowrap;
-    gap: 0;
-  }
-  .subtab { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
-
-  /* DIFF-BAR: wrap + smaller */
-  .diff-bar { flex-wrap: wrap; gap: 4px; padding: 8px 0 10px; }
-  .diff-btn, .filter-btn { padding: 4px 8px; font-size: 11px; }
-
-  /* SCORE BAR */
-  .scorebar { gap: 10px; padding: 6px 10px; }
-  .score-item { font-size: 12px; }
-
-  /* GRIDS: immer 1 Spalte auf Mobile */
-  .row2, .row3 { grid-template-columns: 1fr; }
-
-  /* BOX padding kleiner */
-  .box { padding: 12px 10px; }
-  .box-label { font-size: 10px; }
-
-  /* BUTTONS kleiner */
-  .opt { padding: 5px 10px; font-size: 12px; }
-
-  /* RESULT BOX */
-  .result { padding: 12px 12px 12px 14px; }
-  .result-title { font-size: 15px; }
-  .result-why   { font-size: 12px; }
-  .acts-row { flex-direction: column; }
-  .act-box  { min-width: 0; }
-
-  /* ── PREFLOP RANGE GRID ──
-     Kleinere Zellen + horizontales Scrollen */
+  /* Preflop range */
   .range-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .rg td   { width: 36px; height: 28px; font-size: 9px; }
+  .rg td { width: 36px; height: 28px; font-size: 9px; }
   .rg th.rl, .rg th.ct { font-size: 9px; width: 16px; min-width: 16px; }
-
-  /* POS BANNER */
   .pos-info { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
   .pos-name-big { font-size: 20px; }
   .pos-pct-big  { font-size: 18px; }
-  .pos-combos   { font-size: 11px; }
-
-  /* POS BUTTONS */
   .pos-btns { gap: 4px; }
   .pos-btn  { padding: 6px 10px; font-size: 12px; min-width: 44px; }
-
-  /* POS OVERVIEW 6er Grid bleibt 6 Spalten aber kompakter */
   .pos-overview { gap: 4px; }
   .pov-card { padding: 6px 2px; }
   .pov-pos  { font-size: 10px; }
   .pov-pct  { font-size: 15px; }
-
-  /* LEGEND */
-  .legend { gap: 8px; }
+  .legend   { gap: 8px; }
   .legend .leg { font-size: 11px; }
   .legend .leg-sq { width: 12px; height: 12px; }
 
-  /* BOARD GRID */
-  .board-grid { grid-template-columns: repeat(2, 1fr); }
-  .bc-board   { font-size: 14px; }
-  .bc-lbl     { font-size: 10px; }
-
-  /* BOARD INFO */
-  .bi-grid { grid-template-columns: 1fr; }
-  .stat-row { grid-template-columns: 1fr; gap: 6px; }
-
-  /* CARDS (trainer) */
-  .card { width: 40px; height: 56px; font-size: 14px; }
+  /* Trainer */
+  .trainer-topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .btn-new   { width: 100%; text-align: center; padding: 10px; }
+  .btn-stats { width: 100%; text-align: center; padding: 10px; }
+  .mode-bar  { flex-wrap: wrap; gap: 4px; padding: 8px 0 10px; }
+  .mode-btn  { padding: 4px 8px; font-size: 11px; }
+  .scorebar  { flex-wrap: wrap; gap: 10px; }
+  .score-item { font-size: 12px; }
+  .card { width: 40px; height: 56px; }
   .card-rank { font-size: 15px; }
   .card-suit { font-size: 12px; }
   .cards-row { gap: 12px; }
-
-  /* ACTION BUTTONS (trainer) */
   .action-grid { grid-template-columns: 1fr 1fr; }
   .action-btn  { padding: 10px 10px; }
   .action-btn .ab-name { font-size: 13px; }
   .action-btn .ab-desc { font-size: 10px; }
-
-  /* TRAINER TOPBAR */
-  .trainer-topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .trainer-topbar .btn-new   { width: 100%; text-align: center; padding: 10px; }
-  .trainer-topbar .btn-stats { width: 100%; text-align: center; padding: 10px; }
-  .scorebar { flex-wrap: wrap; }
-
-  /* FEEDBACK */
   .fb-text   { font-size: 12px; }
   .fb-detail { font-size: 11px; }
-
-  /* NEXT BUTTON */
-  .next-btn { padding: 12px; font-size: 13px; }
-
-  /* REFERENCE TABLE: scroll */
+  .next-btn  { padding: 12px; font-size: 13px; }
+  .pot-info  { gap: 10px; font-size: 12px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ref-tbl { font-size: 11px; }
   .ref-tbl th, .ref-tbl td { padding: 5px 6px; }
-
-  /* EQ GRID */
-  .eq-grid    { grid-template-columns: repeat(2, 1fr); }
-  .cbref-grid { grid-template-columns: repeat(2, 1fr); }
-
-  /* STATS */
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-
-  /* POT INFO */
-  .pot-info { gap: 10px; font-size: 12px; flex-wrap: wrap; }
-
-  /* HAND TIP */
-  .hand-tip { font-size: 12px; padding: 6px 10px; }
-
-  /* BAR */
-  .bar-marks { font-size: 9px; }
-
-  /* TAGS */
-  .tag { font-size: 10px; padding: 2px 6px; }
   .tags { gap: 4px; }
-  .btag { font-size: 10px; padding: 2px 6px; }
+  .tag  { font-size: 10px; padding: 2px 6px; }
   .board-tags { gap: 4px; }
-
-  /* HAND ANALYSIS */
-  .hand-analysis { padding: 8px 10px; }
-  .ha-strength { font-size: 14px; }
+  .btag { font-size: 10px; padding: 2px 6px; }
 }
 
-/* Extra klein (z.B. iPhone SE, 375px) */
 @media (max-width: 400px) {
-  .rg td   { width: 28px; height: 24px; font-size: 8px; }
+  .rg td { width: 28px; height: 24px; font-size: 8px; }
   .rg th.rl, .rg th.ct { width: 13px; min-width: 13px; font-size: 8px; }
   .action-grid { grid-template-columns: 1fr; }
   .card { width: 36px; height: 50px; }
@@ -899,16 +552,19 @@ body {
 </head>
 <body>
 
+<!-- ══════════════════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════════════════ -->
 <nav class="topnav">
   <div class="nav-logo">POKER SUITE</div>
-  <button class="nav-tab active" onclick="goPage('preflop',this)">Preflop Ranges</button>
-  <button class="nav-tab" onclick="goPage('flop',this)">Flop Strategie</button>
-  <button class="nav-tab" onclick="goPage('cbet',this)">C-Bet Guide</button>
-  <button class="nav-tab" onclick="goPage('trainer',this)">Postflop Trainer</button>
+  <button class="nav-tab active" onclick="goPage('preflop', this)">Preflop Ranges</button>
+  <button class="nav-tab"        onclick="goPage('trainer', this)">Postflop Trainer</button>
 </nav>
 
 
-<!-- ════════════════ PAGE 1: PREFLOP ════════════════ -->
+<!-- ══════════════════════════════════════════════════════
+     PAGE: PREFLOP RANGES
+══════════════════════════════════════════════════════ -->
 <div class="page active" id="page-preflop">
   <div class="sec-title">Preflop Ranges — 6-max NL, 100bb</div>
   <div class="sec-sub">GTO-Näherung. Klick auf eine Position oder eine Hand für Details.</div>
@@ -934,711 +590,47 @@ body {
     <div class="box-label" style="margin-bottom:8px;">Schnell-Navigation nach Position</div>
     <div class="pos-overview">
       <div class="pov-card active" id="pov-utg" onclick="switchPos('UTG')"><div class="pov-pos">UTG</div><div class="pov-pct" style="color:var(--red)">14%</div></div>
-      <div class="pov-card" id="pov-mp"  onclick="switchPos('MP')"><div class="pov-pos">MP</div><div class="pov-pct" style="color:var(--amber)">20%</div></div>
-      <div class="pov-card" id="pov-co"  onclick="switchPos('CO')"><div class="pov-pos">CO</div><div class="pov-pct" style="color:var(--amber)">28%</div></div>
-      <div class="pov-card" id="pov-btn" onclick="switchPos('BTN')"><div class="pov-pos">BTN</div><div class="pov-pct" style="color:var(--green)">48%</div></div>
-      <div class="pov-card" id="pov-sb"  onclick="switchPos('SB')"><div class="pov-pos">SB</div><div class="pov-pct" style="color:var(--blue)">37%</div></div>
-      <div class="pov-card" id="pov-bb"  onclick="switchPos('BB')"><div class="pov-pos">BB</div><div class="pov-pct" style="color:var(--blue)">65%</div></div>
+      <div class="pov-card"        id="pov-mp"  onclick="switchPos('MP')"> <div class="pov-pos">MP</div> <div class="pov-pct" style="color:var(--amber)">20%</div></div>
+      <div class="pov-card"        id="pov-co"  onclick="switchPos('CO')"> <div class="pov-pos">CO</div> <div class="pov-pct" style="color:var(--amber)">28%</div></div>
+      <div class="pov-card"        id="pov-btn" onclick="switchPos('BTN')"><div class="pov-pos">BTN</div><div class="pov-pct" style="color:var(--green)">48%</div></div>
+      <div class="pov-card"        id="pov-sb"  onclick="switchPos('SB')"> <div class="pov-pos">SB</div> <div class="pov-pct" style="color:var(--blue)">37%</div></div>
+      <div class="pov-card"        id="pov-bb"  onclick="switchPos('BB')"> <div class="pov-pos">BB</div> <div class="pov-pct" style="color:var(--blue)">65%</div></div>
     </div>
   </div>
 </div>
 
 
-<!-- ════════════════ PAGE 2: FLOP ════════════════ -->
-<div class="page" id="page-flop">
-  <div class="sec-title">Flop Strategie</div>
-  <div class="sec-sub">Entscheidungshilfe für alle Flop-Situationen als Aggressor und Caller.</div>
-
-  <div class="subtabs">
-    <button class="subtab active" onclick="switchSub('fsub','fd',this)">Entscheidung</button>
-    <button class="subtab" onclick="switchSub('fsub','fb',this)">Board-Textures</button>
-    <button class="subtab" onclick="switchSub('fsub','fc',this)">Als Caller</button>
-    <button class="subtab" onclick="switchSub('fsub','fr',this)">Referenz</button>
-  </div>
-
-  <!-- Entscheidung -->
-  <div class="subsection active" id="fsub-fd">
-    <div class="row2">
-      <div>
-        <div class="box">
-          <div class="box-label">Rolle im Pot</div>
-          <div class="btn-row">
-            <button class="opt sel" data-g="frole" data-v="ag" onclick="pick(this,'f')">Aggressor (ich hab geraist)</button>
-            <button class="opt" data-g="frole" data-v="cal" onclick="pick(this,'f')">Caller (ich hab gecallt)</button>
-          </div>
-          <div class="box-label">Position</div>
-          <div class="btn-row">
-            <button class="opt sel" data-g="fpos" data-v="ip" onclick="pick(this,'f')">In Position (IP)</button>
-            <button class="opt" data-g="fpos" data-v="oop" onclick="pick(this,'f')">Out of Position (OOP)</button>
-          </div>
-          <div class="box-label">Gegner</div>
-          <div class="btn-row">
-            <button class="opt sel" data-g="fopp" data-v="hu" onclick="pick(this,'f')">Heads-up</button>
-            <button class="opt" data-g="fopp" data-v="multi" onclick="pick(this,'f')">Multiway (2+ Gegner)</button>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="box">
-          <div class="box-label">Hand-Stärke</div>
-          <div class="btn-row">
-            <button class="opt sel" data-g="fhand" data-v="nuts" onclick="pick(this,'f')">Set / 2-Pair oder besser</button>
-            <button class="opt" data-g="fhand" data-v="top" onclick="pick(this,'f')">Top Pair guter Kicker</button>
-            <button class="opt" data-g="fhand" data-v="mid" onclick="pick(this,'f')">Mittleres Paar / schwaches TP</button>
-            <button class="opt" data-g="fhand" data-v="draw" onclick="pick(this,'f')">Starker Draw (FD / OESD)</button>
-            <button class="opt" data-g="fhand" data-v="air" onclick="pick(this,'f')">Nichts / Luft</button>
-          </div>
-          <div class="box-label">Board-Texture</div>
-          <div class="btn-row">
-            <button class="opt sel" data-g="fboard" data-v="dry" onclick="pick(this,'f')">Dry  (K72r, A83r)</button>
-            <button class="opt" data-g="fboard" data-v="mid" onclick="pick(this,'f')">Mittel  (JT6, Q85s)</button>
-            <button class="opt" data-g="fboard" data-v="wet" onclick="pick(this,'f')">Wet / Connected  (JT9, 876)</button>
-            <button class="opt" data-g="fboard" data-v="paired" onclick="pick(this,'f')">Gepaired  (AA5, KK2)</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="box">
-      <div class="box-label">Gegner-Aktion auf dem Flop</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="foppact" data-v="check" onclick="pick(this,'f')">Checkt</button>
-        <button class="opt" data-g="foppact" data-v="bet33" onclick="pick(this,'f')">Bettet klein (25–33%)</button>
-        <button class="opt" data-g="foppact" data-v="bet66" onclick="pick(this,'f')">Bettet mittel (50–75%)</button>
-        <button class="opt" data-g="foppact" data-v="pot" onclick="pick(this,'f')">Bettet groß (80–100%)</button>
-        <button class="opt" data-g="foppact" data-v="raise" onclick="pick(this,'f')">Raised meinen Bet</button>
-      </div>
-    </div>
-    <div id="result-f"></div>
-  </div>
-
-  <!-- Board Textures -->
-  <div class="subsection" id="fsub-fb">
-    <div class="board-grid">
-      <div class="board-card active" onclick="selBoard(this,'k72r')"><div class="bc-board" style="color:#ffcc80">K♥ 7♦ 2♣</div><div class="bc-lbl">Rainbow · Sehr dry</div></div>
-      <div class="board-card" onclick="selBoard(this,'a83r')"><div class="bc-board" style="color:#ffcc80">A♠ 8♦ 3♥</div><div class="bc-lbl">Ace-High · Dry</div></div>
-      <div class="board-card" onclick="selBoard(this,'jt6s')"><div class="bc-board" style="color:#90caf9">J♥ T♦ 6♥</div><div class="bc-lbl">1 Flush Draw · Mittel</div></div>
-      <div class="board-card" onclick="selBoard(this,'q85s')"><div class="bc-board" style="color:#90caf9">Q♠ 8♠ 5♠</div><div class="bc-lbl">Monotone · Wet</div></div>
-      <div class="board-card" onclick="selBoard(this,'jt9')"><div class="bc-board" style="color:#ef9a9a">J♣ T♥ 9♦</div><div class="bc-lbl">Very Connected · Wet</div></div>
-      <div class="board-card" onclick="selBoard(this,'876')"><div class="bc-board" style="color:#ef9a9a">8♠ 7♥ 6♦</div><div class="bc-lbl">Low Connected · Wet</div></div>
-      <div class="board-card" onclick="selBoard(this,'aa5')"><div class="bc-board" style="color:#ce93d8">A♣ A♦ 5♥</div><div class="bc-lbl">Hoch gepaired</div></div>
-      <div class="board-card" onclick="selBoard(this,'qq8')"><div class="bc-board" style="color:#ce93d8">Q♥ Q♠ 8♣</div><div class="bc-lbl">Mittel gepaired</div></div>
-      <div class="board-card" onclick="selBoard(this,'kjs')"><div class="bc-board" style="color:#a5d6a7">K♠ J♠ 4♠</div><div class="bc-lbl">Monotone High</div></div>
-      <div class="board-card" onclick="selBoard(this,'t54')"><div class="bc-board" style="color:#a5d6a7">T♥ 5♦ 4♣</div><div class="bc-lbl">Low Connected · Mittel</div></div>
-    </div>
-    <div id="board-info" class="board-info"><div style="color:var(--muted)">Klick auf ein Board oben.</div></div>
-  </div>
-
-  <!-- Als Caller -->
-  <div class="subsection" id="fsub-fc">
-    <div class="row2">
-      <div class="box">
-        <div class="box-label">Position</div>
-        <div class="btn-row">
-          <button class="opt sel" data-g="cpos" data-v="ip" onclick="pick(this,'c')">In Position (IP)</button>
-          <button class="opt" data-g="cpos" data-v="oop" onclick="pick(this,'c')">Out of Position (OOP)</button>
-        </div>
-        <div class="box-label">Hand-Stärke</div>
-        <div class="btn-row">
-          <button class="opt sel" data-g="chand" data-v="strong" onclick="pick(this,'c')">Set / 2-Pair</button>
-          <button class="opt" data-g="chand" data-v="tpgk" onclick="pick(this,'c')">Top Pair guter Kicker</button>
-          <button class="opt" data-g="chand" data-v="tpwk" onclick="pick(this,'c')">Top Pair schwacher Kicker</button>
-          <button class="opt" data-g="chand" data-v="mppair" onclick="pick(this,'c')">Mittleres / unteres Paar</button>
-          <button class="opt" data-g="chand" data-v="fd" onclick="pick(this,'c')">Flush Draw</button>
-          <button class="opt" data-g="chand" data-v="oesd" onclick="pick(this,'c')">OESD</button>
-          <button class="opt" data-g="chand" data-v="gut" onclick="pick(this,'c')">Gutshot</button>
-          <button class="opt" data-g="chand" data-v="air" onclick="pick(this,'c')">Nichts</button>
-        </div>
-      </div>
-      <div class="box">
-        <div class="box-label">Gegner C-Bet Größe</div>
-        <div class="btn-row">
-          <button class="opt sel" data-g="cbet" data-v="none" onclick="pick(this,'c')">Kein C-Bet (checkt)</button>
-          <button class="opt" data-g="cbet" data-v="small" onclick="pick(this,'c')">Klein (25–33%)</button>
-          <button class="opt" data-g="cbet" data-v="mid" onclick="pick(this,'c')">Mittel (50–66%)</button>
-          <button class="opt" data-g="cbet" data-v="big" onclick="pick(this,'c')">Groß (75–100%)</button>
-        </div>
-        <div class="box-label">Board</div>
-        <div class="btn-row">
-          <button class="opt sel" data-g="cboard" data-v="dry" onclick="pick(this,'c')">Dry</button>
-          <button class="opt" data-g="cboard" data-v="wet" onclick="pick(this,'c')">Wet / Connected</button>
-          <button class="opt" data-g="cboard" data-v="paired" onclick="pick(this,'c')">Gepaired</button>
-        </div>
-        <div class="box-label">Gegner-Typ</div>
-        <div class="btn-row">
-          <button class="opt sel" data-g="ctype" data-v="unknown" onclick="pick(this,'c')">Unbekannt</button>
-          <button class="opt" data-g="ctype" data-v="aggro" onclick="pick(this,'c')">Aggro / blufft viel</button>
-          <button class="opt" data-g="ctype" data-v="nit" onclick="pick(this,'c')">Tight / Nit</button>
-        </div>
-      </div>
-    </div>
-    <div id="result-c"></div>
-  </div>
-
-  <!-- Referenz -->
-  <div class="subsection" id="fsub-fr">
-    <table class="ref-tbl">
-      <thead>
-        <tr><th>Situation</th><th>Aktion</th><th>Begründung</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Raiser · Dry · HU · IP</td><td><span class="badge bdg-g">C-Bet 25–33%</span></td><td>Board trifft BB selten. Kleiner Bet am effizientesten.</td></tr>
-        <tr><td>Raiser · Wet · HU · Wert</td><td><span class="badge bdg-g">C-Bet 60–75%</span></td><td>Draws teuer machen. Hand schützen.</td></tr>
-        <tr><td>Raiser · Multiway · keine Hand</td><td><span class="badge bdg-r">Check / Fold</span></td><td>Zu viele Gegner. Bluff EV negativ.</td></tr>
-        <tr><td>Set / 2-Pair · Wet Board</td><td><span class="badge bdg-g">Bet 66–80%</span></td><td>Wert + Protection. Draws dürfen nicht billig callen.</td></tr>
-        <tr><td>Caller · FD · IP · Bet klein</td><td><span class="badge bdg-b">Call / Raise</span></td><td>Semi-Bluff Raise holt Fold-Equity. ~35% Equity Backup.</td></tr>
-        <tr><td>Caller · OESD · OOP · Bet mittel</td><td><span class="badge bdg-b">Call</span></td><td>Check-Raise möglich. OOP vorsichtig.</td></tr>
-        <tr><td>Mittleres Paar · Bet groß</td><td><span class="badge bdg-r">Meist Fold</span></td><td>Großer Bet = Stärke. Mittleres Paar zu wenig Equity.</td></tr>
-        <tr><td>Top Pair · Gegner raised C-Bet</td><td><span class="badge bdg-a">Call / 3-Bet</span></td><td>Wet Board → Call. Dry Board → 3-Bet Value.</td></tr>
-        <tr><td>Gepairtes Board · keine Hand</td><td><span class="badge bdg-g">Klein betten</span></td><td>Paired Board trifft BB sehr selten. Sehr profitabel.</td></tr>
-        <tr><td>Caller · IP · Gegner checkt</td><td><span class="badge bdg-g">Bet 33–50%</span></td><td>Probe-Bet nutzt Fold-Equity. Check zurück nur mit Showdown.</td></tr>
-        <tr><td>Gutshot · Dry · Bet klein</td><td><span class="badge bdg-a">Call / Check</span></td><td>~16% Equity auf Turn. Implizite Odds prüfen.</td></tr>
-      </tbody>
-    </table>
-    <div class="eq-grid">
-      <div class="eq-box"><div class="eq-lbl">Flush Draw</div><div class="eq-val" style="color:var(--blue)">~35%</div><div class="eq-sub">bis River · 19% Turn</div></div>
-      <div class="eq-box"><div class="eq-lbl">OESD</div><div class="eq-val" style="color:var(--green)">~32%</div><div class="eq-sub">bis River · 17% Turn</div></div>
-      <div class="eq-box"><div class="eq-lbl">FD + Gutshot</div><div class="eq-val" style="color:var(--purple)">~54%</div><div class="eq-sub">bis River · Monster-Draw</div></div>
-      <div class="eq-box"><div class="eq-lbl">Gutshot</div><div class="eq-val" style="color:var(--amber)">~17%</div><div class="eq-sub">bis River · 9% Turn</div></div>
-      <div class="eq-box"><div class="eq-lbl">Überpaar</div><div class="eq-val" style="color:var(--green)">~70–80%</div><div class="eq-sub">vs. zwei Overcards HU</div></div>
-      <div class="eq-box"><div class="eq-lbl">Backdoor FD</div><div class="eq-val" style="color:var(--muted)">~4%</div><div class="eq-sub">bis River · nur Bonus</div></div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ════════════════ PAGE 3: C-BET ════════════════ -->
-<div class="page" id="page-cbet">
-  <div class="sec-title">C-Bet Guide</div>
-  <div class="sec-sub">Wähle deine Situation — du erhältst sofort Empfehlung und optimale Bet-Größe.</div>
-
-  <div class="row2">
-    <div class="box">
-      <div class="box-label">Position</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="bpos" data-v="ip" onclick="pick(this,'b')">In Position (IP)</button>
-        <button class="opt" data-g="bpos" data-v="oop" onclick="pick(this,'b')">Out of Position (OOP)</button>
-      </div>
-      <div class="box-label">Gegner</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="bopp" data-v="hu" onclick="pick(this,'b')">Heads-up</button>
-        <button class="opt" data-g="bopp" data-v="multi" onclick="pick(this,'b')">Multiway (2+ Gegner)</button>
-      </div>
-      <div class="box-label">Board-Texture</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="bboard" data-v="dry" onclick="pick(this,'b')">Dry  (K72r, A83r)</button>
-        <button class="opt" data-g="bboard" data-v="mid" onclick="pick(this,'b')">Mittel  (JT6, Q85s)</button>
-        <button class="opt" data-g="bboard" data-v="wet" onclick="pick(this,'b')">Wet  (JT9, 876, flush)</button>
-      </div>
-    </div>
-    <div class="box">
-      <div class="box-label">Deine Hand</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="bhand" data-v="top" onclick="pick(this,'b')">Top Pair oder besser</button>
-        <button class="opt" data-g="bhand" data-v="draw" onclick="pick(this,'b')">Starker Draw (FD / OESD)</button>
-        <button class="opt" data-g="bhand" data-v="weak" onclick="pick(this,'b')">Schwach / Luft</button>
-      </div>
-      <div class="box-label">Range Advantage</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="brange" data-v="good" onclick="pick(this,'b')">Ich habe Range-Advantage</button>
-        <button class="opt" data-g="brange" data-v="even" onclick="pick(this,'b')">Neutral / unklar</button>
-        <button class="opt" data-g="brange" data-v="bad" onclick="pick(this,'b')">Gegner hat Advantage</button>
-      </div>
-      <div class="box-label">Stack-zu-Pot (SPR)</div>
-      <div class="btn-row">
-        <button class="opt sel" data-g="bspr" data-v="deep" onclick="pick(this,'b')">Deep  (SPR &gt; 6)</button>
-        <button class="opt" data-g="bspr" data-v="mid" onclick="pick(this,'b')">Mittel  (SPR 3–6)</button>
-        <button class="opt" data-g="bspr" data-v="short" onclick="pick(this,'b')">Short  (SPR &lt; 3)</button>
-      </div>
-    </div>
-  </div>
-  <div id="result-b"></div>
-
-  <div style="margin-top:16px;">
-    <div class="box-label" style="margin-bottom:8px;">Schnell-Referenz · Bet-Größen nach Situation</div>
-    <div class="cbref-grid">
-      <div class="cbref-box"><div class="cbref-top" style="color:var(--blue)">Dry · HU · IP</div><div class="cbref-val">25–33% Pot</div></div>
-      <div class="cbref-box"><div class="cbref-top" style="color:var(--green)">Wet · HU · Wert</div><div class="cbref-val">60–75% Pot</div></div>
-      <div class="cbref-box"><div class="cbref-top" style="color:var(--amber)">Multiway · Wert</div><div class="cbref-val">50–66% Pot</div></div>
-      <div class="cbref-box"><div class="cbref-top" style="color:var(--purple)">Semi-Bluff · Draw</div><div class="cbref-val">50–66% Pot</div></div>
-      <div class="cbref-box"><div class="cbref-top" style="color:var(--muted)">Pure Bluff · Dry</div><div class="cbref-val">25–33% Pot</div></div>
-      <div class="cbref-box"><div class="cbref-top" style="color:var(--red)">Short SPR · Wert</div><div class="cbref-val">66–100% / All-In</div></div>
-    </div>
-  </div>
-</div>
-
-
-<script>
-// ══ PAGE NAV ══
-function goPage(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  el.classList.add('active');
-  if (id === 'flop') { renderF(); renderC(); }
-  if (id === 'cbet') renderB();
-  if (id === 'trainer') {
-    loadScores(); updateScoreboard(); dealNew();
-  }
-}
-
-// ══ SUBTABS ══
-function switchSub(prefix, id, el) {
-  document.querySelectorAll(`[id^="${prefix}-"]`).forEach(s => s.classList.remove('active'));
-  el.closest('.subtabs').querySelectorAll('.subtab').forEach(t => t.classList.remove('active'));
-  document.getElementById(prefix+'-'+id).classList.add('active');
-  el.classList.add('active');
-  if (id === 'fb') selBoard(document.querySelector('.board-card.active'), 'k72r');
-}
-
-// ══ STATE & PICK ══
-const sF={frole:'ag',fpos:'ip',fopp:'hu',fhand:'nuts',fboard:'dry',foppact:'check'};
-const sC={cpos:'ip',chand:'strong',cbet:'none',cboard:'dry',ctype:'unknown'};
-const sB={bpos:'ip',bopp:'hu',bboard:'dry',bhand:'top',brange:'good',bspr:'deep'};
-
-function pick(btn, ns) {
-  const g = btn.dataset.g;
-  document.querySelectorAll(`[data-g="${g}"]`).forEach(b => b.classList.remove('sel'));
-  btn.classList.add('sel');
-  if (ns==='f') { sF[g]=btn.dataset.v; renderF(); }
-  else if (ns==='c') { sC[g]=btn.dataset.v; renderC(); }
-  else if (ns==='b') { sB[g]=btn.dataset.v; renderB(); }
-}
-
-// ══ RESULT BUILDER ══
-function mkResult(color, title, why, tags, acts, sz, sv) {
-  const tagsH = tags.map(([c,t]) => `<span class="tag ${c}">${t}</span>`).join('');
-  const actsH = acts.map(a =>
-    `<div class="act-box ${a.p?'primary':''}">
-       <div class="act-lbl">${a.l}</div>
-       <div class="act-val">${a.v}</div>
-     </div>`).join('');
-  let sizeH = '';
-  if (sz) {
-    sizeH = `<hr class="divider">
-      <div class="size-lbl">Empfohlene Bet-Größe</div>
-      <div class="size-val">${sz}</div>
-      <div class="bar-bg"><div class="bar-fill" style="width:${sv}%"></div></div>
-      <div class="bar-marks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>`;
-  }
-  return `<div class="result ${color}">
-    <div class="result-title">${title}</div>
-    <div class="result-why">${why}</div>
-    <div class="tags">${tagsH}</div>
-    <hr class="divider">
-    <div style="font-size:11px;font-weight:bold;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Empfohlene Aktion</div>
-    <div class="acts-row">${actsH}</div>
-    ${sizeH}
-  </div>`;
-}
-
-// ══ FLOP DECISION ══
-function renderF() {
-  const {frole:role,fpos:pos,fopp:opp,fhand:hand,fboard:board,foppact:oppact} = sF;
-  let v='',c='',w='',tags=[],acts=[],sz='',sv=0;
-  const ag=role==='ag';
-  const ip=pos==='ip', oop=pos==='oop';
-  const hu=opp==='hu', multi=opp==='multi';
-  const dry=board==='dry', wet=board==='wet', paired=board==='paired';
-  const nuts=hand==='nuts', top=hand==='top', mid=hand==='mid', draw=hand==='draw', air=hand==='air';
-  const checked=oppact==='check', raised=oppact==='raise', betBig=oppact==='pot';
-
-  if (ag) {
-    if (nuts && wet) {
-      v='Bet groß — Protection + Wert'; c='green';
-      w='Set oder 2-Pair auf nassem Board: Wert maximieren UND Draws teuer machen. Kleiner Bet gibt Gegnern zu gute Odds für Draw-Calls.';
-      tags=[['tag-g','Wert-Bet'],['tag-g','Protection'],['tag-b','60–80% Pot']];
-      acts=[{l:'Primär',v:'Bet 60–80%',p:true}]; sz='60–80% des Pots'; sv=70;
-    } else if (nuts && (dry||paired)) {
-      v='Bet klein — Wert maximieren'; c='green';
-      w='Starke Hand auf dry Board. Kleiner Bet lockt Calls mit schlechteren Händen. Zu groß schreckt ab.';
-      tags=[['tag-g','Value Bet'],['tag-b','25–40% Pot'],['tag-a','Mix: Slowplay']];
-      acts=[{l:'Primär',v:'Bet 25–40%',p:true},{l:'Manchmal',v:'Check (slow play)'}]; sz='25–40% des Pots'; sv=33;
-    } else if (top && wet && raised) {
-      v='Entscheidung: Call oder Fold'; c='amber';
-      w = oppTight
-        ? `Gegner (${opp.label}) hat sehr enge Range — ein Raise auf nassem Board bedeutet meist Set oder 2-Pair. Eher folden oder sehr vorsichtig callen.`
-        : `Gegner (${opp.label}) hat weite Range — er raistet öfter mit Draws oder schwächeren Händen. Call ist hier meistens richtig.`;
-      tags = oppTight
-        ? [['tag-r','Vs Tight: Fold'],['tag-a','Range nur Sets/2P']]
-        : [['tag-b','Meist Call'],['tag-a','Vs Wide: Call sicher']];
-      acts = oppTight
-        ? [{l:'Vs Tight',v:'Fold/Vorsicht',p:true},{l:'Vs Wide',v:'Call'}]
-        : [{l:'Meist',v:'Call',p:true},{l:'Vs Tight (UTG)',v:'Fold'}];
-    } else if (top && wet) {
-      v='Bet 50–66% — Wert + Schutz'; c='green';
-      w='Top Pair auf nassem Board: Wert aufbauen UND Draws teuer machen. Kleiner Bet gibt Draws zu gute Odds.';
-      tags=[['tag-g','Value + Schutz'],['tag-b','50–66% Pot']];
-      acts=[{l:'Primär',v:'Bet 50–66%',p:true}]; sz='50–66% des Pots'; sv=58;
-    } else if (top && (dry||paired)) {
-      v='Bet klein — effiziente Wert-Bet'; c='green';
-      w='Top Pair, dry Board. Kleiner Bet ist am effizientesten — lockt Calls von 2nd Pair und Overcards.';
-      tags=[['tag-g','Value Bet'],['tag-b','25–33% Pot']];
-      acts=[{l:'Primär',v:'Bet 25–33%',p:true},{l:'OOP Mix',v:'Check'}]; sz='25–33% des Pots'; sv=29;
-    } else if (mid && wet && raised) {
-      v='Fold — zu wenig Equity'; c='red';
-      w='Mittleres Paar, nasses Board, Gegner raised. Fast immer Fold. Gegner zeigt hier Sets, 2-Pair oder starke Draws.';
-      tags=[['tag-r','Fold'],['tag-r','Wenig Equity']];
-      acts=[{l:'Standard',v:'Fold',p:true}];
-    } else if (mid && wet) {
-      v='Check — Pot-Kontrolle'; c='amber';
-      w='Mittleres Paar auf nassem Board: Nicht stark genug für großen Pot, nicht schwach genug um sofort aufzugeben. Check und Equity günstig realisieren.';
-      tags=[['tag-a','Pot-Kontrolle'],['tag-a','Equity realisieren']];
-      acts=[{l:'Primär',v:'Check',p:true},{l:'IP klein',v:'Bet 25–33%'}];
-    } else if (draw && !raised) {
-      v='Semi-Bluff — Bet 50–66%'; c='green';
-      w='Starker Draw + Initiative = perfekter Semi-Bluff Spot. Zwei Gewinnwege: Fold-Equity (Gegner foldet) + Equity-Backup (du triffst).';
-      tags=[['tag-g','Semi-Bluff'],['tag-g','Doppelte Equity'],['tag-b','50–66% Pot']];
-      acts=[{l:'Primär',v:'Bet 50–66%',p:true},{l:'Dry Board',v:'Bet 33%'}]; sz='50–66% des Pots'; sv=58;
-    } else if (air && (multi || numOpponents > 1)) {
-      v='Check — kein Bluff Multiway'; c='red';
-      w=`Luft gegen ${numOpponents||1} Gegner: Alle müssen folden — statistisch fast unmöglich. EV stark negativ. Check immer.`;
-      tags=[['tag-r','Kein Bluff'],['tag-r','Multiway']];
-      acts=[{l:'Standard',v:'Check',p:true}];
-    } else if (air && hu && (dry||paired)) {
-      v='C-Bet Bluff — 25–33%'; c='green';
-      w='Klassischer C-Bet Bluff: Dry oder Paired Board, Heads-up. Board trifft kaum jemanden. Kleiner Bet reicht völlig aus.';
-      tags=[['tag-g','Bluff-Spot'],['tag-b','25–33% Pot']];
-      acts=[{l:'Primär',v:'Bet 25–33%',p:true}]; sz='25–33% des Pots'; sv=29;
-    } else if (air && hu && wet) {
-      v='Check — zu riskant'; c='amber';
-      w='Luft auf nassem Board HU: Gegner callt oft mit Draws und Paaren. Ohne Equity-Backup langfristig verlieren.';
-      tags=[['tag-a','Kein Bluff wet'],['tag-a','Turn abwarten']];
-      acts=[{l:'Primär',v:'Check',p:true},{l:'Guter Turn',v:'Delayed C-Bet'}];
-    } else if (air && raised) {
-      v='Fold — keine Equity'; c='red';
-      w='Luft und Gegner raised: Fold. Keine Hand, kein Draw. Re-Bluff ohne Backup ist sehr teuer.';
-      tags=[['tag-r','Fold'],['tag-r','Keine Equity']];
-      acts=[{l:'Standard',v:'Fold',p:true}];
-    } else {
-      v='Situationsabhängig'; c='amber';
-      w='Grundregel: Mit Wert immer betten. Mit Draws semi-bluffen. Mit Luft nur auf Dry oder Paired Boards HU.';
-      tags=[['tag-a','Board analysieren']];
-      acts=[{l:'Basis',v:'Wert=Bet · Luft dry=Bet · Luft wet=Check',p:true}];
-    }
-  } else {
-    // CALLER
-    if (nuts && checked && ip) {
-      v='Bet 50–70% — Wert aufbauen'; c='green';
-      w='Gegner checkt, du hast Nuts in Position. Jetzt Wert bauen! Check zurück ist ein Fehler.';
-      tags=[['tag-g','Nuts IP'],['tag-b','50–70% Pot']];
-      acts=[{l:'Primär',v:'Bet 50–70%',p:true}]; sz='50–70% des Pots'; sv=60;
-    } else if (nuts && checked && oop) {
-      v='Check — dann Check-Raise'; c='green';
-      w='OOP mit Nuts: Check und warte den C-Bet ab. Dann raise. Holt mehr Wert als direktes Lead.';
-      tags=[['tag-g','Check-Raise'],['tag-a','OOP']];
-      acts=[{l:'Primär',v:'Check (warte C-Bet)',p:true},{l:'Falls C-Bet',v:'Raise 3x'}];
-    } else if (nuts) {
-      v='Call oder Raise — Board-abhängig'; c='green';
-      w='Nuts gegen C-Bet: Wet Board → Raise (Protection). Dry Board → Call (slow play für mehr Wert auf Turn/River).';
-      tags=[['tag-g','Nuts'],['tag-b','Wet: Raise · Dry: Call']];
-      acts=[{l:'Wet Board',v:'Raise 3x',p:true},{l:'Dry Board',v:'Call'}];
-    } else if (betBig && !nuts) {
-      v='Meist Fold'; c='red';
-      w='Großer Bet ohne starke Hand: Pot-Odds oft nicht ausreichend. Fold ist Standard.';
-      tags=[['tag-r','Fold'],['tag-a','Pot-Odds prüfen']];
-      acts=[{l:'Standard',v:'Fold',p:true}];
-    } else if (raised) {
-      v='Meist Fold'; c='red';
-      w='Gegner raised: Starkes Signal. Ohne starke Hand oder Monster-Draw folden.';
-      tags=[['tag-r','Fold']];
-      acts=[{l:'Standard',v:'Fold',p:true}];
-    } else {
-      v='Call — Equity realisieren'; c='blue';
-      w='Als Caller: Call kleine und mittlere C-Bets mit TP, Draws, Floats. Raise nur mit Nuts oder Sets auf wet Boards.';
-      tags=[['tag-b','Equity realisieren'],['tag-b','Call-down Linie']];
-      acts=[{l:'Standard',v:'Call',p:true},{l:'IP + Check',v:'Bet 33–50%'},{l:'Nuts OOP',v:'Check-Raise'}];
-    }
-  }
-
-  document.getElementById('result-f').innerHTML = mkResult(c,v,w,tags,acts,sz,sv);
-}
-
-// ══ BOARD DATA ══
-const boardData = {
-  k72r:{title:'K♥ 7♦ 2♣  —  Dry Rainbow',color:'#ffcc80',
-    texture:'Sehr trocken. Keine Flush-Draws. Keine Straight-Draws.',
-    who:'PFR hat massiven Range-Advantage. BB trifft dieses Board kaum.',
-    strat:'Kleiner C-Bet (25–33%) fast immer profitabel. Auch ohne Hand.',
-    cbetFreq:88,callerFreq:18,wetness:12,
-    tags:[['tag-g','Sehr Dry'],['tag-g','PFR-Advantage'],['tag-b','25–33% Pot']]},
-  a83r:{title:'A♠ 8♦ 3♥  —  Ace-High Dry',color:'#ffcc80',
-    texture:'Trocken. Ace stoppt die meisten Draws. Rainbow.',
-    who:'PFR trifft stark (Ax, AA, 88, 33). BB hat wenig Ax.',
-    strat:'C-Bet fast immer. Ace = gute Blocker-Karte für Bluffs.',
-    cbetFreq:85,callerFreq:22,wetness:15,
-    tags:[['tag-g','Ace High'],['tag-g','PFR dominiert'],['tag-b','25–40%']]},
-  jt6s:{title:'J♥ T♦ 6♥  —  Wet mit Flush Draw',color:'#90caf9',
-    texture:'Mittel-nass. Flush Draw vorhanden. Mögliche Straights (89, Q9).',
-    who:'BB trifft öfter (connected hands). PFR hat weniger Advantage.',
-    strat:'C-Bets nur mit Wert oder starken Draws. 50–66% Pot.',
-    cbetFreq:55,callerFreq:48,wetness:55,
-    tags:[['tag-b','Flush Draw'],['tag-a','Mixed'],['tag-a','50–66%']]},
-  q85s:{title:'Q♠ 8♠ 5♠  —  Monotone Flush',color:'#90caf9',
-    texture:'Alle drei Karten gleiche Farbe. Ca. 5% aller Flops.',
-    who:'Ohne Flush-Draw: Kaum Equity. Mit Flush-Draw: Sehr stark.',
-    strat:'Ohne Spade-Draw: Check. Mit FD: Semi-Bluff. Mit Flush: Wert.',
-    cbetFreq:35,callerFreq:55,wetness:70,
-    tags:[['tag-r','Monotone'],['tag-p','Flush Key'],['tag-a','Ohne FD: Check']]},
-  jt9:{title:'J♣ T♥ 9♦  —  Very Connected',color:'#ef9a9a',
-    texture:'Maximale Connectivity. Viele mögliche Straights und Draws.',
-    who:'BB hat viele SC. Caller hat hier oft gute Equity.',
-    strat:'Overpaar: Bet 60–75%. Ohne Hand: Fast immer Check.',
-    cbetFreq:42,callerFreq:65,wetness:88,
-    tags:[['tag-r','Sehr Wet'],['tag-r','Caller Advantage'],['tag-b','Nur Wert betten']]},
-  '876':{title:'8♠ 7♥ 6♦  —  Low Connected',color:'#ef9a9a',
-    texture:'Low cards, sehr verbunden. BB trifft diese Boards oft.',
-    who:'BB hat massiven Range-Advantage (76s, 87s, 65s).',
-    strat:'PFR: Sehr selektiv. Nur Overpairs mit 66%+.',
-    cbetFreq:30,callerFreq:72,wetness:82,
-    tags:[['tag-r','BB Advantage'],['tag-r','PFR-Nachteil'],['tag-a','PFR: Vorsicht!']]},
-  aa5:{title:'A♣ A♦ 5♥  —  Hoch gepaired',color:'#ce93d8',
-    texture:'Zwei Asse. Sehr trocken. Kaum Draws. Seltener Flop.',
-    who:'Wer Ax hat, dominiert. BB trifft dieses Board sehr selten.',
-    strat:'Kleiner C-Bet (25–33%) fast immer sehr profitabel.',
-    cbetFreq:90,callerFreq:15,wetness:10,
-    tags:[['tag-g','Gepaired'],['tag-g','Extrem dry'],['tag-b','Kleine Bets']]},
-  qq8:{title:'Q♥ Q♠ 8♣  —  Mittel gepaired',color:'#ce93d8',
-    texture:'Gepaired, mittelhohe Karte. Wenige Draws.',
-    who:'PFR hat Advantage (QQ, KQ, AQ in Range).',
-    strat:'Klein C-Betten (25–33%) sehr profitabel.',
-    cbetFreq:82,callerFreq:22,wetness:18,
-    tags:[['tag-g','Gepaired'],['tag-p','PFR-Range gut'],['tag-b','25–33%']]},
-  kjs:{title:'K♠ J♠ 4♠  —  Monotone High',color:'#a5d6a7',
-    texture:'Alle Spades, High-Card. Wer kein Spade hat, hat wenig Equity.',
-    who:'Mit Spade-Draw: Sehr stark. Ohne: Nur Made-Hand.',
-    strat:'Ohne Spade-Draw: Nur Made Hand betten. Mit FD: Semi-Bluff.',
-    cbetFreq:38,callerFreq:50,wetness:65,
-    tags:[['tag-p','Monotone'],['tag-b','FD Key'],['tag-a','Ohne Spade: Vorsicht']]},
-  t54:{title:'T♥ 5♦ 4♣  —  Low Connected',color:'#a5d6a7',
-    texture:'T-hoch, 5-4 verbunden. BB hat 54s, 65s in Range.',
-    who:'Mittlere Advantage für Caller. BB trifft low boards gut.',
-    strat:'PFR: Overpaar 66%+. Kleiner Bluff auf rainbow möglich.',
-    cbetFreq:52,callerFreq:45,wetness:48,
-    tags:[['tag-a','Mixed'],['tag-b','T-High'],['tag-a','Low-Conn.']]}
-};
-
-function selBoard(el, id) {
-  document.querySelectorAll('.board-card').forEach(c => c.classList.remove('active'));
-  if (el) el.classList.add('active');
-  const d = boardData[id]; if (!d) return;
-  const tagsH = d.tags.map(([c,t])=>`<span class="tag ${c}">${t}</span>`).join('');
-  document.getElementById('board-info').innerHTML = `
-    <div class="bi-title" style="color:${d.color}">${d.title}</div>
-    <div class="tags" style="margin-bottom:12px">${tagsH}</div>
-    <div class="bi-grid">
-      <div><div class="bi-lbl">Board Texture</div><div class="bi-txt">${d.texture}</div></div>
-      <div><div class="bi-lbl">Wer trifft es?</div><div class="bi-txt">${d.who}</div></div>
-      <div><div class="bi-lbl">Strategie</div><div class="bi-txt">${d.strat}</div></div>
-    </div>
-    <hr class="divider">
-    <div class="stat-row">
-      <div class="stat-box">
-        <div class="stat-lbl">C-Bet Frequenz (PFR)</div>
-        <div class="stat-bar"><div style="height:6px;background:${d.color};width:${d.cbetFreq}%"></div></div>
-        <div class="stat-val" style="color:${d.color}">${d.cbetFreq}%</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-lbl">Caller Equity (BB)</div>
-        <div class="stat-bar"><div style="height:6px;background:#64b5f6;width:${d.callerFreq}%"></div></div>
-        <div class="stat-val" style="color:#64b5f6">${d.callerFreq}%</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-lbl">Board Wetness</div>
-        <div class="stat-bar"><div style="height:6px;background:#ce93d8;width:${d.wetness}%"></div></div>
-        <div class="stat-val" style="color:#ce93d8">${d.wetness}%</div>
-      </div>
-    </div>`;
-}
-
-// ══ CALLER ══
-function renderC() {
-  const {cpos,chand,cbet,cboard,ctype} = sC;
-  let v='',c='',w='',tags=[],acts=[],sz='',sv=0;
-  const ip=cpos==='ip', oop=cpos==='oop';
-  const strong=chand==='strong', tpgk=chand==='tpgk', tpwk=chand==='tpwk';
-  const mppair=chand==='mppair', fd=chand==='fd', oesd=chand==='oesd', gut=chand==='gut', air=chand==='air';
-  const noCbet=cbet==='none', small=cbet==='small', midB=cbet==='mid', big=cbet==='big';
-  const dry=cboard==='dry', wet=cboard==='wet';
-  const nit=ctype==='nit';
-
-  if (strong && noCbet && ip)       { v='Bet 50–70% — Wert aufbauen'; c='green'; w='Gegner checkt, du IP mit Nuts. Jetzt Wert! Check zurück ist ein Leak.'; tags=[['tag-g','Nuts IP'],['tag-b','50–70%']]; acts=[{l:'Primär',v:'Bet 50–70%',p:true}]; sz='50–70% Pot'; sv=60; }
-  else if (strong && noCbet && oop) { v='Check — dann Check-Raise'; c='green'; w='OOP Nuts: Check, warte C-Bet, dann raise. Mehr Wert als Lead.'; tags=[['tag-g','Check-Raise'],['tag-a','OOP']]; acts=[{l:'Primär',v:'Check',p:true},{l:'Falls C-Bet',v:'Raise 3x'}]; }
-  else if (strong && (small||midB)) { v='Call oder Raise'; c='green'; w='Starke Hand gegen C-Bet: Wet=Raise (Protection). Dry=Call (slow play für mehr Wert).'; tags=[['tag-g','Nuts'],['tag-b','Wet: Raise'],['tag-b','Dry: Call']]; acts=[{l:'Wet Board',v:'Raise 3x',p:true},{l:'Dry Board',v:'Call'}]; }
-  else if (strong && big)           { v='Raise — Stärke gegen Stärke'; c='green'; w='Großer Bet und du hast Nuts/Set: Raise maximiert Wert.'; tags=[['tag-g','Raise']]; acts=[{l:'Set/2P',v:'Raise',p:true},{l:'TPGK',v:'Call'}]; }
-  else if (tpgk && big && nit)      { v='Fold — Vs Nit'; c='red'; w='Tight Spieler + großer Bet: Fast immer dominiert.'; tags=[['tag-r','Fold vs Nit']]; acts=[{l:'Vs Nit',v:'Fold',p:true}]; }
-  else if (tpgk && (small||midB))   { v='Call — Float und reassess'; c='blue'; w='TPGK gegen kleinen/mittleren C-Bet. Call und Turn evaluieren.'; tags=[['tag-b','Call + Eval']]; acts=[{l:'Standard',v:'Call',p:true}]; }
-  else if (tpwk && big)             { v='Meist Fold'; c='red'; w='Schwaches TP gegen großen Bet: Meist dominated. Fold.'; tags=[['tag-r','Fold Standard'],['tag-a','Vs Aggro: Call']]; acts=[{l:'Standard',v:'Fold',p:true},{l:'Vs Aggro',v:'Call (tight)'}]; }
-  else if (mppair && (midB||big))   { v='Fold'; c='red'; w='Mittleres Paar gegen mittelgroßen bis großen C-Bet: Zu wenig Equity. Fold.'; tags=[['tag-r','Fold']]; acts=[{l:'Standard',v:'Fold',p:true}]; }
-  else if (mppair && small && dry)  { v='Call — Pot-Odds okay'; c='blue'; w='Kleiner Bet, dry Board, mittleres Paar. Pot-Odds gut genug. Showdown Value vorhanden.'; tags=[['tag-b','Pot-Odds ok']]; acts=[{l:'Standard',v:'Call',p:true},{l:'IP Turn',v:'Check-back'}]; }
-  else if (fd && small)             { v='Call oder Semi-Bluff Raise'; c='blue'; w='Flush Draw, kleiner Bet: Sehr gute Pot-Odds. Call Standard. IP Raise als Semi-Bluff profitabel (~35% Equity).'; tags=[['tag-b','FD ~35%'],['tag-g','Semi-Raise mögl.']]; acts=[{l:'Standard',v:'Call',p:true},{l:'IP Aggro',v:'Raise 2.5–3x'},{l:'OOP',v:'Call'}]; sz='Call oder Raise'; sv=50; }
-  else if (fd && (midB||big))       { v='Call — Odds oft noch gut'; c='blue'; w='FD gegen mittleren/großen Bet: FD hat ~35% bis River. Pot-Odds meist noch okay.'; tags=[['tag-b','FD + Odds'],['tag-b','Call']]; acts=[{l:'Standard',v:'Call',p:true}]; }
-  else if (oesd && (small||midB))   { v='Call — starker Draw'; c='blue'; w='OESD ~32% Equity. Pot-Odds gegen kleine/mittlere Bets meist gut. OOP: Check-Raise gelegentlich.'; tags=[['tag-b','OESD ~32%'],['tag-b','Call + Eval']]; acts=[{l:'Standard',v:'Call',p:true},{l:'OOP Mix',v:'Check-Raise 30%'}]; }
-  else if (gut && big)              { v='Fold — Odds nicht gut'; c='red'; w='Gutshot (17%) gegen großen Bet: Pot-Odds reichen meist nicht. Implizite Odds bedenken.'; tags=[['tag-r','Fold meist'],['tag-a','17% Equity']]; acts=[{l:'Standard',v:'Fold',p:true},{l:'Mit Pair/FD',v:'Call (combo)'}]; }
-  else if (air && noCbet && ip)     { v='Bet 33–40% — Probe-Bet'; c='blue'; w='Nichts, IP, Gegner checkt. Probe-Bet holt Fold-Equity. Viele Gegner checken um zu testen.'; tags=[['tag-b','Probe-Bet'],['tag-b','33–40%']]; acts=[{l:'IP',v:'Bet 33–40%',p:true},{l:'Falls gecallt',v:'Turn: Bet/Give Up'}]; sz='33–40% Pot'; sv=37; }
-  else if (air && (small||midB))    { v='Fold — kein Float ohne Plan'; c='red'; w='Nichts und du wirst gebettet: Ohne Draws oder klaren Plan ist Call ein Fehler.'; tags=[['tag-r','Fold']]; acts=[{l:'Standard',v:'Fold',p:true}]; }
-  else { v='Situationsabhängig'; c='blue'; w='Wert → callen. Draw mit Odds → callen. Nichts → meist folden außer IP mit Fold-Equity.'; tags=[['tag-a','Situation prüfen']]; acts=[{l:'Basis',v:'Wert/Draw=Call · Luft=Fold',p:true}]; }
-
-  document.getElementById('result-c').innerHTML = mkResult(c,v,w,tags,acts,sz,sv);
-}
-
-// ══ C-BET ══
-function renderB() {
-  const {bpos,bopp,bboard,bhand,brange,bspr} = sB;
-  let v='',c='',w='',tags=[],acts=[],sz='',sv=0;
-  const multi=bopp==='multi', wet=bboard==='wet', dry=bboard==='dry';
-  const hasVal=bhand==='top', hasDraw=bhand==='draw', hasNoth=bhand==='weak';
-  const oop=bpos==='oop', rangeGood=brange==='good', rangeBad=brange==='bad', shortSPR=bspr==='short';
-
-  if (multi && hasNoth && !dry)           { v='Check — kein Bluff Multiway'; c='red'; w='Multiway ohne Hand: Alle müssen folden. Statistisch fast unmöglich. EV stark negativ.'; tags=[['tag-r','Kein Bluff'],['tag-r','Multiway']]; acts=[{l:'Standard',v:'Check',p:true}]; sz='0% — Check'; sv=0; }
-  else if (multi && hasNoth && dry)       { v='Kleiner C-Bet möglich'; c='amber'; w='Trockenes Multiway-Board: Kleiner Bet kann funktionieren, aber bleibt riskant.'; tags=[['tag-a','Nur Dry Board'],['tag-a','25–33%']]; acts=[{l:'Möglich',v:'Bet 25–33%',p:true}]; sz='25–33% Pot'; sv=29; }
-  else if (hasVal && wet && multi)        { v='Bet groß — Protection + Wert'; c='green'; w='Wert auf nassem Multiway-Board: Schütze deine Hand! Draws dürfen nicht billig callen.'; tags=[['tag-g','Wert'],['tag-g','Protection'],['tag-b','60–75%']]; acts=[{l:'Primär',v:'Bet 60–75%',p:true}]; sz='60–75% Pot'; sv=67; }
-  else if (hasVal && dry && !oop)         { v='C-Bet klein — Wert-Bet IP'; c='green'; w='Wert IP auf dry Board: Kleiner Bet lockt Calls. Sehr effizient.'; tags=[['tag-g','Value IP'],['tag-b','25–40%']]; acts=[{l:'Primär',v:'Bet 25–40%',p:true}]; sz='25–40% Pot'; sv=32; }
-  else if (hasVal && dry && oop)          { v='C-Bet klein OOP'; c='green'; w='Wert OOP, dry Board. Klein betten und auf Raises vorbereitet sein.'; tags=[['tag-g','Value OOP'],['tag-b','25–33%']]; acts=[{l:'Primär',v:'Bet 25–33%',p:true}]; sz='25–33% Pot'; sv=29; }
-  else if (hasDraw && wet)               { v='Semi-Bluff 50–66%'; c='green'; w='Starker Draw auf nassem Board: Fold-Equity + Equity-Backup. Paradespot für Semi-Bluff.'; tags=[['tag-g','Semi-Bluff'],['tag-g','Doppelter Gewinnweg'],['tag-b','50–66%']]; acts=[{l:'Primär',v:'Bet 50–66%',p:true}]; sz='50–66% Pot'; sv=58; }
-  else if (hasNoth && dry && rangeGood)  { v='C-Bet Bluff — 25–33%'; c='green'; w='Klassischer Bluff: Dry Board, HU, Range-Advantage. Kleiner Bet reicht.'; tags=[['tag-g','Range Adv.'],['tag-b','25–33%']]; acts=[{l:'Primär',v:'Bet 25–33%',p:true}]; sz='25–33% Pot'; sv=29; }
-  else if (hasNoth && wet)               { v='Check — eher verzichten'; c='amber'; w='Luft auf nassem Board: Gegner callt oft. Ohne Equity-Backup verlieren.'; tags=[['tag-a','Bluff-Risk hoch'],['tag-a','Lieber Check']]; acts=[{l:'Primär',v:'Check',p:true}]; sz='0–25% oder Check'; sv=15; }
-  else if (rangeBad)                     { v='Vorsicht — Range Disadvantage'; c='amber'; w='Gegner hat Range-Advantage. Nur Wert und starke Draws betten. Bluffs weglassen.'; tags=[['tag-r','Range Disadv.'],['tag-a','Nur Wert']]; acts=[{l:'Vs Adv.',v:'Nur Wert betten',p:true}]; sz=hasVal?'50–60% Pot':'0%'; sv=hasVal?55:0; }
-  else if (shortSPR && hasVal)           { v='Bet groß — ggf. All-In'; c='green'; w='Kurzer Stack: Oft committed. Mit Wert all-in gehen oder Turn-All-In planen.'; tags=[['tag-g','Committed'],['tag-b','66–100%']]; acts=[{l:'Primär',v:'Bet 66–100%',p:true},{l:'Sehr kurz',v:'All-In'}]; sz='66–100% oder All-In'; sv=80; }
-  else                                   { v='Situationsabhängig'; c='amber'; w='Wert → betten. Draw → semi-bluffen. Luft → nur dry HU.'; tags=[['tag-a','Analysieren']]; acts=[{l:'Basis',v:'Wert=Bet · Draw=SB · Luft dry=Bet',p:true}]; sz='33–50% Pot'; sv=40; }
-
-  document.getElementById('result-b').innerHTML = mkResult(c,v,w,tags,acts,sz,sv);
-}
-
-
-// ══════════════════════════
-// PREFLOP RANGES
-// ══════════════════════════
-const RK = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
-function hnd(r,c){if(r===c)return RK[r]+RK[r];if(r<c)return RK[r]+RK[c]+'s';return RK[c]+RK[r]+'o';}
-function cb(s){let n=0;s.forEach(h=>{if(h.length===2)n+=6;else if(h[h.length-1]==='s')n+=4;else n+=12;});return n;}
-
-const RANGES = {
-  UTG:{note:'Raise First In · Raise auf 3 BB',
-    b:new Set(['AA','KK','QQ','AKs','AKo']),
-    c:new Set(['JJ','TT','AQs','AQo','KQs']),
-    r:new Set(['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'])},
-  MP:{note:'Raise First In · Raise auf 3 BB',
-    b:new Set(['AA','KK','QQ','AKs','AKo']),
-    c:new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
-    r:new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'])},
-  CO:{note:'Raise First In · Raise auf 3 BB',
-    b:new Set(['AA','KK','QQ','AKs','AKo']),
-    c:new Set(['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo']),
-    r:new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','Q7s','Q6s','J9s','J8s','J7s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','74s','65s','64s','63s','54s','53s','43s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','JTo','J9o'])},
-  BTN:{note:'Raise First In · Raise auf 2.5 BB',
-    b:new Set(['AA','KK','QQ','AKs','AKo']),
-    c:new Set(['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo']),
-    r:new Set(['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','J9s','J8s','J7s','J6s','T8s','T7s','T6s','97s','96s','95s','86s','85s','84s','75s','74s','64s','54s','53s','42s','A9o','A8o','A7o','A6o','A5o','A4o','K9o','K8o','Q9o','Q8o','J9o','J8o','T9o','T8o','98o','87o','76o','65o'])},
-  SB:{note:'Raise vs BB · Rest limp oder fold',
-    b:new Set(['AA','KK','QQ','AKs','AKo']),
-    c:new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
-    r:new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','Q8s','JTs','J9s','J8s','T9s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','A8o','A7o','KJo','KTo','K9o','K8o','QJo','QTo','Q9o','JTo','J9o','T9o','98o','87o','76o'])},
-  BB:{note:'Defend vs BTN (call + 3-bet)',
-    b:new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c:new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo']),
-    r:new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','97o','87o','76o','65o'])}
-};
-
-const POSITIONS = ['UTG','MP','CO','BTN','SB','BB'];
-let curPos = 'UTG';
-
-function switchPos(pos) {
-  curPos = pos;
-  document.querySelectorAll('[id^="pov-"]').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('pov-' + pos.toLowerCase());
-  if (el) el.classList.add('active');
-  document.querySelectorAll('.pos-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === pos);
-  });
-  renderRange(false);
-}
-
-function renderRange(buildTabs) {
-  const tabs = document.getElementById('pos-tabs');
-  if (buildTabs) {
-    tabs.innerHTML = '';
-    POSITIONS.forEach(p => {
-      const btn = document.createElement('button');
-      btn.className = 'pos-btn' + (p===curPos?' active':'');
-      btn.textContent = p;
-      btn.onclick = () => switchPos(p);
-      tabs.appendChild(btn);
-    });
-  }
-
-  const {b,c,r,note} = RANGES[curPos];
-  const bc=cb(b), cc=cb(c), rc=cb(r);
-  const total=bc+cc+rc;
-  const pct=((total/1326)*100).toFixed(1);
-
-  document.getElementById('pos-banner').innerHTML = `
-    <div class="pos-name-big">${curPos}</div>
-    <div class="pos-note-txt">${note}</div>
-    <div style="margin-left:auto;text-align:right;">
-      <div class="pos-pct-big">${pct}%</div>
-      <div class="pos-combos">4-bet: ${bc} · Call: ${cc} · Raise/fold: ${rc} combos</div>
-    </div>`;
-
-  let h = '<thead><tr><th class="rl"></th>';
-  RK.forEach(rk => h += `<th class="ct">${rk}</th>`);
-  h += '</tr></thead><tbody>';
-  RK.forEach((_,ri) => {
-    h += `<tr><th class="rl">${RK[ri]}</th>`;
-    RK.forEach((_2,ci) => {
-      const hand = hnd(ri,ci);
-      const cl = b.has(hand)?'h4':c.has(hand)?'hc':r.has(hand)?'hr':'hf';
-      const cat = b.has(hand)?'4-Bet / Immer Raise':c.has(hand)?'Raise + 3-Bet callen':r.has(hand)?'Raise + Fold vs 3-Bet':'Fold';
-      h += `<td class="${cl}" title="${hand} — ${cat}" onclick="showTip('${hand}','${cat}')">${hand}</td>`;
-    });
-    h += '</tr>';
-  });
-  h += '</tbody>';
-  document.getElementById('range-grid').innerHTML = h;
-}
-
-function showTip(hand, cat) {
-  const el = document.getElementById('hand-tip');
-  el.style.display = 'block';
-  el.innerHTML = `<strong>${hand}</strong> &nbsp;—&nbsp; ${cat}`;
-}
-
-// ── Init ──
-renderRange(true);
-renderF();
-renderC();
-renderB();
-selBoard(document.querySelector('.board-card'), 'k72r');
-</script>
-
-<!-- TRAINER PAGE -->
+<!-- ══════════════════════════════════════════════════════
+     PAGE: POSTFLOP TRAINER
+══════════════════════════════════════════════════════ -->
 <div class="page" id="page-trainer">
   <div class="sec-title">Postflop Trainer</div>
   <div class="sec-sub">Range-basierte Situationen — wähle die richtige Aktion und erhalte sofort Feedback.</div>
 
   <div class="trainer-topbar">
-    <div class="scorebar" style="background:transparent;border:none;padding:0;flex:1;gap:16px;">
+    <div class="scorebar">
       <div class="score-item">Richtig: <span class="correct" id="sc-correct">0</span></div>
-      <div class="score-item">Falsch: <span class="wrong" id="sc-wrong">0</span></div>
-      <div class="score-item">Quote: <span class="pct" id="sc-pct">—</span></div>
-      <div class="score-item">Serie: <span class="streak" id="sc-streak">0</span> ✓</div>
-      <div class="score-item">Hände: <span id="sc-total">0</span></div>
+      <div class="score-item">Falsch:  <span class="wrong"   id="sc-wrong">0</span></div>
+      <div class="score-item">Quote:   <span class="pct"     id="sc-pct">—</span></div>
+      <div class="score-item">Serie:   <span class="streak"  id="sc-streak">0</span> ✓</div>
+      <div class="score-item">Hände:   <span id="sc-total">0</span></div>
     </div>
-    <button class="btn-new" onclick="dealNew()">&#8635; Neue Hand</button>
+    <button class="btn-new"   onclick="dealNew()">&#8635; Neue Hand</button>
     <button class="btn-stats" onclick="showStats()">Statistiken</button>
   </div>
 
-  <div class="diff-bar" style="padding:8px 0 12px;background:transparent;border-bottom:1px solid var(--border);margin-bottom:14px;">
-    <span class="diff-label">MODUS:</span>
-    <button class="diff-btn active" onclick="setMode('pfr',this)">Als PFR (Aggressor)</button>
-    <button class="diff-btn" onclick="setMode('caller',this)">Als Caller (BB)</button>
-    <button class="diff-btn" onclick="setMode('both',this)">Gemischt</button>
-    <span class="diff-label" style="margin-left:10px">POSITION:</span>
-    <button class="filter-btn active" data-pos="ALL" onclick="togglePos(this)">Alle</button>
-    <button class="filter-btn" data-pos="UTG" onclick="togglePos(this)">UTG</button>
-    <button class="filter-btn" data-pos="MP" onclick="togglePos(this)">MP</button>
-    <button class="filter-btn" data-pos="CO" onclick="togglePos(this)">CO</button>
-    <button class="filter-btn" data-pos="BTN" onclick="togglePos(this)">BTN</button>
-    <button class="filter-btn" data-pos="SB" onclick="togglePos(this)">SB</button>
+  <div class="mode-bar">
+    <span class="mode-bar-label">MODUS:</span>
+    <button class="mode-btn active" onclick="setMode('pfr',    this)">Als PFR (Aggressor)</button>
+    <button class="mode-btn"        onclick="setMode('caller', this)">Als Caller (BB)</button>
+    <button class="mode-btn"        onclick="setMode('both',   this)">Gemischt</button>
+    <span class="mode-bar-label" style="margin-left:10px">POSITION:</span>
+    <button class="mode-btn active" data-pos="ALL" onclick="togglePos(this)">Alle</button>
+    <button class="mode-btn" data-pos="UTG"        onclick="togglePos(this)">UTG</button>
+    <button class="mode-btn" data-pos="MP"         onclick="togglePos(this)">MP</button>
+    <button class="mode-btn" data-pos="CO"         onclick="togglePos(this)">CO</button>
+    <button class="mode-btn" data-pos="BTN"        onclick="togglePos(this)">BTN</button>
+    <button class="mode-btn" data-pos="SB"         onclick="togglePos(this)">SB</button>
   </div>
 
   <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
@@ -1647,911 +639,830 @@ selBoard(document.querySelector('.board-card'), 'k72r');
   <div id="main-area"></div>
 </div>
 
+
 <script>
-// ══════════════════════════════════
-// CARD ENGINE
-// ══════════════════════════════════
-const RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
-const SUITS = ['c','d','h','s'];
-const RANK_VAL = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,'T':10,'J':11,'Q':12,'K':13,'A':14};
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 1 — PAGE NAVIGATION
+══════════════════════════════════════════════════════════════════ */
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'trainer') {
+    loadScores();
+    updateScoreboard();
+    dealNew();
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 2 — PREFLOP RANGES
+══════════════════════════════════════════════════════════════════ */
+const PF_RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+
+/** Build hand notation from grid row/col indices */
+function pfHandName(r, c) {
+  if (r === c) return PF_RANKS[r] + PF_RANKS[r];
+  if (r < c)   return PF_RANKS[r] + PF_RANKS[c] + 's';
+  return PF_RANKS[c] + PF_RANKS[r] + 'o';
+}
+
+/** Count combos in a Set of hand notations */
+function countCombos(handSet) {
+  let n = 0;
+  handSet.forEach(h => {
+    if (h.length === 2)            n += 6;  // pocket pair
+    else if (h[h.length-1] === 's') n += 4;  // suited
+    else                            n += 12; // offsuit
+  });
+  return n;
+}
+
+const PF_RANGES = {
+  UTG: {
+    note: 'Raise First In · Raise auf 3 BB',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','AQs','AQo','KQs']),
+    r: new Set(['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'])
+  },
+  MP: {
+    note: 'Raise First In · Raise auf 3 BB',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
+    r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'])
+  },
+  CO: {
+    note: 'Raise First In · Raise auf 3 BB',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo']),
+    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','Q7s','Q6s','J9s','J8s','J7s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo','J9o'])
+  },
+  BTN: {
+    note: 'Raise First In · Raise auf 2.5 BB',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo']),
+    r: new Set(['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','J9s','J8s','J7s','J6s','T8s','T7s','T6s','97s','96s','95s','86s','85s','84s','75s','74s','64s','54s','53s','42s','A9o','A8o','A7o','A6o','A5o','A4o','K9o','K8o','Q9o','Q8o','J9o','J8o','T9o','T8o','98o','87o','76o','65o'])
+  },
+  SB: {
+    note: 'Raise vs BB · Rest limp oder fold',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
+    r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','Q8s','JTs','J9s','J8s','T9s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o','76o'])
+  },
+  BB: {
+    note: 'Defend vs BTN (call + 3-bet)',
+    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
+    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo']),
+    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','97o','87o','76o','65o'])
+  }
+};
+
+const PF_POSITIONS = ['UTG','MP','CO','BTN','SB','BB'];
+let currentPFPos = 'UTG';
+
+function switchPos(pos) {
+  currentPFPos = pos;
+  document.querySelectorAll('[id^="pov-"]').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('pov-' + pos.toLowerCase());
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.pos-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === pos);
+  });
+  renderPreflopRange(false);
+}
+
+function renderPreflopRange(buildTabs) {
+  if (buildTabs) {
+    const tabs = document.getElementById('pos-tabs');
+    tabs.innerHTML = '';
+    PF_POSITIONS.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'pos-btn' + (p === currentPFPos ? ' active' : '');
+      btn.textContent = p;
+      btn.onclick = () => switchPos(p);
+      tabs.appendChild(btn);
+    });
+  }
+
+  const {b, c, r, note} = PF_RANGES[currentPFPos];
+  const bc = countCombos(b), cc = countCombos(c), rc = countCombos(r);
+  const total = bc + cc + rc;
+  const pct   = ((total / 1326) * 100).toFixed(1);
+
+  document.getElementById('pos-banner').innerHTML = `
+    <div class="pos-name-big">${currentPFPos}</div>
+    <div class="pos-note-txt">${note}</div>
+    <div style="margin-left:auto;text-align:right;">
+      <div class="pos-pct-big">${pct}%</div>
+      <div class="pos-combos">4-bet: ${bc} · Call: ${cc} · Raise/fold: ${rc} combos</div>
+    </div>`;
+
+  let html = '<thead><tr><th class="rl"></th>';
+  PF_RANKS.forEach(rk => { html += `<th class="ct">${rk}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  PF_RANKS.forEach((_, ri) => {
+    html += `<tr><th class="rl">${PF_RANKS[ri]}</th>`;
+    PF_RANKS.forEach((_, ci) => {
+      const hand = pfHandName(ri, ci);
+      const cls  = b.has(hand) ? 'h4' : c.has(hand) ? 'hc' : r.has(hand) ? 'hr' : 'hf';
+      const cat  = b.has(hand) ? '4-Bet / Immer Raise'
+                 : c.has(hand) ? 'Raise + 3-Bet callen'
+                 : r.has(hand) ? 'Raise + Fold vs 3-Bet' : 'Fold';
+      html += `<td class="${cls}" title="${hand} — ${cat}" onclick="showHandTip('${hand}','${cat}')">${hand}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('range-grid').innerHTML = html;
+}
+
+function showHandTip(hand, cat) {
+  const el = document.getElementById('hand-tip');
+  el.style.display = 'block';
+  el.innerHTML = `<strong>${hand}</strong> &nbsp;—&nbsp; ${cat}`;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 3 — CARD ENGINE
+══════════════════════════════════════════════════════════════════ */
+const RANKS    = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+const SUITS    = ['c','d','h','s'];
+const RANK_VAL = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,J:11,Q:12,K:13,A:14};
 const SUIT_SYM = {c:'♣',d:'♦',h:'♥',s:'♠'};
 const SUIT_RED = {c:false,d:true,h:true,s:false};
 
-function cardRank(c) { return c.slice(0,-1); }
-function cardSuit(c) { return c.slice(-1); }
-function cardVal(c)  { return RANK_VAL[cardRank(c)]; }
+const cardRank = c => c.slice(0, -1);
+const cardSuit = c => c.slice(-1);
+const cardVal  = c => RANK_VAL[cardRank(c)];
 
-function shuffleDeck(exclude=[]) {
+function shuffleDeck(exclude = []) {
   let deck = [];
   RANKS.forEach(r => SUITS.forEach(s => {
-    const c = r+s;
+    const c = r + s;
     if (!exclude.includes(c)) deck.push(c);
   }));
-  for (let i = deck.length-1; i > 0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [deck[i],deck[j]] = [deck[j],deck[i]];
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
   }
   return deck;
 }
 
-function renderCard(c, hidden=false) {
-  if (hidden) return `<div class="card hidden"></div>`;
-  const r = cardRank(c), s = cardSuit(c);
-  const red = SUIT_RED[s] ? 'red-card' : '';
-  return `<div class="card ${red}"><div class="card-rank">${r}</div><div class="card-suit">${SUIT_SYM[s]}</div></div>`;
-}
-
-// ══════════════════════════════════
-// PREFLOP T_RANGES
-// ══════════════════════════════════
-const T_RANGES = {
-  UTG:{
-    b:['AA','KK','QQ','AKs','AKo'],
-    c:['JJ','TT','AQs','AQo','KQs'],
-    r:['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo']
-  },
-  MP:{
-    b:['AA','KK','QQ','AKs','AKo'],
-    c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'],
-    r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo']
-  },
-  CO:{
-    b:['AA','KK','QQ','AKs','AKo'],
-    c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'],
-    r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo','J9o']
-  },
-  BTN:{
-    b:['AA','KK','QQ','AKs','AKo'],
-    c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'],
-    r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','96s','86s','85s','75s','65s','54s','A9o','A8o','A7o','A6o','K9o','K8o','Q9o','J9o','T9o','T8o','98o','87o','76o','65o']
-  },
-  SB:{
-    b:['AA','KK','QQ','AKs','AKo'],
-    c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'],
-    r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o']
-  }
-};
-
-// BB defending range (vs BTN open)
-const BB_DEFEND = {
-  b:['AA','KK','QQ','JJ','AKs','AKo'],
-  c:['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo'],
-  r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','QTs','Q9s','Q8s','JTs','J9s','J8s','T9s','T8s','T7s','98s','97s','96s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','KJo','KTo','K9o','K8o','QJo','QTo','Q9o','JTo','J9o','J8o','T9o','T8o','98o','87o','76o','65o']
-};
-
-function getHandCategory(hand, range) {
-  if (range.b.includes(hand)) return '4bet';
-  if (range.c.includes(hand)) return 'call3b';
-  if (range.r.includes(hand)) return 'raise_fold';
-  return null;
-}
-
-// Convert hand notation to actual cards
-function handToCards(handNotation, exclude=[]) {
-  const r1 = handNotation[0], r2 = handNotation[1];
-  const suited = handNotation.endsWith('s');
-  const pair = r1 === r2;
-  const deck = shuffleDeck(exclude);
-
-  if (pair) {
-    // Find two cards of same rank
-    const cards = deck.filter(c => cardRank(c) === r1);
-    if (cards.length < 2) return null;
-    return [cards[0], cards[1]];
-  } else if (suited) {
-    const suits = ['c','d','h','s'];
-    shuffleArray(suits);
-    for (const s of suits) {
-      const c1 = r1+s, c2 = r2+s;
-      if (!exclude.includes(c1) && !exclude.includes(c2)) return [c1, c2];
-    }
-    return null;
-  } else {
-    // offsuit — pick random suits, different
-    const s1 = SUITS[Math.floor(Math.random()*4)];
-    let s2;
-    do { s2 = SUITS[Math.floor(Math.random()*4)]; } while (s2 === s1);
-    const c1 = r1+s1, c2 = r2+s2;
-    if (exclude.includes(c1) || exclude.includes(c2)) {
-      // try other combination
-      for (const sa of SUITS) for (const sb of SUITS) {
-        if (sa === sb) continue;
-        const a = r1+sa, b = r2+sb;
-        if (!exclude.includes(a) && !exclude.includes(b)) return [a,b];
-      }
-      return null;
-    }
-    return [c1, c2];
-  }
-}
-
 function shuffleArray(arr) {
-  for (let i=arr.length-1;i>0;i--) {
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
 }
 
-// ══════════════════════════════════
-// HAND EVALUATION
-// ══════════════════════════════════
-function evaluateHand(hole, board) {
-  const all = [...hole, ...board];
-  const ranks = all.map(cardVal).sort((a,b)=>b-a);
-  const suits = all.map(cardSuit);
+/** Convert hand notation (e.g. "AKs", "TT", "87o") to two actual cards */
+function handToCards(notation, exclude = []) {
+  const r1 = notation[0], r2 = notation[1];
+  const suited = notation.endsWith('s');
+  const pair   = r1 === r2;
 
-  // Count rank occurrences
-  const rankCount = {};
-  all.forEach(c => { const r=cardVal(c); rankCount[r]=(rankCount[r]||0)+1; });
-
-  // Suit counts
-  const suitCount = {};
-  suits.forEach(s => suitCount[s]=(suitCount[s]||0)+1);
-
-  const pairs = Object.entries(rankCount).filter(([,v])=>v>=2).map(([r])=>+r).sort((a,b)=>b-a);
-  const trips = Object.entries(rankCount).filter(([,v])=>v>=3).map(([r])=>+r);
-  const quads = Object.entries(rankCount).filter(([,v])=>v>=4);
-
-  // Check flush
-  const hasFlush = Object.values(suitCount).some(v=>v>=5);
-
-  // Check straight
-  const uniqueRanks = [...new Set(all.map(cardVal))].sort((a,b)=>b-a);
-  let hasStraight = false;
-  for (let i=0;i<uniqueRanks.length-4;i++) {
-    if (uniqueRanks[i]-uniqueRanks[i+4]===4) { hasStraight=true; break; }
+  const deck = shuffleDeck(exclude);
+  if (pair) {
+    const cards = deck.filter(c => cardRank(c) === r1);
+    return cards.length >= 2 ? [cards[0], cards[1]] : null;
   }
-  // Wheel
-  if (uniqueRanks.includes(14)&&uniqueRanks.includes(2)&&uniqueRanks.includes(3)&&uniqueRanks.includes(4)&&uniqueRanks.includes(5)) hasStraight=true;
-
-  if (quads.length)                    return {rank:7, name:'Vierling'};
-  if (trips.length && pairs.length>1)  return {rank:6, name:'Full House'};
-  if (hasFlush)                        return {rank:5, name:'Flush'};
-  if (hasStraight)                     return {rank:4, name:'Straight'};
-  if (trips.length)                    return {rank:3, name:'Drilling'};
-  if (pairs.length>=2)                 return {rank:2, name:'Zwei Paare'};
-  if (pairs.length===1)                return {rank:1, name:'Ein Paar ('+pairRankName(pairs[0])+')'};
-  return {rank:0, name:'High Card'};
+  if (suited) {
+    const suits = shuffleArray([...SUITS]);
+    for (const s of suits) {
+      const c1 = r1 + s, c2 = r2 + s;
+      if (!exclude.includes(c1) && !exclude.includes(c2)) return [c1, c2];
+    }
+    return null;
+  }
+  // offsuit
+  for (const sa of SUITS) for (const sb of SUITS) {
+    if (sa === sb) continue;
+    const a = r1 + sa, b = r2 + sb;
+    if (!exclude.includes(a) && !exclude.includes(b)) return [a, b];
+  }
+  return null;
 }
 
-function pairRankName(v) {
-  const m={14:'Asse',13:'Könige',12:'Damen',11:'Buben',10:'Zehner',9:'Neuner',8:'Achter',7:'Siebener',6:'Sechser',5:'Fünfer',4:'Vierer',3:'Dreier',2:'Zweier'};
-  return m[v]||v;
+/** Render a playing card as HTML */
+function renderCard(c, hidden = false) {
+  if (hidden) return `<div class="card hidden"></div>`;
+  const r = cardRank(c), s = cardSuit(c);
+  const red = SUIT_RED[s] ? 'red-card' : '';
+  return `<div class="card ${red}">
+    <div class="card-rank">${r}</div>
+    <div class="card-suit">${SUIT_SYM[s]}</div>
+  </div>`;
 }
 
-function getHoleHandStrength(hole, board) {
-  const h1=cardVal(hole[0]), h2=cardVal(hole[1]);
-  const hS1=cardSuit(hole[0]), hS2=cardSuit(hole[1]);
-  const boardVals=board.map(cardVal);
-  const boardSuits=board.map(cardSuit);
-  const boardRankCount={};
-  board.forEach(c=>{const r=cardVal(c);boardRankCount[r]=(boardRankCount[r]||0)+1;});
 
-  // Made hand
-  const made = evaluateHand(hole, board);
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 4 — HAND EVALUATION
+══════════════════════════════════════════════════════════════════ */
+const RANK_NAME = {14:'Asse',13:'Könige',12:'Damen',11:'Buben',10:'Zehner',9:'Neuner',8:'Achter',7:'Siebener',6:'Sechser',5:'Fünfer',4:'Vierer',3:'Dreier',2:'Zweier'};
+const pairName  = v => RANK_NAME[v] || String(v);
 
-  // Top pair?
-  const topBoardCard = Math.max(...boardVals);
-  const secondBoard  = boardVals.slice().sort((a,b)=>b-a)[1];
-  const thirdBoard   = boardVals.slice().sort((a,b)=>b-a)[2];
+/** Evaluate best 5-card hand from hole + board (7 cards) */
+function evaluateMadeHand(hole, board) {
+  const all = [...hole, ...board];
+  const rankCount = {};
+  all.forEach(c => { const r = cardVal(c); rankCount[r] = (rankCount[r] || 0) + 1; });
+  const suitCount = {};
+  all.forEach(c => { const s = cardSuit(c); suitCount[s] = (suitCount[s] || 0) + 1; });
 
+  const pairs  = Object.keys(rankCount).filter(r => rankCount[r] >= 2).map(Number);
+  const trips  = Object.keys(rankCount).filter(r => rankCount[r] >= 3).map(Number);
+  const quads  = Object.keys(rankCount).filter(r => rankCount[r] >= 4).map(Number);
+  const hasFlush = Object.values(suitCount).some(v => v >= 5);
+
+  // Straight check
+  const unique = [...new Set(all.map(cardVal))].sort((a, b) => a - b);
+  let hasStraight = false;
+  for (let i = 0; i <= unique.length - 5; i++) {
+    if (unique[i + 4] - unique[i] === 4 && new Set(unique.slice(i, i + 5)).size === 5) {
+      hasStraight = true; break;
+    }
+  }
+  // Wheel (A-2-3-4-5)
+  if ([14,2,3,4,5].every(v => unique.includes(v))) hasStraight = true;
+
+  if (quads.length)                  return {rank: 7, name: 'Vierling'};
+  if (trips.length && pairs.length > 1) return {rank: 6, name: 'Full House'};
+  if (hasFlush)                      return {rank: 5, name: 'Flush'};
+  if (hasStraight)                   return {rank: 4, name: 'Straight'};
+  if (trips.length)                  return {rank: 3, name: 'Drilling'};
+  if (pairs.length >= 2)             return {rank: 2, name: 'Zwei Paare'};
+  if (pairs.length === 1)            return {rank: 1, name: 'Ein Paar (' + pairName(pairs[0]) + ')'};
+  return                                    {rank: 0, name: 'High Card'};
+}
+
+/**
+ * Full hand strength analysis:
+ * Returns { madeStrength, madeLabel, goodKicker, draws, drawStrength, bestMade }
+ */
+function analyzeHoleCards(hole, board) {
+  const h1 = cardVal(hole[0]), h2 = cardVal(hole[1]);
+  const hS1 = cardSuit(hole[0]), hS2 = cardSuit(hole[1]);
+  const boardVals  = board.map(cardVal);
+  const boardSuits = board.map(cardSuit);
+  const boardRankCount = {};
+  board.forEach(c => { const r = cardVal(c); boardRankCount[r] = (boardRankCount[r] || 0) + 1; });
+
+  const made     = evaluateMadeHand(hole, board);
+  const topBoard = Math.max(...boardVals);
+
+  // ── Made strength (0–5 scale) ──────────────────────────────
   let madeStrength = 0;
-  let madeLabel = '';
+  let madeLabel    = '';
 
-  if (made.rank >= 3) {
-    madeStrength = made.rank >= 5 ? 5 : (made.rank === 4 ? 4 : 3);
-    madeLabel = made.name;
-  } else if (made.rank === 2) {
-    // Two pair — check if both our cards are paired
-    const p1 = boardVals.includes(h1), p2 = boardVals.includes(h2);
-    if (boardRankCount[h1]>=1 && boardRankCount[h2]>=1) {
+  if (made.rank >= 5)      { madeStrength = 5; madeLabel = made.name; }
+  else if (made.rank === 4) { madeStrength = 4; madeLabel = made.name; }
+  else if (made.rank === 3) { madeStrength = 3; madeLabel = made.name; }
+  else if (made.rank === 2) {
+    // Distinguish "two pair using both hole cards" (stronger) from board-assisted
+    if (boardRankCount[h1] >= 1 && boardRankCount[h2] >= 1) {
       madeStrength = 3; madeLabel = 'Zwei Paare (beide Hole Cards)';
     } else {
       madeStrength = 2; madeLabel = 'Zwei Paare';
     }
-  } else if (made.rank === 1) {
-    const pairedVals = Object.entries(boardRankCount).filter(([,v])=>v>=2).map(([r])=>+r);
-    if (boardVals.filter(v=>v===h1).length>=1 && h1===topBoardCard) {
-      madeStrength=2; madeLabel='Top Pair ('+pairRankName(h1)+')';
-    } else if (boardVals.filter(v=>v===h2).length>=1 && h2===topBoardCard) {
-      madeStrength=2; madeLabel='Top Pair ('+pairRankName(h2)+')';
-    } else if (h1===h2 && h1>topBoardCard) {
-      madeStrength=3; madeLabel='Überpaar ('+pairRankName(h1)+')';
-    } else if (h1===h2) {
-      madeStrength=1; madeLabel='Taschenpaar ('+pairRankName(h1)+')';
-    } else if (boardVals.includes(h1) || boardVals.includes(h2)) {
-      madeStrength=1; madeLabel='Mittleres/unteres Paar';
-    } else if (pairedVals.length>0) {
-      madeStrength=0; madeLabel='Paar auf Board';
-    } else {
-      madeStrength=0; madeLabel='Paar auf Board';
-    }
-  } else {
-    madeStrength=0; madeLabel='High Card / Nichts';
   }
+  else if (made.rank === 1) {
+    if (h1 === h2 && h1 > topBoard)          { madeStrength = 3; madeLabel = 'Überpaar (' + pairName(h1) + ')'; }
+    else if (h1 === h2)                       { madeStrength = 1; madeLabel = 'Taschenpaar (' + pairName(h1) + ')'; }
+    else if (boardVals.includes(h1) && h1 === topBoard) { madeStrength = 2; madeLabel = 'Top Pair (' + pairName(h1) + ')'; }
+    else if (boardVals.includes(h2) && h2 === topBoard) { madeStrength = 2; madeLabel = 'Top Pair (' + pairName(h2) + ')'; }
+    else { madeStrength = 1; madeLabel = 'Mittleres / unteres Paar'; }
+  }
+  else { madeStrength = 0; madeLabel = 'High Card / Nichts'; }
 
-  // KICKER for top pair
-  const topKicker = Math.max(h1,h2);
-  let goodKicker = false;
-  if (made.rank===1 && (boardVals.includes(h1)||boardVals.includes(h2))) {
+  // Kicker quality for top pair
+  const goodKicker = (() => {
+    if (made.rank !== 1) return false;
     const notPaired = boardVals.includes(h1) ? h2 : h1;
-    goodKicker = notPaired >= 11; // J or better
-  }
+    return notPaired >= 11; // J or better
+  })();
 
-  // ── DRAWS ──
+  // ── Draws ──────────────────────────────────────────────────
   const draws = [];
 
-  // ── 1. FLUSH DRAWS ──
-  // Need 4 cards of same suit = Flush Draw (9 outs, 1 needed)
-  // Need 3 cards of same suit = Backdoor FD (~2 outs, 2 needed)
-  if (hS1===hS2) {
-    // Suited hole cards: 2 hole + board
-    const boardOfSuit = boardSuits.filter(s=>s===hS1).length;
-    if (boardOfSuit===2) draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
-    else if (boardOfSuit===1) draws.push({type:'bdoor_fd', strength:1, outs:1, label:'Backdoor Flush Draw'});
-    // boardOfSuit===0 → only 2 of suit → no draw
+  // 1. Flush draws
+  if (hS1 === hS2) {
+    const boardOfSuit = boardSuits.filter(s => s === hS1).length;
+    if (boardOfSuit === 2)      draws.push({type:'flush_draw', strength:3, outs:9,  label:'Flush Draw'});
+    else if (boardOfSuit === 1) draws.push({type:'bdoor_fd',   strength:1, outs:1,  label:'Backdoor Flush Draw'});
   } else {
-    // Offsuit hole cards: at most 1 hole card contributes per suit
-    const fd1 = boardSuits.filter(s=>s===hS1).length; // board cards matching h1 suit
-    const fd2 = boardSuits.filter(s=>s===hS2).length; // board cards matching h2 suit
-    // 1 hole + 3 board = 4 → Flush Draw (monotone board matching one hole card)
-    if (fd1===3) draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
-    else if (fd2===3) draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
-    // 1 hole + 2 board = 3 → Backdoor FD
-    else if (fd1===2) draws.push({type:'bdoor_fd', strength:1, outs:1, label:'Backdoor Flush Draw'});
-    else if (fd2===2) draws.push({type:'bdoor_fd', strength:1, outs:1, label:'Backdoor Flush Draw'});
-    // 1 hole + 1 board = 2 → too weak, ignore
+    const fd1 = boardSuits.filter(s => s === hS1).length;
+    const fd2 = boardSuits.filter(s => s === hS2).length;
+    if (fd1 === 3 || fd2 === 3)      draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
+    else if (fd1 === 2 || fd2 === 2) draws.push({type:'bdoor_fd',   strength:1, outs:1, label:'Backdoor Flush Draw'});
   }
 
-  // ── 2. STRAIGHT DRAWS ──
+  // 2. Straight draws
   const allVals    = [h1, h2, ...boardVals];
   const uniqueVals = [...new Set(allVals)];
-  let hasOESD = false, hasGutshot = false, hasBdoorStraight = false;
+  const holeAceLow = [h1, h2, ...(h1 === 14 || h2 === 14 ? [1] : [])];
+  const valsAceLow = uniqueVals.includes(14) ? [...new Set([...uniqueVals, 1])] : uniqueVals;
 
+  let hasOESD = false, hasGutshot = false, hasBdoorStr = false;
   if (made.rank < 4) {
-    const valsWithAceLow = uniqueVals.includes(14)
-      ? [...new Set([...uniqueVals, 1])]
-      : uniqueVals;
-    const holeValsAceLow = [h1, h2, ...(h1===14||h2===14 ? [1] : [])];
-
     for (let low = 1; low <= 10; low++) {
       const hi = low + 4;
-      const inWindow  = valsWithAceLow.filter(v => v >= low && v <= hi);
-      const holeInWin = holeValsAceLow.filter(v => v >= low && v <= hi);
-
-      if (inWindow.length === 4 && holeInWin.length >= 1) {
-        const gap = [low,low+1,low+2,low+3,hi].find(v => !inWindow.includes(v));
-        if (gap === low || gap === hi) hasOESD = true;
-        else hasGutshot = true;
+      const inWin   = valsAceLow.filter(v => v >= low && v <= hi);
+      const holeInW = holeAceLow.filter(v => v >= low && v <= hi);
+      if (inWin.length === 4 && holeInW.length >= 1) {
+        const gap = [low,low+1,low+2,low+3,hi].find(v => !inWin.includes(v));
+        if (gap === low || gap === hi) hasOESD    = true;
+        else                           hasGutshot = true;
       }
-      // Backdoor straight: 3 of 5 ranks present, at least 1 hole card
-      if (!hasOESD && !hasGutshot && inWindow.length === 3 && holeInWin.length >= 1) {
-        hasBdoorStraight = true;
-      }
+      if (!hasOESD && !hasGutshot && inWin.length === 3 && holeInW.length >= 1) hasBdoorStr = true;
     }
   }
+  if (hasOESD)   draws.push({type:'oesd',     strength:3, outs:8, label:'OESD (beidseitig offen)'});
+  if (hasGutshot && !hasOESD) draws.push({type:'gutshot', strength:2, outs:4, label:'Gutshot (einseitig)'});
+  if (hasBdoorStr && !hasOESD && !hasGutshot) draws.push({type:'bdoor_str', strength:1, outs:1, label:'Backdoor Straight Draw'});
 
-  if (hasOESD)         draws.push({type:'oesd',          strength:3, outs:8,  label:'OESD (beidseitig offen)'});
-  if (hasGutshot && !hasOESD) draws.push({type:'gutshot', strength:2, outs:4,  label:'Gutshot (einseitig)'});
-  if (hasBdoorStraight && !hasOESD && !hasGutshot)
-                        draws.push({type:'bdoor_str',     strength:1, outs:1,  label:'Backdoor Straight Draw'});
-
-  // ── 3. COMBO DRAW detection (FD + OESD or FD + Gutshot) ──
-  const hasFD   = draws.some(d=>d.type==='flush_draw');
-  const hasOESDd= draws.some(d=>d.type==='oesd');
-  const hasGutd = draws.some(d=>d.type==='gutshot');
-  if (hasFD && hasOESDd) {
-    // Remove individual entries, replace with combo
-    draws.splice(draws.findIndex(d=>d.type==='flush_draw'),1);
-    draws.splice(draws.findIndex(d=>d.type==='oesd'),1);
+  // 3. Combo draws (FD + OESD or FD + Gutshot)
+  const fdIdx   = draws.findIndex(d => d.type === 'flush_draw');
+  const oesdIdx = draws.findIndex(d => d.type === 'oesd');
+  const gutIdx  = draws.findIndex(d => d.type === 'gutshot');
+  if (fdIdx >= 0 && oesdIdx >= 0) {
+    draws.splice(Math.max(fdIdx, oesdIdx), 1);
+    draws.splice(Math.min(fdIdx, oesdIdx), 1);
     draws.unshift({type:'combo_draw', strength:4, outs:15, label:'Combo Draw (FD + OESD)'});
-  } else if (hasFD && hasGutd) {
-    draws.splice(draws.findIndex(d=>d.type==='flush_draw'),1);
-    draws.splice(draws.findIndex(d=>d.type==='gutshot'),1);
+  } else if (fdIdx >= 0 && gutIdx >= 0) {
+    draws.splice(Math.max(fdIdx, gutIdx), 1);
+    draws.splice(Math.min(fdIdx, gutIdx), 1);
     draws.unshift({type:'combo_draw', strength:3, outs:12, label:'Combo Draw (FD + Gutshot)'});
   }
 
-  // ── 4. IMPROVEMENT OUTS ──
-  // a) Set draw: pocket pair below board → 2 outs to hit set
-  if (h1===h2 && h1 < topBoardCard && made.rank < 3) {
-    draws.push({type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairRankName(h1)})`});
-  }
-  // b) Overcards: unmatched hole cards ABOVE top board card → outs to top pair
-  if (made.rank === 0) { // only if we have nothing
-    const oc1 = !boardVals.includes(h1) && h1 > topBoardCard;
-    const oc2 = !boardVals.includes(h2) && h2 > topBoardCard;
-    if (oc1 && oc2) {
-      draws.push({type:'overcards', strength:2, outs:6, label:`Zwei Overcards (${pairRankName(h1)}+${pairRankName(h2)})`});
-    } else if (oc1) {
-      draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairRankName(h1)})`});
-    } else if (oc2) {
-      draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairRankName(h2)})`});
-    }
-  }
-  // c) If we have top pair but NOT with hole cards above it (e.g. AK on K72):
-  //    The non-paired card is a kicker-improving out counted above.
-  //    If we have a pocket pair ON the board (e.g. 88 on A83), show set-draw
-  if (h1===h2 && boardVals.includes(h1) && made.rank < 3) {
-    draws.push({type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairRankName(h1)})`});
+  // 4. Set draw / Overcards
+  if (h1 === h2 && h1 < topBoard && made.rank < 3) draws.push({type:'set_draw',  strength:2, outs:2, label:`Set Draw (${pairName(h1)})`});
+  if (h1 === h2 && boardVals.includes(h1) && made.rank < 3) draws.push({type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairName(h1)})`});
+  if (made.rank === 0) {
+    const oc1 = !boardVals.includes(h1) && h1 > topBoard;
+    const oc2 = !boardVals.includes(h2) && h2 > topBoard;
+    if      (oc1 && oc2) draws.push({type:'overcards', strength:2, outs:6, label:`Zwei Overcards (${pairName(h1)}+${pairName(h2)})`});
+    else if (oc1)        draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairName(h1)})`});
+    else if (oc2)        draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairName(h2)})`});
   }
 
-  // ── 5. OVERALL draw strength ──
-  const drawStrength = draws.reduce((m,d)=>Math.max(m,d.strength),0);
-
-  return {
-    madeStrength, madeLabel, goodKicker,
-    draws, drawStrength,
-    bestMade: made,
-    topKicker: goodKicker
-  };
+  const drawStrength = draws.reduce((m, d) => Math.max(m, d.strength), 0);
+  return {madeStrength, madeLabel, goodKicker, draws, drawStrength, bestMade: made};
 }
 
-// ══════════════════════════════════
-// BOARD ANALYSIS
-// ══════════════════════════════════
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 5 — BOARD ANALYSIS
+══════════════════════════════════════════════════════════════════ */
 function analyzeBoard(board) {
   const vals  = board.map(cardVal);
   const suits = board.map(cardSuit);
 
-  const suitCounts = {};
-  suits.forEach(s => suitCounts[s] = (suitCounts[s]||0)+1);
-  const monotone = Object.values(suitCounts).some(v=>v>=3);
-  const twoTone  = !monotone && Object.values(suitCounts).some(v=>v>=2);
+  const suitCount = {};
+  suits.forEach(s => { suitCount[s] = (suitCount[s] || 0) + 1; });
+  const monotone = Object.values(suitCount).some(v => v >= 3);
+  const twoTone  = !monotone && Object.values(suitCount).some(v => v >= 2);
   const rainbow  = !monotone && !twoTone;
 
   const rankCount = {};
-  vals.forEach(v => rankCount[v] = (rankCount[v]||0)+1);
-  const paired = Object.values(rankCount).some(v=>v>=2);
+  vals.forEach(v => { rankCount[v] = (rankCount[v] || 0) + 1; });
+  const paired = Object.values(rankCount).some(v => v >= 2);
 
-  // ALWAYS use unique values for connectivity — a paired board like 997
-  // has unique ranks [9,7] and the gap is 2, NOT 0.
-  // Using [...vals].sort() on 997 gives [9,9,7] → gap1=0 → wrong "connected" result.
-  const uvals = [...new Set(vals)].sort((a,b)=>b-a);
-
-  // For connectivity we need exactly 3 reference points.
-  // If board is paired (only 2 unique ranks), treat the missing rank
-  // as very far away so connectivity = 0.
-  const sv0 = uvals[0];
-  const sv1 = uvals[1] !== undefined ? uvals[1] : sv0 - 10;
-  const sv2 = uvals[2] !== undefined ? uvals[2] : sv1 - 10;
-
+  // Use UNIQUE vals for connectivity (paired board like 997 has 2 unique ranks, not 3)
+  const uvals  = [...new Set(vals)].sort((a, b) => b - a);
+  const sv0    = uvals[0];
+  const sv1    = uvals[1] !== undefined ? uvals[1] : sv0 - 10;
+  const sv2    = uvals[2] !== undefined ? uvals[2] : sv1 - 10;
   const gap1   = sv0 - sv1;
   const gap2   = sv1 - sv2;
   const maxGap = Math.max(gap1, gap2);
   const minGap = Math.min(gap1, gap2);
   const highBoard = sv0 >= 12;
 
-  // Danger score — only applies to non-paired unique ranks
+  // Danger score (0–10) drives texture label
   let danger = 0;
-  if (monotone)       danger += 5;
-  else if (twoTone)   danger += 2;
-
+  if (monotone)     danger += 5;
+  else if (twoTone) danger += 2;
   if (!paired) {
-    // Only score connectivity on un-paired boards
-    if (minGap <= 1 && maxGap <= 1) danger += highBoard ? 3 : 5; // JT9, 876
-    else if (minGap <= 1)           danger += 2;                  // Q87, JT6
-    else if (minGap <= 2)           danger += 3;                  // J98, 986
+    if (minGap <= 1 && maxGap <= 1) danger += highBoard ? 3 : 5;
+    else if (minGap <= 1)           danger += 2;
+    else if (minGap <= 2)           danger += 3;
   }
-  // Paired boards get a small danger reduction (fewer draw combinations)
   if (paired) danger -= 1;
   danger = Math.max(0, Math.min(10, danger));
 
-  const texture  = danger >= 4 ? 'wet' : danger >= 2 ? 'mid' : 'dry';
-  const connected   = !paired && minGap <= 1;
-  const semiConnect = !paired && minGap <= 2 && !connected;
-  const highCard    = sv0 >= 11;
+  const texture      = danger >= 4 ? 'wet' : danger >= 2 ? 'mid' : 'dry';
+  const connected    = !paired && minGap <= 1;
+  const semiConnect  = !paired && minGap <= 2 && !connected;
+  const highCard     = sv0 >= 11;
 
   return {monotone, twoTone, rainbow, paired, connected, semiConnect, highCard, highBoard, danger, texture};
 }
 
 
-// ══════════════════════════════════
-// CORRECT ACTION ENGINE
-// ══════════════════════════════════
-function getCorrectAction(role, position, ip, boardInfo, handStrength, vs3bet, oppPosition, numOpponents) {
-  const {texture, paired, connected, monotone, danger} = boardInfo;
-  const {madeStrength, drawStrength, madeLabel, draws, goodKicker} = handStrength;
-  const opp   = oppRangeLabel(oppPosition || 'BTN');
-  const multi = (numOpponents || 1) > 1;
-  const wet   = texture === 'wet';
-  const mid   = texture === 'mid';
-  const dry   = texture === 'dry';
-  const strongDraws = draws.filter(d=>d.strength>=3).map(d=>d.label).join(' + ');
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 6 — CORRECT ACTION ENGINE
+══════════════════════════════════════════════════════════════════ */
 
-  // ═══════════════════════════════════════
-  // PFR — C-BET DECISION
-  // Key principle: Board texture drives sizing. Hand strength drives whether to bet.
-  // ═══════════════════════════════════════
+/**
+ * Returns { action, label, reason }
+ * action is one of the action IDs in TRAINER_ACTIONS_PFR / TRAINER_ACTIONS_CALLER
+ */
+function getCorrectAction(role, ip, boardInfo, handStrength, numOpponents) {
+  const {texture, paired, connected} = boardInfo;
+  const {madeStrength, drawStrength, madeLabel, draws, goodKicker} = handStrength;
+  const multi       = (numOpponents || 1) > 1;
+  const dry         = texture === 'dry';
+  const mid         = texture === 'mid';
+  const wet         = texture === 'wet';
+  const strongDraws = draws.filter(d => d.strength >= 3).map(d => d.label).join(' + ');
+
+  // ── PFR: C-bet decision ──────────────────────────────────────────
   if (role === 'pfr') {
 
-    // ── Sizing guide ──────────────────────────────────────────
-    // dry board  : 25–33% (low danger, BB misses often, cheap price efficient)
-    // mid board  : 40–50% (moderate draws, medium protection needed)
-    // wet board  : 55–70% (many draws, must price them out)
-    // multiway   : +1 size tier (more equity against us)
-    // ─────────────────────────────────────────────────────────
-
-    function sizing(base_dry, base_mid, base_wet, reason_suffix) {
+    /** Pick sizing based on board texture (+ multiway modifier) */
+    function sizing(label_dry, label_mid, label_wet, prefix) {
       if (multi) {
-        // Multiway always bigger — more players = more combined equity vs us
-        if (dry || paired) return {action:'bet_mid',   label:'Bet 40–50% (Multiway)', reason:`${reason_suffix} Multiway → immer größer betten: mehr Gegner haben kombiniert mehr Equity gegen dich.`};
-        if (mid)           return {action:'bet_mid',   label:'Bet 50–60% (Multiway)', reason:`${reason_suffix} Multiway auf connected Board — mittelgroßer Bet zum Schutz.`};
-        return                    {action:'bet_big',   label:'Bet 60–70% (Multiway)', reason:`${reason_suffix} Multiway auf nassem Board — groß betten, Draws und Overcards sind teuer zu machen.`};
+        if (dry || paired) return {action:'bet_mid',   label:`Bet 40–50% (Multiway)`, reason:`${prefix} Multiway → immer größer: mehr Gegner = mehr kombinierte Equity gegen dich.`};
+        if (mid)           return {action:'bet_mid',   label:`Bet 50–60% (Multiway)`, reason:`${prefix} Multiway auf connected Board — mittlerer Bet zum Schutz.`};
+        return                    {action:'bet_big',   label:`Bet 60–70% (Multiway)`, reason:`${prefix} Multiway auf nassem Board — groß betten, Draws dürfen nicht günstig callen.`};
       }
-      if (dry || paired) return {action:'bet_small', label:base_dry, reason:`${reason_suffix} Dry Board → kleiner Bet: BB hat kaum getroffen, 25–33% reicht.`};
-      if (mid)           return {action:'bet_mid',   label:base_mid, reason:`${reason_suffix} Mid Board → mittlerer Bet: connected Board hat Straight-Draw Potential.`};
-      return                    {action:'bet_big',   label:base_wet, reason:`${reason_suffix} Wet Board → großer Bet: viele Draws vorhanden, du willst sie teuer machen.`};
+      if (dry || paired)   return {action:'bet_small', label:label_dry, reason:`${prefix} Dry Board → kleiner Bet (25–33%): BB hat kaum getroffen.`};
+      if (mid)             return {action:'bet_mid',   label:label_mid, reason:`${prefix} Mid Board → mittlerer Bet: Straight-Draw-Potential begrenzen.`};
+      return                      {action:'bet_big',   label:label_wet, reason:`${prefix} Wet Board → großer Bet: viele Draws vorhanden, teuer machen.`};
     }
 
-    // [1] Monster: Set, 2-Pair, Überpaar, Straight, Flush
-    if (madeStrength >= 3) {
-      return sizing('Bet 25–40%', 'Bet 50–60%', 'Bet 60–70%', `${madeLabel} —`);
-    }
-
-    // [2] Top Pair (strong or weak kicker)
-    if (madeStrength === 2) {
-      return sizing('Bet 25–33%', 'Bet 40–50%', 'Bet 55–65%', `Top Pair (${madeLabel}) —`);
-    }
-
-    // [3] Strong Draw BEFORE weak pair — draw + initiative = semi-bluff
+    // Monster (Set, 2P, Flush, Straight etc.)
+    if (madeStrength >= 3)  return sizing('Bet 25–40%', 'Bet 50–60%', 'Bet 60–70%', `${madeLabel} —`);
+    // Top Pair
+    if (madeStrength === 2) return sizing('Bet 25–33%', 'Bet 40–50%', 'Bet 55–65%', `Top Pair (${madeLabel}) —`);
+    // Strong draw (semi-bluff)
     if (drawStrength >= 3) {
-      if (dry || paired) return {action:'bet_small', label:'Bet 25–33%', reason:`${strongDraws} auf dry Board — kleiner Semi-Bluff. Du hast Fold-Equity jetzt und Equity-Backup wenn gecallt.`};
-      if (mid)           return {action:'bet_mid',   label:'Bet 40–50%', reason:`${strongDraws} — Semi-Bluff. Fold-Equity + ~35% Equity-Backup. Zwei Gewinnwege.`};
-      return                    {action:'bet_mid',   label:'Bet 50–60%', reason:`${strongDraws} auf nassem Board — Semi-Bluff mit starker Equity. Gegner soll nicht günstig callen.`};
+      if (dry || paired) return {action:'bet_small', label:'Bet 25–33%', reason:`${strongDraws} auf dry Board — kleiner Semi-Bluff: Fold-Equity + Equity-Backup.`};
+      if (mid)           return {action:'bet_mid',   label:'Bet 40–50%', reason:`${strongDraws} — Semi-Bluff. Fold-Equity + ~35% Equity-Backup.`};
+      return                    {action:'bet_mid',   label:'Bet 50–60%', reason:`${strongDraws} auf nassem Board — Semi-Bluff mit starker Equity.`};
     }
-
-    // [4] Middle/bottom pair → Pot-Kontrolle
+    // Middle/bottom pair
     if (madeStrength === 1) {
-      if (wet)          return {action:'check', label:'Check', reason:`Mittleres Paar auf nassem Board — zu schwach für C-Bet ohne Draw-Backup. Pot-Kontrolle: check und Turn abwarten.`};
-      return                   {action:'check', label:'Check', reason:`Mittleres Paar — Pot-Kontrolle. Check und auf schwache Turn-Karten oder Gegner-Checks reagieren.`};
+      if (wet) return {action:'check', label:'Check', reason:`Mittleres Paar auf nassem Board — Pot-Kontrolle: check, turn abwarten.`};
+      return          {action:'check', label:'Check', reason:`Mittleres Paar — Pot-Kontrolle. Check und auf schwache Turn-Karten warten.`};
     }
-
-    // [5] Gutshot allein
-    if (drawStrength === 2) {
-      return {action:'check', label:'Check', reason:`Gutshot (4 Outs, ~17%) — zu wenig Equity für C-Bet allein. Check und abwarten.`};
-    }
-
-    // [6] Luft / Backdoor Draw / Paar auf Board
-    if (dry || paired) {
-      return {action:'bet_small', label:'Bet 25–33%', reason:`Luft auf dry/paired Board — klassischer C-Bet Bluff. BB-Range trifft diese Boards selten. Kleiner Bet ist kosteneffizient.`};
-    }
-    if (wet) {
-      return {action:'check', label:'Check', reason:`Luft auf nassem Board — kein Bluff ohne Equity-Backup. Gegner callt zu oft mit Draws.`};
-    }
-    return {action:'check', label:'Check', reason:`Luft — auf mid Board lieber checken. Warte einen besseren Turn-Spot.`};
+    // Gutshot alone
+    if (drawStrength === 2) return {action:'check', label:'Check', reason:`Gutshot (4 Outs, ~17%) — zu wenig Equity für C-Bet allein. Check.`};
+    // Nothing / backdoor draws
+    if (dry || paired) return {action:'bet_small', label:'Bet 25–33%', reason:`Luft auf dry/paired Board — klassischer C-Bet Bluff. BB trifft diese Boards selten.`};
+    if (wet)           return {action:'check',     label:'Check',      reason:`Luft auf nassem Board — kein Bluff ohne Equity-Backup. Gegner callt zu oft.`};
+    return                    {action:'check',     label:'Check',      reason:`Luft auf mid Board — lieber checken. Warte einen besseren Turn-Spot.`};
   }
 
-  // ═══════════════════════════════════════
-  // CALLER (BB) — FACING C-BET
-  // Key principle: Position + hand strength determines call/raise/fold.
-  // ═══════════════════════════════════════
+  // ── Caller (BB): facing a c-bet ─────────────────────────────────
   else {
-
-    // [1] Monster: Flush, Straight, Full House, Quads
+    // Monster
     if (madeStrength >= 4) {
-      if (ip)  return {action:'raise',       label:'Raise 3x',    reason:`${madeLabel} IP — direkt raisen. Wert maximieren und Draws teuer machen.`};
-      return          {action:'check_raise', label:'Check-Raise',  reason:`${madeLabel} OOP — check und raise den C-Bet. Mehr Wert als direktes Lead da du den Gegner zum Betten einlädst.`};
+      if (ip)  return {action:'raise',       label:'Raise 3x',   reason:`${madeLabel} IP — direkt raisen. Wert maximieren.`};
+      return          {action:'check_raise', label:'Check-Raise', reason:`${madeLabel} OOP — check-raise: mehr Wert als Lead.`};
     }
-
-    // [2] Set / 2-Pair / Überpaar
+    // Set / 2P / Overpair
     if (madeStrength === 3) {
-      if (wet  && ip)  return {action:'raise',       label:'Raise 2.5–3x', reason:`${madeLabel} auf nassem Board, IP — raise für Wert und Schutz. Draws sind gefährlich.`};
-      if (wet  && !ip) return {action:'check_raise', label:'Check-Raise',  reason:`${madeLabel} auf nassem Board, OOP — check-raise ist profitabler als Lead. Lockt den C-Bet.`};
-      if (mid)         return {action:'call',         label:'Call',         reason:`${madeLabel} auf mid Board — call und turn abwarten. Bei weiterem Bet auf Turn stark erhöhen.`};
-      // dry
-      return                  {action:'call',         label:'Call (Slow)',  reason:`${madeLabel} auf dry Board — slow play. Kleiner C-Bet callen und Turn/River eskalieren.`};
+      if (wet  && ip)  return {action:'raise',       label:'Raise 2.5–3x', reason:`${madeLabel} nasses Board, IP — raise für Wert + Schutz.`};
+      if (wet  && !ip) return {action:'check_raise', label:'Check-Raise',  reason:`${madeLabel} nasses Board, OOP — check-raise lockt den C-Bet.`};
+      if (mid)         return {action:'call',         label:'Call',         reason:`${madeLabel} mid Board — call, turn eskalieren.`};
+      return                  {action:'call',         label:'Call (Slow)',  reason:`${madeLabel} dry Board — slow play, turn/river eskalieren.`};
     }
-
-    // [3] Top Pair guter Kicker
+    // TPGK
     if (madeStrength === 2 && goodKicker) {
-      if (wet && !ip) return {action:'check_raise', label:'Check-Raise (selten)', reason:`TPGK OOP auf nassem Board — check-raise möglich als Wert/Semi-Bluff. Meistens aber callen.`};
-      return                 {action:'call',          label:'Call',               reason:`Top Pair guter Kicker — call und Turn evaluieren. Stark genug um fortzufahren.`};
+      if (wet && !ip) return {action:'check_raise', label:'Check-Raise (selten)', reason:`TPGK OOP nasses Board — check-raise möglich. Meistens callen.`};
+      return                 {action:'call',          label:'Call',               reason:`Top Pair guter Kicker — call und Turn evaluieren.`};
     }
-
-    // [4] Top Pair schwacher Kicker
+    // Top Pair weak kicker
     if (madeStrength === 2 && !goodKicker) {
-      if (wet) return {action:'call', label:'Call (vorsichtig)', reason:`Top Pair schwacher Kicker auf nassem Board — call aber bei Druck auf Turn oft folden.`};
-      return          {action:'call', label:'Call',              reason:`Top Pair schwacher Kicker — call auf ${texture} Board, Turn evaluieren.`};
+      if (wet) return {action:'call', label:'Call (vorsichtig)', reason:`TPWK auf nassem Board — call, bei Druck auf Turn oft folden.`};
+      return          {action:'call', label:'Call',              reason:`TPWK auf ${texture} Board — call, turn evaluieren.`};
     }
-
-    // [5] Mittleres / unteres Paar
+    // Middle/bottom pair
     if (madeStrength === 1) {
-      if (drawStrength >= 3) return {action:'call', label:'Call', reason:`Mittleres Paar + ${strongDraws} — kombiniert genug Equity (~50%). Call ist profitabel.`};
-      if (wet)               return {action:'fold', label:'Fold', reason:`Mittleres/unteres Paar auf nassem Board — zu wenig Equity. Fold gegen C-Bet.`};
-      if (mid)               return {action:'fold', label:'Fold', reason:`Mittleres Paar auf mid Board — fold gegen mittelgroßen/großen C-Bet. Nur gegen sehr kleinen Bet (< 25%) call.`};
-      return                        {action:'fold', label:'Fold', reason:`Mittleres Paar auf dry Board — fold. Gegner hat oft Top Pair oder besser auf dry Boards.`};
+      if (drawStrength >= 3) return {action:'call', label:'Call', reason:`Mittleres Paar + ${strongDraws} — kombiniert genug Equity (~50%). Call profitabel.`};
+      return                        {action:'fold', label:'Fold', reason:`Mittleres/unteres Paar gegen C-Bet — zu wenig Equity. Fold.`};
     }
-
-    // [6] Draws ohne Paar
+    // Strong draw
     if (drawStrength >= 3) {
-      if (ip) return {action:'raise', label:'Raise (Semi-Bluff)', reason:`${strongDraws} IP — Semi-Bluff Raise. ~35% Equity bis River + Fold-Equity macht das sehr profitabel.`};
-      return         {action:'call',  label:'Call',               reason:`${strongDraws} OOP — Call Standard. ~35% Equity bis River rechtfertigt Call gegen normale C-Bet-Größen.`};
+      if (ip) return {action:'raise', label:'Raise (Semi-Bluff)', reason:`${strongDraws} IP — Semi-Bluff Raise. ~35% Equity + Fold-Equity.`};
+      return         {action:'call',  label:'Call',               reason:`${strongDraws} OOP — call Standard. ~35% Equity bis River.`};
     }
-
-    // [7] Gutshot allein
+    // Gutshot
     if (drawStrength === 2) {
-      if (ip && dry) return {action:'call', label:'Call (Pot-Odds)', reason:`Gutshot auf dry Board IP — implizite Odds können Call rechtfertigen. ~17% Equity, turn oft günstig.`};
-      return                {action:'fold', label:'Fold',            reason:`Gutshot (4 Outs, ~17%) — Pot-Odds gegen C-Bet meist nicht ausreichend. Fold.`};
+      if (ip && dry) return {action:'call', label:'Call (Pot-Odds)', reason:`Gutshot auf dry Board IP — implizite Odds können Call rechtfertigen.`};
+      return                {action:'fold', label:'Fold',            reason:`Gutshot (4 Outs, ~17%) — Pot-Odds reichen meist nicht. Fold.`};
     }
-
-    // [8] Nichts (keine Hand, keine Draws), aber IP und Gegner checkt
+    // Probe bet IP when checked to
     if (madeStrength === 0 && drawStrength <= 1 && ip) {
-      return {action:'bet_small', label:'Probe-Bet 25–33%', reason:`IP und Gegner checkt: kleiner Probe-Bet holt Fold-Equity. Viele PFRs spielen check-fold mit schwachen Händen.`};
+      return {action:'bet_small', label:'Probe-Bet 25–33%', reason:`IP, Gegner checkt — kleiner Probe-Bet holt Fold-Equity.`};
     }
-
-    // [9] Nichts
-    return {action:'fold', label:'Fold', reason:'Ohne Hand und ohne Draw: fold gegen jeden C-Bet.'};
+    // Nothing
+    return {action:'fold', label:'Fold', reason:'Ohne Hand und Draw: fold gegen jeden C-Bet.'};
   }
 }
 
 
-// ══════════════════════════════════
-// ACTION DEFINITIONS
-// ══════════════════════════════════
-const ACTIONS_PFR = [
-  {id:'check',     name:'Check',       desc:'Kein Bet — passt'},
-  {id:'bet_small', name:'Bet klein',   desc:'25–33% des Pots'},
-  {id:'bet_mid',   name:'Bet mittel',  desc:'50–66% des Pots'},
-  {id:'bet_big',   name:'Bet groß',    desc:'66–80% des Pots'},
-  {id:'fold',      name:'Fold',        desc:'Aufgeben'},
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 7 — TRAINER GAME STATE & DEAL LOGIC
+══════════════════════════════════════════════════════════════════ */
+
+// Trainer ranges (same data as PF_RANGES but only positions used in training)
+const TRAINER_RANGES = {
+  UTG: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','AQs','AQo','KQs'], r:['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'] },
+  MP:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'] },
+  CO:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'], r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo','J9o'] },
+  BTN: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'], r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','96s','86s','85s','75s','65s','54s','A9o','A8o','A7o','A6o','K9o','K8o','Q9o','J9o','T9o','T8o','98o','87o','76o','65o'] },
+  SB:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'] }
+};
+
+const BB_DEFEND_RANGE = {
+  b: ['AA','KK','QQ','JJ','AKs','AKo'],
+  c: ['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo'],
+  r: ['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','QTs','Q9s','Q8s','JTs','J9s','J8s','T9s','T8s','T7s','98s','97s','96s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','KJo','KTo','K9o','K8o','QJo','QTo','Q9o','JTo','J9o','J8o','T9o','T8o','98o','87o','76o','65o']
+};
+
+// Available actions per role
+const TRAINER_ACTIONS_PFR = [
+  {id:'check',     name:'Check',      desc:'Kein Bet — passt'},
+  {id:'bet_small', name:'Bet klein',  desc:'25–33% des Pots'},
+  {id:'bet_mid',   name:'Bet mittel', desc:'50–66% des Pots'},
+  {id:'bet_big',   name:'Bet groß',   desc:'66–80% des Pots'},
+  {id:'fold',      name:'Fold',       desc:'Aufgeben'},
+];
+const TRAINER_ACTIONS_CALLER = [
+  {id:'fold',        name:'Fold',        desc:'Aufgeben'},
+  {id:'call',        name:'Call',        desc:'Mitgehen'},
+  {id:'check_raise', name:'Check-Raise', desc:'Check, dann raisen'},
+  {id:'raise',       name:'Raise',       desc:'Erhöhen'},
+  {id:'bet_small',   name:'Bet klein',   desc:'25–40% (wenn IP + check)'},
 ];
 
-const ACTIONS_CALLER = [
-  {id:'fold',        name:'Fold',          desc:'Aufgeben'},
-  {id:'call',        name:'Call',          desc:'Mitgehen'},
-  {id:'check_raise', name:'Check-Raise',   desc:'Check, dann raisen'},
-  {id:'raise',       name:'Raise',         desc:'Erhöhen'},
-  {id:'bet_small',   name:'Bet klein',     desc:'25–40% (wenn IP + check)'},
-];
+// Position postflop order for IP calculation
+const POST_ORDER = {SB:0, BB:1, UTG:2, MP:3, CO:4, BTN:5};
 
-// ══════════════════════════════════
-// OPPONENT POSITION HELPER
-// ══════════════════════════════════
-const OPP_RANGE_WIDTH = {UTG:14, MP:20, CO:28, BTN:48, SB:37, BB:65};
+// Weighted random position picker
+function weightedRandom(opts, weights) {
+  let total = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < opts.length; i++) { r -= weights[i]; if (r <= 0) return opts[i]; }
+  return opts[opts.length - 1];
+}
 
-function pickOppPosition() {
-  // BB is defending vs a raiser — realistic raiser positions
-  const opts = ['UTG','MP','CO','BTN','SB'];
-  const weights = [1, 1.5, 2, 3, 1.5]; // BTN raises most often
-  let total = weights.reduce((a,b)=>a+b,0);
-  let r = Math.random()*total;
-  for (let i=0; i<opts.length; i++) { r -= weights[i]; if (r<=0) return opts[i]; }
-  return 'BTN';
+function pickOppPositionAsCaller() {
+  // Who raised before us (BB calls)
+  return weightedRandom(['UTG','MP','CO','BTN','SB'], [1, 1.5, 2, 3, 1.5]);
 }
 
 function pickCallerPosition(heroPos) {
-  // Who calls hero's open? Positions that act AFTER hero (plus BB always possible)
-  // Weighted: late positions and BB call most often
-  const callerMap = {
+  const map = {
     UTG: {opts:['MP','CO','BTN','SB','BB'], weights:[1,1.5,2,1,2.5]},
     MP:  {opts:['CO','BTN','SB','BB'],      weights:[1.5,2,1,2.5]},
     CO:  {opts:['BTN','SB','BB'],           weights:[2,1,2.5]},
     BTN: {opts:['SB','BB'],                 weights:[1,3]},
     SB:  {opts:['BB'],                      weights:[1]},
   };
-  const map = callerMap[heroPos] || callerMap['BTN'];
-  let total = map.weights.reduce((a,b)=>a+b,0);
-  let r = Math.random()*total;
-  for (let i=0; i<map.opts.length; i++) { r -= map.weights[i]; if (r<=0) return map.opts[i]; }
-  return map.opts[map.opts.length-1];
+  const m = map[heroPos] || map.BTN;
+  return weightedRandom(m.opts, m.weights);
 }
 
-function oppRangeLabel(pos) {
-  const w = OPP_RANGE_WIDTH[pos] || 25;
-  if (w <= 14) return {label:'Sehr eng (UTG)', tightness:'very_tight', width:w};
-  if (w <= 20) return {label:'Eng (MP)',       tightness:'tight',      width:w};
-  if (w <= 28) return {label:'Mittel (CO)',    tightness:'medium',     width:w};
-  if (w <= 37) return {label:'Weit (SB)',      tightness:'wide',       width:w};
-  return              {label:'Sehr weit (BTN)',tightness:'very_wide',  width:w};
-}
+const OPP_RANGE_WIDTH = {UTG:14, MP:20, CO:28, BTN:48, SB:37, BB:65};
 
-// ══════════════════════════════════
-// GAME STATE
-// ══════════════════════════════════
-let scores = {correct:0, wrong:0, streak:0, bestStreak:0, total:0};
-let gameMode = 'pfr';
-let posFilter = 'ALL';
-let answered = false;
-let currentSituation = null;
+// Game state
+let trainerMode = 'pfr';
+let posFilter   = 'ALL';
+let answered    = false;
+let currentHand = null;
+let scores      = {correct:0, wrong:0, streak:0, bestStreak:0, total:0};
 let categoryScores = {};
 
-// Stats storage
 function saveScores() {
-  try { localStorage.setItem('pft_scores', JSON.stringify({scores, categoryScores})); } catch(e){}
+  try { localStorage.setItem('pft_scores', JSON.stringify({scores, categoryScores})); } catch(e) {}
 }
 function loadScores() {
   try {
-    const d = JSON.parse(localStorage.getItem('pft_scores')||'null');
-    if (d) { scores=d.scores; categoryScores=d.categoryScores||{}; }
-  } catch(e){}
+    const d = JSON.parse(localStorage.getItem('pft_scores') || 'null');
+    if (d) { scores = d.scores; categoryScores = d.categoryScores || {}; }
+  } catch(e) {}
 }
 
 function setMode(mode, btn) {
-  gameMode = mode;
-  document.getElementById('page-trainer').querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  trainerMode = mode;
+  document.getElementById('page-trainer').querySelectorAll('.mode-btn[onclick^="setMode"]')
+    .forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  answered = false;
   dealNew();
 }
 
 function togglePos(btn) {
-  const trainer = document.getElementById('page-trainer');
   const pos = btn.dataset.pos;
+  const trainer = document.getElementById('page-trainer');
   if (pos === 'ALL') {
-    trainer.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    trainer.querySelectorAll('.mode-btn[data-pos]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     posFilter = 'ALL';
   } else {
-    trainer.querySelector('[data-pos="ALL"]').classList.remove('active');
+    trainer.querySelector('.mode-btn[data-pos="ALL"]').classList.remove('active');
     btn.classList.toggle('active');
-    const active = [...trainer.querySelectorAll('.filter-btn.active')].map(b=>b.dataset.pos);
+    const active = [...trainer.querySelectorAll('.mode-btn[data-pos].active')].map(b => b.dataset.pos);
     posFilter = active.length ? active : 'ALL';
   }
   dealNew();
 }
 
-// ══════════════════════════════════
-// DEAL NEW HAND
-// ══════════════════════════════════
 function dealNew() {
   answered = false;
   document.getElementById('main-area').innerHTML = '';
 
-  // Choose role
-  let role = gameMode;
-  if (gameMode === 'both') role = Math.random()<0.5?'pfr':'caller';
+  // Determine role
+  let role = trainerMode;
+  if (role === 'both') role = Math.random() < 0.5 ? 'pfr' : 'caller';
 
-  // Choose position
-  const positions = role === 'pfr'
-    ? ['UTG','MP','CO','BTN','SB']
-    : ['BB'];
-
-  let availPos = positions;
+  // Determine hero position
+  const pfPositions = ['UTG','MP','CO','BTN','SB'];
+  let availPos = role === 'pfr' ? pfPositions : ['BB'];
   if (posFilter !== 'ALL' && role === 'pfr') {
-    const filtered = positions.filter(p => posFilter.includes ? posFilter.includes(p) : posFilter === p);
-    availPos = filtered.length ? filtered : positions;
+    const filtered = pfPositions.filter(p =>
+      Array.isArray(posFilter) ? posFilter.includes(p) : posFilter === p
+    );
+    if (filtered.length) availPos = filtered;
   }
+  const position  = availPos[Math.floor(Math.random() * availPos.length)];
 
-  const position = availPos[Math.floor(Math.random()*availPos.length)];
-  const range = role === 'pfr' ? T_RANGES[position] : BB_DEFEND;
-
-  // Pick random hand from range
-  const allHands = [...range.b, ...range.c, ...range.r];
-  const handNotation = allHands[Math.floor(Math.random()*allHands.length)];
-  const holeCards = handToCards(handNotation, []);
+  // Pick hand from range
+  const range     = role === 'pfr' ? TRAINER_RANGES[position] : BB_DEFEND_RANGE;
+  const allHands  = [...range.b, ...range.c, ...range.r];
+  const notation  = allHands[Math.floor(Math.random() * allHands.length)];
+  const holeCards = handToCards(notation, []);
   if (!holeCards) { dealNew(); return; }
 
   // Deal flop
   const deck = shuffleDeck(holeCards);
   const flop = [deck[0], deck[1], deck[2]];
 
-  // Opponent position — declared FIRST, needed for ip calculation
-  const oppPosition  = role === 'pfr' ? pickCallerPosition(position) : pickOppPosition();
+  // Opponent
+  const oppPosition  = role === 'pfr' ? pickCallerPosition(position) : pickOppPositionAsCaller();
   const numOpponents = (role === 'pfr' && Math.random() < 0.2) ? 2 : 1;
-
-  // IP postflop: hero acts after opp = hero has higher seat index
-  const POST_ORDER = {SB:0, BB:1, UTG:2, MP:3, CO:4, BTN:5};
   const ip = role === 'pfr'
     ? (POST_ORDER[position] || 0) > (POST_ORDER[oppPosition] || 0)
     : false;
 
-  // Analyze
-  const boardInfo = analyzeBoard(flop);
-  const handStrength = getHoleHandStrength(holeCards, flop);
-  const correctAct = getCorrectAction(role, position, ip, boardInfo, handStrength, false, oppPosition, numOpponents);
+  // Analysis
+  const boardInfo    = analyzeBoard(flop);
+  const handStrength = analyzeHoleCards(holeCards, flop);
+  const correctAct   = getCorrectAction(role, ip, boardInfo, handStrength, numOpponents);
 
-  // Pot info
-  const bbSize = 0.25;
-  const openSize = role === 'pfr' ? 3 * bbSize : bbSize;
+  // Pot (approximate NL25 sizing)
   const pot = role === 'pfr'
     ? (position === 'BTN' ? 2.2 : 2.5) + (numOpponents > 1 ? 0.6 : 0)
     : 1.4;
 
-  currentSituation = {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, bbSize, handNotation, oppPosition, numOpponents};
-
-  renderSituation();
+  currentHand = {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, notation, oppPosition, numOpponents};
+  renderTrainer();
 }
 
-// ══════════════════════════════════
-// RENDER
-// ══════════════════════════════════
-function renderSituation() {
-  const {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, oppPosition, numOpponents} = currentSituation;
-  const {texture, paired, connected, monotone, twoTone} = boardInfo;
-  const {madeLabel, draws, madeStrength, drawStrength} = handStrength;
 
-  const actions = role === 'pfr' ? ACTIONS_PFR : ACTIONS_CALLER;
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 8 — TRAINER RENDER
+══════════════════════════════════════════════════════════════════ */
 
-  // Board texture tags
-  let textureTags = '';
-  const tex = texture==='wet'?'wet':texture==='mid'?'mid':'dry';
-  textureTags += `<span class="btag btag-${tex}">${texture==='wet'?'WET / NASS':texture==='mid'?'MITTEL':'DRY / TROCKEN'}</span>`;
-  if (paired) textureTags += `<span class="btag btag-pair">GEPAIRED</span>`;
-  if (monotone) textureTags += `<span class="btag btag-fd">MONOTONE FLUSH</span>`;
-  else if (twoTone) textureTags += `<span class="btag btag-fd">FLUSH DRAW MÖGLICH</span>`;
-  if (connected) textureTags += `<span class="btag btag-wet">CONNECTED</span>`;
+// Equity reference for draw types
+const DRAW_EQ = {
+  flush_draw: {outs:9,  turn:'19%', river:'35%'},
+  oesd:       {outs:8,  turn:'17%', river:'32%'},
+  gutshot:    {outs:4,  turn:'9%',  river:'17%'},
+  combo_draw: {outs:15, turn:'32%', river:'54%'},
+  set_draw:   {outs:2,  turn:'4%',  river:'8%'},
+  overcards:  {outs:6,  turn:'13%', river:'24%'},
+  overcard:   {outs:3,  turn:'6%',  river:'12%'},
+};
 
-  // Hand strength display
-  let haStrengthColor = madeStrength>=3?'var(--green)':madeStrength>=2?'var(--amber)':madeStrength>=1?'var(--amber)':'var(--dim)';
-  let haDrawColor = drawStrength>=3?'var(--blue)':drawStrength>=2?'#90caf9':'var(--dim)';
+function madeEquityStr(str) {
+  if (str >= 5) return '~85–95%';
+  if (str >= 4) return '~80–90%';
+  if (str >= 3) return '~70–80%';
+  if (str === 2) return '~55–70%';
+  if (str === 1) return '~20–35%';
+  return '~25–40%';
+}
 
-  const drawText = draws.length
-    ? draws.map(d=>`<span style="color:${d.strength>=3?'var(--blue)':'var(--purple)'}">${d.label}</span>`).join(' + ')
-    : `<span class="ha-nothing">Keine Draws</span>`;
+function buildEquityTable(handStrength) {
+  const {madeStrength, madeLabel, draws} = handStrength;
+  const madeColor  = madeStrength >= 3 ? 'var(--green)' : madeStrength >= 2 ? 'var(--amber)' : madeStrength >= 1 ? 'var(--amber)' : 'var(--dim)';
 
-  // ── EQUITY & OUTS DISPLAY ──
-  const DRAW_EQ = {
-    flush_draw:  {outs:9,  turn:'19%', river:'35%'},
-    oesd:        {outs:8,  turn:'17%', river:'32%'},
-    gutshot:     {outs:4,  turn:'9%',  river:'17%'},
-    combo_draw:  {outs:15, turn:'32%', river:'54%'},
-    set_draw:    {outs:2,  turn:'4%',  river:'8%'},
-    overcards:   {outs:6,  turn:'13%', river:'24%'},
-    overcard:    {outs:3,  turn:'6%',  river:'12%'},
-  };
+  let rows = '';
 
-  function madeEquityStr(str) {
-    if (str >= 5) return '~85–95%';
-    if (str >= 4) return '~80–90%';
-    if (str >= 3) return '~70–80%';
-    if (str === 2) return '~55–70%';
-    if (str === 1) return '~20–35%'; // kontextabhängig: vs TP ~20%, vs Overcards ~65%
-    return '~25–40%';
-  }
-  function madeEquityNote(str) {
-    if (str === 1) return ' (vs Top Pair ~20%, vs Overcards ~65%)';
-    if (str === 2) return ' (vs schwächeres Paar ~70%, vs Set ~25%)';
-    return '';
-  }
-
-  let equityRows = '';
-
-  // Made hand
-  equityRows += `<div class="eq-row">
+  // Made hand row
+  rows += `<div class="eq-row">
     <span class="eq-type">${madeLabel}</span>
-    <span class="eq-val" style="color:${haStrengthColor}">${madeEquityStr(madeStrength)} Equity${madeEquityNote(madeStrength)}</span>
+    <span class="eq-val" style="color:${madeColor}">${madeEquityStr(madeStrength)} Equity</span>
   </div>`;
 
-  // Split draws into main draws and backdoor draws
-  const bdoorDraws = draws.filter(d => d.type==='bdoor_fd'||d.type==='bdoor_str');
-  const mainDraws  = draws.filter(d => d.type!=='bdoor_fd'&&d.type!=='bdoor_str');
+  // Main draws
+  const mainDraws  = draws.filter(d => d.type !== 'bdoor_fd' && d.type !== 'bdoor_str');
+  const bdoorDraws = draws.filter(d => d.type === 'bdoor_fd' || d.type === 'bdoor_str');
 
-  // Main draws (flush draw, OESD, gutshot, combo, set, overcards)
   mainDraws.forEach(d => {
-    const de = DRAW_EQ[d.type];
-    if (!de) return;
-    const col = d.strength>=4?'#ff9800':d.strength>=3?'var(--blue)':d.strength===2?'#90caf9':'var(--purple)';
-    const isImprove = d.type==='set_draw'||d.type==='overcards'||d.type==='overcard';
-    if (isImprove) {
-      equityRows += `<div class="eq-row">
-        <span class="eq-type" style="color:${col}">${d.label}</span>
-        <span class="eq-val">${de.outs} Outs &nbsp;·&nbsp; River: ${de.river}</span>
-      </div>`;
-    } else {
-      equityRows += `<div class="eq-row">
-        <span class="eq-type" style="color:${col}">${d.label}</span>
-        <span class="eq-val">${de.outs} Outs &nbsp;·&nbsp; Turn: ${de.turn} &nbsp;·&nbsp; River: ${de.river}</span>
-      </div>`;
-    }
+    const de  = DRAW_EQ[d.type]; if (!de) return;
+    const col = d.strength >= 4 ? '#ff9800' : d.strength >= 3 ? 'var(--blue)' : d.strength === 2 ? '#90caf9' : 'var(--purple)';
+    const isImprove = d.type === 'set_draw' || d.type === 'overcards' || d.type === 'overcard';
+    rows += `<div class="eq-row">
+      <span class="eq-type" style="color:${col}">${d.label}</span>
+      <span class="eq-val">${de.outs} Outs${isImprove ? ` · River: ${de.river}` : ` · Turn: ${de.turn} · River: ${de.river}`}</span>
+    </div>`;
   });
 
-  // Backdoor draws — shown combined with additive note
-  if (bdoorDraws.length > 0) {
-    const hasBFD = bdoorDraws.some(d=>d.type==='bdoor_fd');
-    const hasBST = bdoorDraws.some(d=>d.type==='bdoor_str');
-    let bdLabel, bdEq, bdNote;
-    if (hasBFD && hasBST) {
-      bdLabel = 'Backdoor FD + Straight';
-      bdEq    = '~7–8%';
-      bdNote  = '~4% + ~5%, mit Überlappung ~7–8% kombiniert';
-    } else if (hasBFD) {
-      bdLabel = 'Backdoor Flush Draw';
-      bdEq    = '~4%';
-      bdNote  = 'Kein "Out" — braucht zwei gleiche Farbe in Folge';
-    } else {
-      bdLabel = 'Backdoor Straight Draw';
-      bdEq    = '~5%';
-      bdNote  = 'Kein "Out" — braucht zwei spezifische Karten';
-    }
-    equityRows += `<div class="eq-row">
+  // Backdoor draws
+  if (bdoorDraws.length) {
+    const hasBFD = bdoorDraws.some(d => d.type === 'bdoor_fd');
+    const hasBST = bdoorDraws.some(d => d.type === 'bdoor_str');
+    const bdLabel = hasBFD && hasBST ? 'Backdoor FD + Straight' : hasBFD ? 'Backdoor Flush Draw' : 'Backdoor Straight Draw';
+    const bdEq    = hasBFD && hasBST ? '~7–8%' : hasBFD ? '~4%' : '~5%';
+    rows += `<div class="eq-row">
       <span class="eq-type" style="color:var(--purple)">${bdLabel}</span>
-      <span class="eq-val">Bonus: ${bdEq} &nbsp;<span style="color:var(--dim);font-size:10px">(${bdNote})</span></span>
+      <span class="eq-val">Bonus: ${bdEq}</span>
     </div>`;
   }
 
-  // Combined equity: made hand + strong main draw
-  const strongDraw = mainDraws.find(d=>d.strength>=3);
+  // Combined equity (made + strong draw)
+  const strongDraw = mainDraws.find(d => d.strength >= 3);
   if (madeStrength >= 1 && strongDraw) {
-    let combined;
-    if (madeStrength >= 3)                          combined = '~85–90%';
-    else if (madeStrength === 2 && strongDraw.outs>=9) combined = '~70–80%';
-    else if (madeStrength === 2)                    combined = '~65–75%';
-    else                                             combined = '~50–60%';
-    equityRows += `<div class="eq-row eq-combined">
+    const combined = madeStrength >= 3 ? '~85–90%' : madeStrength === 2 && strongDraw.outs >= 9 ? '~70–80%' : madeStrength === 2 ? '~65–75%' : '~50–60%';
+    rows += `<div class="eq-row eq-combined">
       <span class="eq-type">Kombiniert (${madeLabel} + ${strongDraw.label})</span>
       <span class="eq-val" style="color:var(--green)">${combined} Equity</span>
     </div>`;
   }
 
-  // Only backdoors + no hand → show total with backdoor bonus
-  if (madeStrength === 0 && mainDraws.length === 0 && bdoorDraws.length > 0) {
-    const hasBFD = bdoorDraws.some(d=>d.type==='bdoor_fd');
-    const hasBST = bdoorDraws.some(d=>d.type==='bdoor_str');
-    const totalEq = hasBFD && hasBST ? '~32–42%' : '~29–37%';
-    equityRows += `<div class="eq-row eq-combined">
-      <span class="eq-type">High Card + Backdoor(s) gesamt</span>
-      <span class="eq-val" style="color:var(--muted)">${totalEq} Equity total</span>
-    </div>`;
-  }
+  return rows;
+}
 
-  // Opponent range — declared first so all badges can use it
-  const opp = oppRangeLabel(oppPosition || 'BTN');
+function renderTrainer() {
+  const {role, position, ip, holeCards, flop, boardInfo, handStrength, correctAct, pot, oppPosition, numOpponents} = currentHand;
+  const {texture, paired, connected, monotone, twoTone} = boardInfo;
+  const {draws, drawStrength} = handStrength;
+  const actions = role === 'pfr' ? TRAINER_ACTIONS_PFR : TRAINER_ACTIONS_CALLER;
 
-  // Role/position badges
-  const roleBadge = role==='pfr'
-    ? `<span class="sit-badge pfr">AGGRESSOR (PFR)</span>`
-    : `<span class="sit-badge caller">CALLER (BB)</span>`;
-  const ipBadge = ip
-    ? `<span class="sit-badge ip">IN POSITION</span>`
-    : `<span class="sit-badge oop">OUT OF POSITION</span>`;
-  const posBadge   = `<span class="sit-badge pos">${position}</span>`;
-  const oppBadge   = `<span class="sit-badge opp">vs ${oppPosition||'BB'} · ${opp.width}%</span>`;
-  const multiBadge = numOpponents > 1 ? `<span class="sit-badge multi">MULTIWAY (${numOpponents} Gegner)</span>` : '';
+  // Board texture tags
+  const tex = texture === 'wet' ? 'wet' : texture === 'mid' ? 'mid' : 'dry';
+  let textureTags = `<span class="btag btag-${tex}">${texture === 'wet' ? 'WET / NASS' : texture === 'mid' ? 'MITTEL' : 'DRY / TROCKEN'}</span>`;
+  if (paired)   textureTags += `<span class="btag btag-pair">GEPAIRED</span>`;
+  if (monotone) textureTags += `<span class="btag btag-fd">MONOTONE FLUSH</span>`;
+  else if (twoTone) textureTags += `<span class="btag btag-fd">FLUSH DRAW MÖGLICH</span>`;
+  if (connected) textureTags += `<span class="btag btag-wet">CONNECTED</span>`;
 
-  // Opponent info
+  // Draw summary text
+  const drawText = draws.length
+    ? draws.map(d => `<span style="color:${d.strength >= 3 ? 'var(--blue)' : 'var(--purple)'}">${d.label}</span>`).join(' + ')
+    : `<span style="color:var(--dim)">Keine Draws</span>`;
+
+  const oppWidth = OPP_RANGE_WIDTH[oppPosition] || 25;
   const multiStr = numOpponents > 1 ? ` + 1 Caller · MULTIWAY` : '';
-  const oppInfo = role === 'pfr'
+  const oppInfo  = role === 'pfr'
     ? `${oppPosition} hat gecallt${multiStr} · Du bist am Zug`
-    : `${oppPosition||'BTN'} hat geraist (${opp.width}% Range) · C-Bet wahrscheinlich`;
+    : `${oppPosition||'BTN'} hat geraist (${oppWidth}% Range) · C-Bet wahrscheinlich`;
 
-  // Action buttons
-  const actBtns = actions.map(a => `
+  const actionBtns = actions.map(a => `
     <button class="action-btn" id="abtn-${a.id}" onclick="selectAction('${a.id}')">
       <div class="ab-name">${a.name}</div>
       <div class="ab-desc">${a.desc}</div>
     </button>`).join('');
 
-  const html = `
+  document.getElementById('main-area').innerHTML = `
     <div class="situation">
       <div class="sit-header">
-        ${roleBadge}
-        ${posBadge}
-        ${ipBadge}
-        ${oppBadge}
-        ${multiBadge}
+        <span class="sit-badge ${role}">${role === 'pfr' ? 'AGGRESSOR (PFR)' : 'CALLER (BB)'}</span>
+        <span class="sit-badge pos">${position}</span>
+        <span class="sit-badge ${ip ? 'ip' : 'oop'}">${ip ? 'IN POSITION' : 'OUT OF POSITION'}</span>
+        <span class="sit-badge opp">vs ${oppPosition} · ${oppWidth}%</span>
+        ${numOpponents > 1 ? `<span class="sit-badge multi">MULTIWAY (${numOpponents} Gegner)</span>` : ''}
         <span style="font-size:12px;color:var(--muted);margin-left:auto">${oppInfo}</span>
       </div>
 
       <div class="cards-row">
         <div>
           <div class="card-group-label">Deine Hand</div>
-          <div class="cards-display">
-            ${renderCard(holeCards[0])}
-            ${renderCard(holeCards[1])}
-          </div>
+          <div class="cards-display">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div>
         </div>
         <div>
           <div class="card-group-label">Flop</div>
-          <div class="cards-display">
-            ${renderCard(flop[0])}
-            ${renderCard(flop[1])}
-            ${renderCard(flop[2])}
-          </div>
+          <div class="cards-display">${renderCard(flop[0])}${renderCard(flop[1])}${renderCard(flop[2])}</div>
         </div>
         <div>
           <div class="card-group-label">Turn / River</div>
-          <div class="cards-display">
-            ${renderCard('',true)}
-            ${renderCard('',true)}
-          </div>
+          <div class="cards-display">${renderCard('',true)}${renderCard('',true)}</div>
         </div>
       </div>
 
       <div class="pot-info">
         <div class="pot-item">Pot: <b>$${pot.toFixed(2)}</b></div>
         <div class="pot-item">Stack: <b>~$25</b></div>
-        <div class="pot-item">SPR: <b>~${(25/pot).toFixed(1)}</b></div>
+        <div class="pot-item">SPR: <b>~${(25 / pot).toFixed(1)}</b></div>
         <div class="pot-item" style="color:var(--muted);font-size:12px">6-max NL25 · 100bb</div>
       </div>
 
@@ -2559,34 +1470,30 @@ function renderSituation() {
 
       <div class="hand-analysis">
         <div class="ha-title">Deine Hand auf diesem Flop</div>
-        <div class="eq-table">${equityRows}</div>
-        <div style="color:${haDrawColor};margin-top:6px;font-size:12px">${drawText}</div>
+        <div class="eq-table">${buildEquityTable(handStrength)}</div>
+        <div style="margin-top:6px;font-size:12px">${drawText}</div>
       </div>
     </div>
 
     <div class="action-section">
       <div class="action-label">Was ist deine Aktion?</div>
-      <div class="action-grid" id="action-grid">${actBtns}</div>
+      <div class="action-grid" id="action-grid">${actionBtns}</div>
     </div>
 
     <div class="feedback" id="feedback"></div>
-
-    <button class="next-btn" id="next-btn" onclick="dealNew()">
-      Nächste Hand ›
-    </button>
+    <button class="next-btn" id="next-btn" onclick="dealNew()">Nächste Hand ›</button>
   `;
-
-  document.getElementById('main-area').innerHTML = html;
 }
 
-// ══════════════════════════════════
-// HANDLE ANSWER
-// ══════════════════════════════════
+
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 9 — TRAINER ANSWER HANDLING & SCORING
+══════════════════════════════════════════════════════════════════ */
 function selectAction(actionId) {
   if (answered) return;
   answered = true;
 
-  const {correctAct, handStrength, boardInfo, role, position, holeCards, flop} = currentSituation;
+  const {correctAct, handStrength, boardInfo, role} = currentHand;
   const correct = actionId === correctAct.action;
 
   // Update scores
@@ -2599,93 +1506,97 @@ function selectAction(actionId) {
     scores.wrong++;
     scores.streak = 0;
   }
-
-  // Category score
-  const catKey = role+'_'+boardInfo.texture;
-  if (!categoryScores[catKey]) categoryScores[catKey] = {c:0,w:0};
+  const catKey = role + '_' + boardInfo.texture;
+  if (!categoryScores[catKey]) categoryScores[catKey] = {c:0, w:0};
   correct ? categoryScores[catKey].c++ : categoryScores[catKey].w++;
 
   saveScores();
   updateScoreboard();
 
-  // Style buttons
+  // Highlight buttons
+  const allActions = role === 'pfr' ? TRAINER_ACTIONS_PFR : TRAINER_ACTIONS_CALLER;
   document.querySelectorAll('.action-btn').forEach(btn => {
-    const id = btn.id.replace('abtn-','');
-    if (id === actionId && correct)              btn.classList.add('selected-correct');
-    if (id === actionId && !correct)             btn.classList.add('selected-wrong');
-    if (id === correctAct.action && !correct)    btn.classList.add('show-correct');
+    const id = btn.id.replace('abtn-', '');
+    if (id === actionId && correct)            btn.classList.add('selected-correct');
+    if (id === actionId && !correct)           btn.classList.add('selected-wrong');
+    if (id === correctAct.action && !correct)  btn.classList.add('show-correct');
   });
 
   // Build feedback
-  const {madeLabel, madeStrength, draws, drawStrength} = handStrength;
+  const {madeLabel, draws} = handStrength;
   const {texture, paired, connected} = boardInfo;
+  const selectedLabel = allActions.find(a => a.id === actionId)?.name || actionId;
+  const correctLabel  = allActions.find(a => a.id === correctAct.action)?.name || correctAct.label;
 
-  const selectedAction = (role==='pfr'?ACTIONS_PFR:ACTIONS_CALLER).find(a=>a.id===actionId);
-  const correctAction  = (role==='pfr'?ACTIONS_PFR:ACTIONS_CALLER).find(a=>a.id===correctAct.action);
-
-  let detailText = `<b>Deine Aktion:</b> ${selectedAction?.name || actionId}<br>`;
-  if (!correct) detailText += `<b>Korrekte Aktion:</b> ${correctAction?.name || correctAct.label}<br>`;
-  detailText += `<br><b>Hand:</b> ${madeLabel}`;
-  if (draws.length) detailText += `<br><b>Draws:</b> ${draws.map(d=>d.label).join(', ')}`;
-  detailText += `<br><b>Board:</b> ${texture.toUpperCase()}${paired?' · GEPAIRED':''}${connected?' · CONNECTED':''}`;
-  detailText += `<br><b>Erkärung:</b> ${correctAct.reason}`;
+  let detail = `<b>Deine Aktion:</b> ${selectedLabel}<br>`;
+  if (!correct) detail += `<b>Korrekte Aktion:</b> ${correctLabel}<br>`;
+  detail += `<br><b>Hand:</b> ${madeLabel}`;
+  if (draws.length) detail += `<br><b>Draws:</b> ${draws.map(d => d.label).join(', ')}`;
+  detail += `<br><b>Board:</b> ${texture.toUpperCase()}${paired ? ' · GEPAIRED' : ''}${connected ? ' · CONNECTED' : ''}`;
+  detail += `<br><b>Erklärung:</b> ${correctAct.reason}`;
 
   const fb = document.getElementById('feedback');
-  fb.className = 'feedback ' + (correct?'correct':'wrong');
+  fb.className = 'feedback ' + (correct ? 'correct' : 'wrong');
   fb.style.display = 'block';
   fb.innerHTML = `
     <div class="fb-verdict">${correct ? '✓ Richtig!' : '✗ Falsch!'}</div>
     <div class="fb-text">${correctAct.reason}</div>
-    <div class="fb-detail">${detailText}</div>
-  `;
+    <div class="fb-detail">${detail}</div>`;
 
-  document.getElementById('next-btn').style.display = 'block';
-  document.getElementById('next-btn').scrollIntoView({behavior:'smooth', block:'nearest'});
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.style.display = 'block';
+  nextBtn.scrollIntoView({behavior:'smooth', block:'nearest'});
 
   // Progress bar
-  const pct = scores.total > 0 ? Math.min(100, (scores.correct/scores.total)*100) : 0;
-  document.getElementById('prog-bar').style.width = pct + '%';
-  document.getElementById('prog-bar').style.background = pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+  const pct = scores.total > 0 ? Math.min(100, (scores.correct / scores.total) * 100) : 0;
+  const bar  = document.getElementById('prog-bar');
+  bar.style.width      = pct + '%';
+  bar.style.background = pct >= 70 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
 }
 
 function updateScoreboard() {
+  const pct = scores.total > 0 ? Math.round(scores.correct / scores.total * 100) : 0;
   document.getElementById('sc-correct').textContent = scores.correct;
   document.getElementById('sc-wrong').textContent   = scores.wrong;
   document.getElementById('sc-total').textContent   = scores.total;
   document.getElementById('sc-streak').textContent  = scores.streak;
-  const pct = scores.total>0 ? Math.round(scores.correct/scores.total*100) : 0;
-  document.getElementById('sc-pct').textContent = pct+'%';
+  document.getElementById('sc-pct').textContent     = pct + '%';
 }
 
-function showStats() {
-  const pct = scores.total>0?Math.round(scores.correct/scores.total*100):0;
-  const main = document.getElementById('main-area');
 
-  const catRows = Object.entries(categoryScores).map(([k,v])=>{
-    const total=v.c+v.w, p=total?Math.round(v.c/total*100):0;
-    const [role,tex] = k.split('_');
-    const color = p>=70?'var(--green)':p>=50?'var(--amber)':'var(--red)';
+/* ══════════════════════════════════════════════════════════════════
+   MODULE 10 — STATISTICS VIEW
+══════════════════════════════════════════════════════════════════ */
+function showStats() {
+  const pct     = scores.total > 0 ? Math.round(scores.correct / scores.total * 100) : 0;
+  const pctCol  = pct >= 70 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+
+  const catRows = Object.entries(categoryScores).map(([k, v]) => {
+    const total = v.c + v.w;
+    const p     = total ? Math.round(v.c / total * 100) : 0;
+    const [role, tex] = k.split('_');
+    const col   = p >= 70 ? 'var(--green)' : p >= 50 ? 'var(--amber)' : 'var(--red)';
     return `<tr>
-      <td style="color:#fff;font-weight:bold">${role==='pfr'?'Aggressor':'Caller'} · ${tex.toUpperCase()}</td>
+      <td style="color:#fff;font-weight:bold">${role === 'pfr' ? 'Aggressor' : 'Caller'} · ${tex.toUpperCase()}</td>
       <td style="color:var(--green)">${v.c}</td>
       <td style="color:var(--red)">${v.w}</td>
-      <td style="color:${color};font-weight:bold">${p}%</td>
+      <td style="color:${col};font-weight:bold">${p}%</td>
     </tr>`;
   }).join('');
 
-  main.innerHTML = `
+  document.getElementById('main-area').innerHTML = `
     <div class="stats-box">
       <div class="stats-title">Gesamtstatistiken</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-lbl">Gesamt</div><div class="stat-val">${scores.total}</div></div>
-        <div class="stat-card"><div class="stat-lbl">Richtig</div><div class="stat-val" style="color:var(--green)">${scores.correct}</div></div>
-        <div class="stat-card"><div class="stat-lbl">Falsch</div><div class="stat-val" style="color:var(--red)">${scores.wrong}</div></div>
-        <div class="stat-card"><div class="stat-lbl">Quote</div><div class="stat-val" style="color:${pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)'}">${pct}%</div></div>
-        <div class="stat-card"><div class="stat-lbl">Beste Serie</div><div class="stat-val" style="color:var(--amber)">${scores.bestStreak}</div></div>
+        <div class="stat-card"><div class="stat-lbl">Gesamt</div>       <div class="stat-val">${scores.total}</div></div>
+        <div class="stat-card"><div class="stat-lbl">Richtig</div>      <div class="stat-val" style="color:var(--green)">${scores.correct}</div></div>
+        <div class="stat-card"><div class="stat-lbl">Falsch</div>       <div class="stat-val" style="color:var(--red)">${scores.wrong}</div></div>
+        <div class="stat-card"><div class="stat-lbl">Quote</div>        <div class="stat-val" style="color:${pctCol}">${pct}%</div></div>
+        <div class="stat-card"><div class="stat-lbl">Beste Serie</div>  <div class="stat-val" style="color:var(--amber)">${scores.bestStreak}</div></div>
         <div class="stat-card"><div class="stat-lbl">Aktuelle Serie</div><div class="stat-val" style="color:var(--amber)">${scores.streak}</div></div>
       </div>
     </div>
-    ${catRows.length ? `
+    ${catRows ? `
     <div class="stats-box">
       <div class="stats-title">Nach Kategorie</div>
       <table class="ref-tbl" style="font-size:13px;">
@@ -2697,9 +1608,10 @@ function showStats() {
       Zurück zum Training ›
     </button>
     <div style="margin-top:12px;text-align:right;">
-      <button onclick="resetScores()" class="btn-small" style="border-color:var(--red);color:var(--red);">Statistik zurücksetzen</button>
-    </div>
-  `;
+      <button onclick="resetScores()" style="padding:5px 12px;font-size:12px;font-weight:bold;border:1px solid var(--border);background:var(--bg3);color:var(--red);cursor:pointer;font-family:Arial;border-color:var(--red);">
+        Statistik zurücksetzen
+      </button>
+    </div>`;
 }
 
 function resetScores() {
@@ -2708,13 +1620,15 @@ function resetScores() {
   categoryScores = {};
   saveScores();
   updateScoreboard();
-  document.getElementById('prog-bar').style.width='0%';
+  document.getElementById('prog-bar').style.width = '0%';
   dealNew();
 }
 
-// ── INIT ── (called when tab opens via goPage) 
-// Auto-init disabled — triggered by tab click
-</script>
 
+/* ══════════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════════ */
+renderPreflopRange(true);
+</script>
 </body>
 </html>
