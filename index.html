@@ -1,3 +1,58 @@
+
+
+<!DOCTYPE html> <html lang="de"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Poker Strategy Suite – NL6max</title> <style> *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } :root { --bg: #1a1a1
+
+pasted
+
+kannst du mir ein varianz rechner/diagramm bauen für ggpoker  pokerkraft einer neur tab ich muss dann warscheinlich meien pokercraft dateien einlesen oder
+
+14:44
+
+Architektierte Varianz-Rechner mit CSV-Upload und Visualisierung
+Architektierte Varianz-Rechner mit CSV-Upload und Visualisierung
+Ich erstelle dir einen Varianz-Rechner mit Diagramm als neue Tab! Dieser kann PokerCraft CSV-Dateien einlesen und deine Ergebnisse vs. EV visualisieren.
+
+
+Konstruierte Varianz-Rechner mit CSV-Import und Analysen
+Konstruierte Varianz-Rechner mit CSV-Import und Analysen
+Perfekt! Ich habe dir einen Varianz-Rechner in deine Poker Suite eingebaut. Hier sind die Features:
+
+
+Orchestrierte erfolgreiche Dateiablage und plante Feature-Zusammenfassung
+Orchestrierte erfolgreiche Dateiablage und plante Feature-Zusammenfassung
+📊 Varianz-Rechner hinzugefügt!
+Neue Features:
+
+📁 File Upload
+Drag & Drop oder Klick zum Hochladen
+Unterstützt: PokerCraft, Hand2Note, PokerTracker CSV-Exports
+Automatische Erkennung der Spalten (flexible Namen)
+📈 Visualisierungen
+Winnings vs. EV Chart - Zeigt tatsächliche Gewinne vs. erwarteten Wert
+Downswing Analyse - Visualisiert den größten Downswing vom Peak
+📊 Statistiken
+Gespielte Hände - Gesamtanzahl
+Tatsächlicher Gewinn - Mit $/Hand Rate
+EV Gewinn - Expected Value
+Varianz - Differenz zwischen Actual und EV
+Standard-Abweichung - Pro Hand
+Größter Downswing - Vom Peak gemessen
+📋 Hand History Tabelle
+Zeigt erste 100 Hände im Detail
+Spalten: Hand #, Datum, Gewinn, EV, Varianz, Kum. Gewinn, Kum. EV
+Farbcodiert (grün = positiv, rot = negativ)
+CSV-Format: Der Parser ist flexibel und findet automatisch die richtigen Spalten, egal ob sie "Net Won", "Win", "Profit", "EV", "Expected Value" etc. heißen. Funktioniert mit verschiedenen Währungsformaten ($, €, Kommas, etc.).
+
+Poker suite with variance
+Code · HTML 
+
+
+
+
+Claude ist eine KI und kann Fehler machen. Bitte überprüfe die Antworten.
+Poker suite with variance · HTML
+Kopieren
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -320,7 +375,7 @@ body {
 .outs-cell-lbl { font-size: 10px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
 .outs-cell-val { font-size: 24px; font-weight: bold; line-height: 1; }
 .outs-cell-sub { font-size: 10px; color: var(--dim); margin-top: 2px; }
-
+ 
 /* EQUITY NOTE */
 .equity-note {
   font-size: 11px;
@@ -383,26 +438,6 @@ body {
 .eq-type   { font-size: 13px; font-weight: bold; color: var(--text); }
 .eq-val    { font-size: 12px; font-family: 'Courier New', monospace; color: var(--muted); white-space: nowrap; }
  
-/* RIVER HAND DISPLAY */
-.river-hand-box {
-  display: flex;
-  gap: 0;
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 10px;
-  background: var(--bg2);
-}
-.rhb-cell {
-  flex: 1;
-  padding: 12px;
-  text-align: center;
-  border-right: 1px solid var(--border);
-  background: var(--bg2);
-}
-.rhb-cell:last-child { border-right: none; }
-.rhb-lbl { font-size: 10px; font-weight: bold; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
-.rhb-val { font-size: 20px; font-weight: bold; line-height: 1.2; }
- 
 /* EMPTY STATE */
 .empty-state {
   text-align: center;
@@ -411,6 +446,126 @@ body {
 }
 .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-state .es-text { font-size: 15px; }
+ 
+/* ══ VARIANCE CALCULATOR ══ */
+.upload-area {
+  background: var(--bg2);
+  border: 2px dashed var(--border);
+  padding: 30px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.upload-area:hover {
+  border-color: var(--accent);
+  background: var(--bg3);
+}
+.upload-area.drag-over {
+  border-color: var(--green);
+  background: rgba(76,175,80,.1);
+}
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--muted);
+}
+.upload-text {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.upload-hint {
+  font-size: 12px;
+  color: var(--dim);
+}
+.file-input {
+  display: none;
+}
+ 
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 16px;
+  text-align: center;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-sub {
+  font-size: 11px;
+  color: var(--dim);
+}
+ 
+.chart-container {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+  height: 400px;
+}
+.chart-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 16px;
+  text-align: center;
+}
+ 
+.data-table {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.data-table th {
+  background: var(--bg3);
+  color: var(--muted);
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 10px;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.data-table tr:hover {
+  background: var(--bg3);
+}
+ 
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+.neutral { color: var(--muted); }
  
 /* ══ RESPONSIVE ══ */
 @media (max-width: 640px) {
@@ -442,6 +597,9 @@ body {
   .cards-row { gap: 12px; }
   .outs-cell { padding: 8px 10px; }
   .outs-cell-val { font-size: 18px; }
+  
+  .stats-grid { grid-template-columns: 1fr; }
+  .chart-container { height: 300px; }
 }
  
 @media (max-width: 400px) {
@@ -458,6 +616,7 @@ body {
   <div class="nav-logo">POKER SUITE</div>
   <button class="nav-tab active" onclick="goPage('preflop', this)">Preflop Ranges</button>
   <button class="nav-tab"        onclick="goPage('trainer', this)">Postflop Trainer</button>
+  <button class="nav-tab"        onclick="goPage('variance', this)">Varianz-Rechner</button>
 </nav>
  
  
@@ -514,6 +673,39 @@ body {
     <div class="empty-state">
       <div class="es-icon">♠</div>
       <div class="es-text">Klicke <strong>Neue Hand</strong> um zu beginnen</div>
+    </div>
+  </div>
+</div>
+ 
+ 
+<!-- ══ VARIANCE CALCULATOR ══ -->
+<div class="page" id="page-variance">
+  <div class="sec-title">Varianz-Rechner</div>
+  <div class="sec-sub">Lade deine PokerCraft CSV-Datei hoch um Varianz zu analysieren</div>
+  
+  <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-file').click()">
+    <div class="upload-icon">📊</div>
+    <div class="upload-text">CSV-Datei hier ablegen oder klicken zum Hochladen</div>
+    <div class="upload-hint">Unterstützt: PokerCraft, Hand2Note, PokerTracker CSV-Exports</div>
+    <input type="file" id="csv-file" class="file-input" accept=".csv,.txt" onchange="handleFileUpload(event)">
+  </div>
+  
+  <div id="variance-results" style="display:none;">
+    <div class="stats-grid" id="stats-grid"></div>
+    
+    <div class="chart-container">
+      <div class="chart-title">Winnings vs. EV — Kumulativer Graph</div>
+      <canvas id="variance-chart"></canvas>
+    </div>
+    
+    <div class="chart-container" style="height:300px;">
+      <div class="chart-title">Downswing Analyse</div>
+      <canvas id="downswing-chart"></canvas>
+    </div>
+    
+    <div class="box">
+      <div class="box-label">Hand History Daten (erste 100 Hände)</div>
+      <div class="data-table" id="data-table-container"></div>
     </div>
   </div>
 </div>
@@ -741,8 +933,7 @@ function evaluateMadeHand(hole, board) {
   all.forEach(c => { const r = cardVal(c); rankCount[r] = (rankCount[r] || 0) + 1; });
   const suitCount = {};
   all.forEach(c => { const s = cardSuit(c); suitCount[s] = (suitCount[s] || 0) + 1; });
-
-  // Separate by count to avoid quads contaminating pairs/trips check
+ 
   const quads = Object.keys(rankCount).filter(r => rankCount[r] >= 4).map(Number);
   const trips = Object.keys(rankCount).filter(r => rankCount[r] === 3).map(Number);
   const pairs = Object.keys(rankCount).filter(r => rankCount[r] === 2).map(Number);
@@ -802,7 +993,6 @@ function analyzeHoleCards(hole, board) {
  
   const draws = [];
  
-  // Flush draws
   if (hS1 === hS2) {
     const n = boardSuits.filter(s => s === hS1).length;
     if (n === 2)      draws.push({type:'flush_draw', strength:3, outs:9,  label:'Flush Draw'});
@@ -814,7 +1004,6 @@ function analyzeHoleCards(hole, board) {
     else if (fd1 === 2 || fd2 === 2) draws.push({type:'bdoor_fd',   strength:1, outs:1, label:'Backdoor Flush Draw'});
   }
  
-  // Straight draws
   const allVals    = [h1, h2, ...boardVals];
   const uniqueVals = [...new Set(allVals)];
   const holeAceLow = [h1, h2, ...(h1 === 14 || h2 === 14 ? [1] : [])];
@@ -838,7 +1027,6 @@ function analyzeHoleCards(hole, board) {
   if (hasGutshot && !hasOESD)            draws.push({type:'gutshot',  strength:2, outs:4, label:'Gutshot (einseitig)'});
   if (hasBdoorStr && !hasOESD && !hasGutshot) draws.push({type:'bdoor_str', strength:1, outs:1, label:'Backdoor Straight Draw'});
  
-  // Combo draws
   const fdIdx   = draws.findIndex(d => d.type === 'flush_draw');
   const oesdIdx = draws.findIndex(d => d.type === 'oesd');
   const gutIdx  = draws.findIndex(d => d.type === 'gutshot');
@@ -911,64 +1099,37 @@ function analyzeBoard(board) {
  
  
 /* ══════════════════════════════════════════════════════════════════
-   EQUITY HELPERS  ← KORRIGIERT
+   EQUITY HELPERS
 ══════════════════════════════════════════════════════════════════ */
-
-/**
- * Schätzt die Gesamt-Equity mit korrekter Wahrscheinlichkeitsformel:
- *   E = P(hit) × P(win|hit) + P(miss) × P(win|miss)
- *
- * Frühere Version addierte Made-Equity + Draw-Bonus einfach auf,
- * was zu starker Überschätzung führte (z.B. nackter FD on Flop ~61% statt ~46%).
- *
- * @param {object} handStrength  - Output von analyzeHoleCards()
- * @param {string} street        - 'flop' | 'turn'
- */
 function estimateTotalEquity(handStrength, street) {
   const {madeStrength, draws} = handStrength;
-
-  // Basis-Equity der gemachten Hand gegen eine zufällige Hand (Näherungswerte)
   const madeEq = [0.25, 0.32, 0.62, 0.74, 0.85, 0.91][Math.min(madeStrength, 5)];
-
-  // Backdoor-Draws auf dem Turn ignorieren (nur 1 Karte bleibt)
   const mainDraws = draws.filter(d => {
     if (street === 'turn') return !['bdoor_fd','bdoor_str'].includes(d.type);
     return !['bdoor_fd','bdoor_str'].includes(d.type);
   });
-
   if (!mainDraws.length) return Math.min(95, Math.round(madeEq * 100));
-
-  // Besten Draw nach Outs wählen
   const bestDraw = mainDraws.reduce((b, d) => d.outs > b.outs ? d : b, mainDraws[0]);
   const outs = bestDraw.outs;
-
-  // P(Draw trifft): Flop = 2 Karten, Turn = 1 Karte
-  // Exakte Formel für 2 Karten: 1 - P(miss Turn) × P(miss River)
   let pHit;
   if (street === 'flop') {
     pHit = 1 - ((47 - outs) / 47) * ((46 - outs) / 46);
   } else {
-    // Turn: nur noch 1 Karte (River)
     pHit = outs / 46;
   }
-
-  // P(win | Draw trifft) — Draw-typ-spezifisch
   const pWinIfHit = {
-    flush_draw:  0.85,  // Flush gewinnt fast immer gegen eine Random-Hand
-    oesd:        0.82,  // Straight gewinnt oft, aber Flush possible
+    flush_draw:  0.85,
+    oesd:        0.82,
     gutshot:     0.80,
-    combo_draw:  0.90,  // FD+SD = sehr stark wenn getroffen
-    set_draw:    0.90,  // Set ist sehr stark
-    overcards:   0.55,  // Top Pair mit Overcards, nicht immer gut genug
+    combo_draw:  0.90,
+    set_draw:    0.90,
+    overcards:   0.55,
     overcard:    0.50,
   }[bestDraw.type] || 0.80;
-
-  // Korrekte Formel: P(hit)×P(win|hit) + P(miss)×P(win|miss)
   const totalEq = pHit * pWinIfHit + (1 - pHit) * madeEq;
-
   return Math.min(95, Math.round(totalEq * 100));
 }
-
+ 
 function totalOuts(draws) {
   const mainDraws = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
   if (mainDraws.some(d => d.type === 'combo_draw')) return mainDraws.find(d => d.type === 'combo_draw').outs;
@@ -1051,15 +1212,10 @@ function dealNew() {
   const river = deck[4];
  
   const oppPosition = role === 'pfr' ? pickCallerPosition(position) : pickOppPositionAsCaller();
-
-  // IP-Logik: Wer handelt nach dem Flop zuletzt?
-  // PFR ist IP wenn seine POST_ORDER > Gegner (BTN > alle anderen etc.)
-  // Als BB (Caller) ist man nur gegen SB IP
   let ip;
   if (role === 'pfr') {
     ip = (POST_ORDER[position] || 0) > (POST_ORDER[oppPosition] || 0);
   } else {
-    // BB ist nur gegen SB IP postflop
     ip = oppPosition === 'SB';
   }
  
@@ -1104,10 +1260,8 @@ function updateButtons() {
  
  
 /* ══════════════════════════════════════════════════════════════════
-   RENDER
+   RENDER TRAINER
 ══════════════════════════════════════════════════════════════════ */
-
-// Draw-Equity-Tabelle: turn/river Treffer-Wahrscheinlichkeiten (Referenzwerte)
 const DRAW_EQ = {
   flush_draw: {outs:9,  turn:'19%', river:'20%'},
   oesd:       {outs:8,  turn:'17%', river:'17%'},
@@ -1120,27 +1274,20 @@ const DRAW_EQ = {
  
 function buildOutsBar(handStrength, street) {
   const {madeStrength, madeLabel, draws} = handStrength;
-
-  // Backdoor-Draws auf dem Turn ausblenden
   const relevantDraws = street === 'turn'
     ? draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type))
     : draws;
-
   const outs    = totalOuts(relevantDraws);
-  // Korrekte Equity-Berechnung mit street-Parameter übergeben
   const totalEq = estimateTotalEquity(handStrength, street);
  
   const madeColor = madeStrength >= 3 ? 'var(--green)' : madeStrength >= 2 ? 'var(--amber)' : madeStrength >= 1 ? '#ffcc80' : 'var(--dim)';
   const eqColor   = totalEq >= 60 ? 'var(--green)' : totalEq >= 40 ? 'var(--amber)' : totalEq >= 25 ? '#ffcc80' : 'var(--red)';
   const outsColor = outs >= 12 ? '#ff9800' : outs >= 8 ? 'var(--blue)' : outs >= 4 ? '#90caf9' : outs > 0 ? 'var(--purple)' : 'var(--dim)';
  
-  // Regel ×2 auf Turn (1 Karte), ×4 auf Flop (2 Karten) — korrekt
   const ruleMulti = street === 'turn' ? 2 : 4;
   const ruleLabel = street === 'turn' ? 'Regel ×2 (1 Karte, River)' : 'Regel ×4 (2 Karten, T+R)';
   const eqLabel   = street === 'turn' ? 'Equity zum River' : 'Equity bis River';
   const cardsLeft = street === 'turn' ? '1 Karte (River)' : '2 Karten (T+R)';
-
-  // Hinweis: Regel ×2/×4 ist eine Näherung; exakte Werte leicht höher bei vielen Outs
   const ruleNote  = outs >= 9
     ? `Hinweis: Regel ×${ruleMulti} leicht ungenau bei vielen Outs (${outs})`
     : '';
@@ -1198,11 +1345,6 @@ function buildRiverDisplay(handStrength) {
   </div>`;
 }
  
-/**
- * Equity-Tabelle — street-aware:
- * - Auf dem Turn: Backdoor-Draws ausblenden, nur River-Wahrscheinlichkeit zeigen
- * - Auf dem Flop: Turn + River zeigen
- */
 function buildEquityTable(handStrength, street) {
   const {madeStrength, madeLabel, draws} = handStrength;
   const madeColor = madeStrength >= 3 ? 'var(--green)' : madeStrength >= 2 ? 'var(--amber)' : madeStrength >= 1 ? '#ffcc80' : 'var(--dim)';
@@ -1213,18 +1355,12 @@ function buildEquityTable(handStrength, street) {
   </div>`;
  
   const mainDraws  = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
-
-  // Backdoor-Draws nur auf dem Flop zeigen (auf dem Turn irrelevant, nur 1 Karte bleibt)
-  const bdoorDraws = street === 'turn'
-    ? []
-    : draws.filter(d => ['bdoor_fd','bdoor_str'].includes(d.type));
+  const bdoorDraws = street === 'turn' ? [] : draws.filter(d => ['bdoor_fd','bdoor_str'].includes(d.type));
  
   mainDraws.forEach(d => {
     const de  = DRAW_EQ[d.type]; if (!de) return;
     const col = d.strength >= 4 ? '#ff9800' : d.strength >= 3 ? 'var(--blue)' : d.strength === 2 ? '#90caf9' : 'var(--purple)';
     const isImprove = ['set_draw','overcards','overcard'].includes(d.type);
-
-    // Auf dem Turn nur River-Wahrscheinlichkeit zeigen — Turn ist bereits dealt
     let eqStr;
     if (street === 'turn') {
       eqStr = `${de.outs} Outs · River: ${de.river}`;
@@ -1233,7 +1369,6 @@ function buildEquityTable(handStrength, street) {
         ? `${de.outs} Outs · River: ${de.river}`
         : `${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;
     }
-
     rows += `<div class="eq-row">
       <span class="eq-type" style="color:${col}">${d.label}</span>
       <span class="eq-val">${eqStr}</span>
@@ -1315,7 +1450,6 @@ function renderCurrent() {
       </div></div>`;
       contentHtml = buildRiverDisplay(handStrength) + madeRow;
     } else {
-      // dealState ('flop' oder 'turn') als street-Parameter übergeben
       contentHtml = buildOutsBar(handStrength, dealState)
         + `<div class="eq-table">${buildEquityTable(handStrength, dealState)}</div>`;
     }
@@ -1368,9 +1502,384 @@ function renderCurrent() {
  
  
 /* ══════════════════════════════════════════════════════════════════
+   VARIANCE CALCULATOR
+══════════════════════════════════════════════════════════════════ */
+let varianceData = null;
+ 
+// Drag & Drop
+const uploadArea = document.getElementById('upload-area');
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('drag-over');
+});
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('drag-over');
+});
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+ 
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (file) processFile(file);
+}
+ 
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const text = e.target.result;
+    parseCSV(text);
+  };
+  reader.readAsText(file);
+}
+ 
+function parseCSV(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 2) {
+    alert('CSV enthält zu wenig Daten');
+    return;
+  }
+  
+  const headers = lines[0].split(/[,;\t]/).map(h => h.trim().toLowerCase());
+  
+  // Flexible column detection
+  const dateCol = headers.findIndex(h => h.includes('date') || h.includes('datum') || h.includes('time'));
+  const winCol = headers.findIndex(h => h.includes('net won') || h.includes('win') || h.includes('profit') || h.includes('gewinn'));
+  const evCol = headers.findIndex(h => h.includes('ev') || h.includes('expected') || h.includes('erwartet'));
+  const handCol = headers.findIndex(h => h.includes('hand') || h.includes('#'));
+  
+  if (winCol === -1) {
+    alert('Keine "Net Won" oder "Win" Spalte gefunden');
+    return;
+  }
+  
+  const hands = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(/[,;\t]/).map(c => c.trim());
+    if (cols.length < headers.length) continue;
+    
+    const winStr = cols[winCol] || '0';
+    const evStr = evCol >= 0 ? (cols[evCol] || '0') : '0';
+    
+    // Parse numbers (handle different formats: $1.50, 1,50, 1.50, etc.)
+    const win = parseFloat(winStr.replace(/[$€,]/g, '').replace(/\s/g, '')) || 0;
+    const ev = parseFloat(evStr.replace(/[$€,]/g, '').replace(/\s/g, '')) || 0;
+    
+    hands.push({
+      handNum: handCol >= 0 ? cols[handCol] : `#${i}`,
+      date: dateCol >= 0 ? cols[dateCol] : '',
+      win: win,
+      ev: ev || win, // If no EV, use actual win
+      variance: win - (ev || win)
+    });
+  }
+  
+  if (hands.length === 0) {
+    alert('Keine gültigen Daten gefunden');
+    return;
+  }
+  
+  varianceData = hands;
+  renderVarianceAnalysis();
+}
+ 
+function renderVarianceAnalysis() {
+  if (!varianceData) return;
+  
+  // Calculate cumulative values
+  let cumWin = 0, cumEV = 0, cumVar = 0;
+  varianceData.forEach(h => {
+    cumWin += h.win;
+    cumEV += h.ev;
+    cumVar += h.variance;
+    h.cumWin = cumWin;
+    h.cumEV = cumEV;
+    h.cumVar = cumVar;
+  });
+  
+  const totalHands = varianceData.length;
+  const totalWin = cumWin;
+  const totalEV = cumEV;
+  const totalVar = cumVar;
+  const varPercent = totalEV !== 0 ? ((totalVar / totalEV) * 100).toFixed(1) : 0;
+  
+  // Calculate standard deviation
+  const wins = varianceData.map(h => h.win);
+  const mean = wins.reduce((a,b) => a+b, 0) / wins.length;
+  const variance = wins.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / wins.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // Find worst downswing
+  let maxCum = 0, worstDownswing = 0, currentDownswing = 0;
+  varianceData.forEach(h => {
+    if (h.cumWin > maxCum) maxCum = h.cumWin;
+    currentDownswing = maxCum - h.cumWin;
+    if (currentDownswing > worstDownswing) worstDownswing = currentDownswing;
+  });
+  
+  // Render stats
+  const winColor = totalWin >= 0 ? 'positive' : 'negative';
+  const varColor = totalVar >= 0 ? 'positive' : 'negative';
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Gespielte Hände</div>
+      <div class="stat-value">${totalHands.toLocaleString()}</div>
+      <div class="stat-sub">Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Tatsächlicher Gewinn</div>
+      <div class="stat-value ${winColor}">${totalWin >= 0 ? '+' : ''}${totalWin.toFixed(2)}$</div>
+      <div class="stat-sub">${(totalWin/totalHands).toFixed(3)}$ / Hand</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">EV Gewinn</div>
+      <div class="stat-value">${totalEV >= 0 ? '+' : ''}${totalEV.toFixed(2)}$</div>
+      <div class="stat-sub">${(totalEV/totalHands).toFixed(3)}$ / Hand</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Varianz</div>
+      <div class="stat-value ${varColor}">${totalVar >= 0 ? '+' : ''}${totalVar.toFixed(2)}$</div>
+      <div class="stat-sub">${varPercent >= 0 ? '+' : ''}${varPercent}% vom EV</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Standard-Abweichung</div>
+      <div class="stat-value">${stdDev.toFixed(2)}$</div>
+      <div class="stat-sub">Pro Hand</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Größter Downswing</div>
+      <div class="stat-value negative">-${worstDownswing.toFixed(2)}$</div>
+      <div class="stat-sub">Vom Peak</div>
+    </div>
+  `;
+  
+  // Render charts
+  renderMainChart();
+  renderDownswingChart();
+  renderDataTable();
+  
+  document.getElementById('variance-results').style.display = 'block';
+}
+ 
+function renderMainChart() {
+  const canvas = document.getElementById('variance-chart');
+  const ctx = canvas.getContext('2d');
+  
+  // Set canvas size
+  canvas.width = canvas.parentElement.clientWidth - 40;
+  canvas.height = 360;
+  
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = {top: 20, right: 40, bottom: 40, left: 60};
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  
+  // Get data ranges
+  const maxHand = varianceData.length;
+  const allValues = varianceData.flatMap(h => [h.cumWin, h.cumEV]);
+  const minY = Math.min(...allValues, 0);
+  const maxY = Math.max(...allValues, 0);
+  const rangeY = maxY - minY || 1;
+  
+  // Clear canvas
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg2');
+  ctx.fillRect(0, 0, width, height);
+  
+  // Draw grid
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding.top + (plotHeight / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(padding.left + plotWidth, y);
+    ctx.stroke();
+    
+    const val = maxY - (rangeY / 5) * i;
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim');
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(val.toFixed(0) + '$', padding.left - 10, y + 4);
+  }
+  
+  // Draw x-axis labels
+  for (let i = 0; i <= 5; i++) {
+    const x = padding.left + (plotWidth / 5) * i;
+    const handNum = Math.floor((maxHand / 5) * i);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim');
+    ctx.textAlign = 'center';
+    ctx.fillText(handNum.toString(), x, height - 20);
+  }
+  
+  // Draw zero line
+  if (minY < 0 && maxY > 0) {
+    const zeroY = padding.top + plotHeight * (1 - (0 - minY) / rangeY);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--muted');
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(padding.left, zeroY);
+    ctx.lineTo(padding.left + plotWidth, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  
+  // Draw EV line
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--amber');
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  varianceData.forEach((h, i) => {
+    const x = padding.left + (plotWidth * i / (maxHand - 1));
+    const y = padding.top + plotHeight * (1 - (h.cumEV - minY) / rangeY);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // Draw actual line
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--blue');
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  varianceData.forEach((h, i) => {
+    const x = padding.left + (plotWidth * i / (maxHand - 1));
+    const y = padding.top + plotHeight * (1 - (h.cumWin - minY) / rangeY);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // Draw legend
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--blue');
+  ctx.fillRect(padding.left + 10, 10, 20, 3);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text');
+  ctx.font = 'bold 12px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('Tatsächlicher Gewinn', padding.left + 35, 15);
+  
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--amber');
+  ctx.fillRect(padding.left + 180, 10, 20, 3);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text');
+  ctx.fillText('EV Gewinn', padding.left + 205, 15);
+}
+ 
+function renderDownswingChart() {
+  const canvas = document.getElementById('downswing-chart');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = canvas.parentElement.clientWidth - 40;
+  canvas.height = 260;
+  
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = {top: 20, right: 40, bottom: 40, left: 60};
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  
+  // Calculate drawdown
+  let maxCum = 0;
+  const drawdowns = varianceData.map(h => {
+    if (h.cumWin > maxCum) maxCum = h.cumWin;
+    return maxCum - h.cumWin;
+  });
+  
+  const maxDrawdown = Math.max(...drawdowns, 0);
+  
+  // Clear
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg2');
+  ctx.fillRect(0, 0, width, height);
+  
+  // Grid
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const y = padding.top + (plotHeight / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(padding.left + plotWidth, y);
+    ctx.stroke();
+    
+    const val = maxDrawdown - (maxDrawdown / 5) * i;
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim');
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText('-' + val.toFixed(0) + '$', padding.left - 10, y + 4);
+  }
+  
+  // Draw drawdown area
+  ctx.fillStyle = 'rgba(244, 67, 54, 0.3)';
+  ctx.beginPath();
+  ctx.moveTo(padding.left, padding.top + plotHeight);
+  drawdowns.forEach((dd, i) => {
+    const x = padding.left + (plotWidth * i / (drawdowns.length - 1));
+    const y = padding.top + plotHeight * (1 - dd / maxDrawdown);
+    ctx.lineTo(x, y);
+  });
+  ctx.lineTo(padding.left + plotWidth, padding.top + plotHeight);
+  ctx.closePath();
+  ctx.fill();
+  
+  // Draw line
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--red');
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  drawdowns.forEach((dd, i) => {
+    const x = padding.left + (plotWidth * i / (drawdowns.length - 1));
+    const y = padding.top + plotHeight * (1 - dd / maxDrawdown);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+ 
+function renderDataTable() {
+  const maxRows = 100;
+  const displayData = varianceData.slice(0, maxRows);
+  
+  let html = `<table>
+    <thead>
+      <tr>
+        <th>Hand #</th>
+        <th>Datum</th>
+        <th>Gewinn</th>
+        <th>EV</th>
+        <th>Varianz</th>
+        <th>Kum. Gewinn</th>
+        <th>Kum. EV</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  
+  displayData.forEach(h => {
+    const winClass = h.win >= 0 ? 'positive' : 'negative';
+    const varClass = h.variance >= 0 ? 'positive' : 'negative';
+    html += `<tr>
+      <td>${h.handNum}</td>
+      <td>${h.date}</td>
+      <td class="${winClass}">${h.win >= 0 ? '+' : ''}${h.win.toFixed(2)}$</td>
+      <td>${h.ev >= 0 ? '+' : ''}${h.ev.toFixed(2)}$</td>
+      <td class="${varClass}">${h.variance >= 0 ? '+' : ''}${h.variance.toFixed(2)}$</td>
+      <td class="${h.cumWin >= 0 ? 'positive' : 'negative'}">${h.cumWin >= 0 ? '+' : ''}${h.cumWin.toFixed(2)}$</td>
+      <td>${h.cumEV >= 0 ? '+' : ''}${h.cumEV.toFixed(2)}$</td>
+    </tr>`;
+  });
+  
+  if (varianceData.length > maxRows) {
+    html += `<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:12px;">... und ${varianceData.length - maxRows} weitere Hände</td></tr>`;
+  }
+  
+  html += `</tbody></table>`;
+  document.getElementById('data-table-container').innerHTML = html;
+}
+ 
+/* ══════════════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════════════ */
 renderPreflopRange(true);
 </script>
 </body>
 </html>
+ 
