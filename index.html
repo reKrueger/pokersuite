@@ -630,9 +630,9 @@ body {
   
   <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-file').click()">
     <div class="upload-icon">📊</div>
-    <div class="upload-text">CSV-Datei hier ablegen oder klicken zum Hochladen</div>
-    <div class="upload-hint">Unterstützt: PokerCraft, Hand2Note, PokerTracker CSV-Exports</div>
-    <input type="file" id="csv-file" class="file-input" accept=".csv,.txt" onchange="handleFileUpload(event)">
+    <div class="upload-text">Dateien hier ablegen oder klicken zum Hochladen</div>
+    <div class="upload-hint">Unterstützt: Hand History (.txt), CSV-Exports • Mehrere Dateien gleichzeitig möglich</div>
+    <input type="file" id="csv-file" class="file-input" accept=".csv,.txt" multiple onchange="handleFileUpload(event)">
   </div>
   
   <div id="variance-results" style="display:none;">
@@ -1466,73 +1466,111 @@ function initVarianceCalculator() {
   uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadArea.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file) processFile(file);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) processFiles(files);
   });
 }
 
 function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (file) processFile(file);
+  const files = Array.from(event.target.files);
+  if (files.length > 0) processFiles(files);
 }
 
-function processFile(file) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const text = e.target.result;
-    parseCSV(text);
-  };
-  reader.readAsText(file);
+function processFiles(files) {
+  let allHands = [];
+  let filesProcessed = 0;
+  
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const hands = parseHandHistory(text);
+      allHands = allHands.concat(hands);
+      filesProcessed++;
+      
+      if (filesProcessed === files.length) {
+        if (allHands.length === 0) {
+          alert('Keine gültigen Hände gefunden');
+          return;
+        }
+        // Sort by hand number
+        allHands.sort((a, b) => {
+          const aNum = parseInt(a.handNum.replace(/[^0-9]/g, ''));
+          const bNum = parseInt(b.handNum.replace(/[^0-9]/g, ''));
+          return aNum - bNum;
+        });
+        varianceData = allHands;
+        renderVarianceAnalysis();
+      }
+    };
+    reader.readAsText(file);
+  });
 }
 
-function parseCSV(text) {
-  const lines = text.split('\n').filter(l => l.trim());
-  if (lines.length < 2) {
-    alert('CSV enthält zu wenig Daten');
-    return;
-  }
-  
-  const headers = lines[0].split(/[,;\t]/).map(h => h.trim().toLowerCase());
-  
-  // Flexible column detection
-  const dateCol = headers.findIndex(h => h.includes('date') || h.includes('datum') || h.includes('time'));
-  const winCol = headers.findIndex(h => h.includes('net won') || h.includes('win') || h.includes('profit') || h.includes('gewinn'));
-  const evCol = headers.findIndex(h => h.includes('ev') || h.includes('expected') || h.includes('erwartet'));
-  const handCol = headers.findIndex(h => h.includes('hand') || h.includes('#'));
-  
-  if (winCol === -1) {
-    alert('Keine "Net Won" oder "Win" Spalte gefunden');
-    return;
-  }
-  
+function parseHandHistory(text) {
   const hands = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(/[,;\t]/).map(c => c.trim());
-    if (cols.length < headers.length) continue;
+  const handBlocks = text.split(/(?=Poker Hand #)/);
+  
+  handBlocks.forEach(block => {
+    if (!block.trim() || !block.includes('Hero')) return;
     
-    const winStr = cols[winCol] || '0';
-    const evStr = evCol >= 0 ? (cols[evCol] || '0') : '0';
+    // Extract hand number
+    const handMatch = block.match(/Poker Hand #([^:]+)/);
+    if (!handMatch) return;
+    const handNum = handMatch[1];
     
-    // Parse numbers (handle different formats: $1.50, 1,50, 1.50, etc.)
-    const win = parseFloat(winStr.replace(/[$€,]/g, '').replace(/\s/g, '')) || 0;
-    const ev = parseFloat(evStr.replace(/[$€,]/g, '').replace(/\s/g, '')) || 0;
+    // Extract date/time
+    const dateMatch = block.match(/- (\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/);
+    const date = dateMatch ? dateMatch[1] : '';
+    
+    // Find Hero's starting stack
+    const seatMatch = block.match(/Seat \d+: Hero \(\$([0-9.]+) in chips\)/);
+    if (!seatMatch) return;
+    const startStack = parseFloat(seatMatch[1]);
+    
+    // Track Hero's investments (bets, calls, raises, blinds)
+    let invested = 0;
+    
+    // Small blind
+    if (block.includes('Hero: posts small blind $')) {
+      const sbMatch = block.match(/Hero: posts small blind \$([0-9.]+)/);
+      if (sbMatch) invested += parseFloat(sbMatch[1]);
+    }
+    
+    // Big blind
+    if (block.includes('Hero: posts big blind $')) {
+      const bbMatch = block.match(/Hero: posts big blind \$([0-9.]+)/);
+      if (bbMatch) invested += parseFloat(bbMatch[1]);
+    }
+    
+    // All Hero actions (calls, bets, raises)
+    const actionMatches = block.matchAll(/Hero: (?:calls|bets|raises[^$]*?) \$([0-9.]+)/g);
+    for (const match of actionMatches) {
+      invested += parseFloat(match[1]);
+    }
+    
+    // Check if Hero collected anything
+    let collected = 0;
+    const collectMatch = block.match(/Seat \d+: Hero[^(]*collected \(\$([0-9.]+)\)/);
+    if (collectMatch) {
+      collected = parseFloat(collectMatch[1]);
+    }
+    
+    // Net win/loss
+    const netWin = collected - invested;
     
     hands.push({
-      handNum: handCol >= 0 ? cols[handCol] : `#${i}`,
-      date: dateCol >= 0 ? cols[dateCol] : '',
-      win: win,
-      ev: ev || win, // If no EV, use actual win
-      variance: win - (ev || win)
+      handNum: handNum,
+      date: date,
+      win: netWin,
+      ev: netWin, // We don't have EV data from hand history, so use actual
+      variance: 0,
+      invested: invested,
+      collected: collected
     });
-  }
+  });
   
-  if (hands.length === 0) {
-    alert('Keine gültigen Daten gefunden');
-    return;
-  }
-  
-  varianceData = hands;
-  renderVarianceAnalysis();
+  return hands;
 }
 
 function renderVarianceAnalysis() {
