@@ -1,58 +1,3 @@
-
-
-<!DOCTYPE html> <html lang="de"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Poker Strategy Suite – NL6max</title> <style> *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } :root { --bg: #1a1a1
-
-pasted
-
-kannst du mir ein varianz rechner/diagramm bauen für ggpoker  pokerkraft einer neur tab ich muss dann warscheinlich meien pokercraft dateien einlesen oder
-
-14:44
-
-Architektierte Varianz-Rechner mit CSV-Upload und Visualisierung
-Architektierte Varianz-Rechner mit CSV-Upload und Visualisierung
-Ich erstelle dir einen Varianz-Rechner mit Diagramm als neue Tab! Dieser kann PokerCraft CSV-Dateien einlesen und deine Ergebnisse vs. EV visualisieren.
-
-
-Konstruierte Varianz-Rechner mit CSV-Import und Analysen
-Konstruierte Varianz-Rechner mit CSV-Import und Analysen
-Perfekt! Ich habe dir einen Varianz-Rechner in deine Poker Suite eingebaut. Hier sind die Features:
-
-
-Orchestrierte erfolgreiche Dateiablage und plante Feature-Zusammenfassung
-Orchestrierte erfolgreiche Dateiablage und plante Feature-Zusammenfassung
-📊 Varianz-Rechner hinzugefügt!
-Neue Features:
-
-📁 File Upload
-Drag & Drop oder Klick zum Hochladen
-Unterstützt: PokerCraft, Hand2Note, PokerTracker CSV-Exports
-Automatische Erkennung der Spalten (flexible Namen)
-📈 Visualisierungen
-Winnings vs. EV Chart - Zeigt tatsächliche Gewinne vs. erwarteten Wert
-Downswing Analyse - Visualisiert den größten Downswing vom Peak
-📊 Statistiken
-Gespielte Hände - Gesamtanzahl
-Tatsächlicher Gewinn - Mit $/Hand Rate
-EV Gewinn - Expected Value
-Varianz - Differenz zwischen Actual und EV
-Standard-Abweichung - Pro Hand
-Größter Downswing - Vom Peak gemessen
-📋 Hand History Tabelle
-Zeigt erste 100 Hände im Detail
-Spalten: Hand #, Datum, Gewinn, EV, Varianz, Kum. Gewinn, Kum. EV
-Farbcodiert (grün = positiv, rot = negativ)
-CSV-Format: Der Parser ist flexibel und findet automatisch die richtigen Spalten, egal ob sie "Net Won", "Win", "Profit", "EV", "Expected Value" etc. heißen. Funktioniert mit verschiedenen Währungsformaten ($, €, Kommas, etc.).
-
-Poker suite with variance
-Code · HTML 
-
-
-
-
-Claude ist eine KI und kann Fehler machen. Bitte überprüfe die Antworten.
-Poker suite with variance · HTML
-Kopieren
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -375,7 +320,7 @@ body {
 .outs-cell-lbl { font-size: 10px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
 .outs-cell-val { font-size: 24px; font-weight: bold; line-height: 1; }
 .outs-cell-sub { font-size: 10px; color: var(--dim); margin-top: 2px; }
- 
+
 /* EQUITY NOTE */
 .equity-note {
   font-size: 11px;
@@ -446,7 +391,7 @@ body {
 }
 .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-state .es-text { font-size: 15px; }
- 
+
 /* ══ VARIANCE CALCULATOR ══ */
 .upload-area {
   background: var(--bg2);
@@ -482,7 +427,7 @@ body {
 .file-input {
   display: none;
 }
- 
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -513,7 +458,7 @@ body {
   font-size: 11px;
   color: var(--dim);
 }
- 
+
 .chart-container {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -529,7 +474,7 @@ body {
   margin-bottom: 16px;
   text-align: center;
 }
- 
+
 .data-table {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -562,7 +507,7 @@ body {
 .data-table tr:hover {
   background: var(--bg3);
 }
- 
+
 .positive { color: var(--green); }
 .negative { color: var(--red); }
 .neutral { color: var(--muted); }
@@ -676,8 +621,8 @@ body {
     </div>
   </div>
 </div>
- 
- 
+
+
 <!-- ══ VARIANCE CALCULATOR ══ -->
 <div class="page" id="page-variance">
   <div class="sec-title">Varianz-Rechner</div>
@@ -933,7 +878,7 @@ function evaluateMadeHand(hole, board) {
   all.forEach(c => { const r = cardVal(c); rankCount[r] = (rankCount[r] || 0) + 1; });
   const suitCount = {};
   all.forEach(c => { const s = cardSuit(c); suitCount[s] = (suitCount[s] || 0) + 1; });
- 
+
   const quads = Object.keys(rankCount).filter(r => rankCount[r] >= 4).map(Number);
   const trips = Object.keys(rankCount).filter(r => rankCount[r] === 3).map(Number);
   const pairs = Object.keys(rankCount).filter(r => rankCount[r] === 2).map(Number);
@@ -1129,7 +1074,7 @@ function estimateTotalEquity(handStrength, street) {
   const totalEq = pHit * pWinIfHit + (1 - pHit) * madeEq;
   return Math.min(95, Math.round(totalEq * 100));
 }
- 
+
 function totalOuts(draws) {
   const mainDraws = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
   if (mainDraws.some(d => d.type === 'combo_draw')) return mainDraws.find(d => d.type === 'combo_draw').outs;
@@ -1499,34 +1444,38 @@ function renderCurrent() {
     ${analysisHtml}
   `;
 }
- 
- 
+
+
 /* ══════════════════════════════════════════════════════════════════
    VARIANCE CALCULATOR
 ══════════════════════════════════════════════════════════════════ */
 let varianceData = null;
- 
-// Drag & Drop
-const uploadArea = document.getElementById('upload-area');
-uploadArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  uploadArea.classList.add('drag-over');
-});
-uploadArea.addEventListener('dragleave', () => {
-  uploadArea.classList.remove('drag-over');
-});
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) processFile(file);
-});
- 
+
+function initVarianceCalculator() {
+  // Drag & Drop - nur initialisieren wenn Element existiert
+  const uploadArea = document.getElementById('upload-area');
+  if (!uploadArea) return;
+  
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('drag-over');
+  });
+  uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('drag-over');
+  });
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  });
+}
+
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (file) processFile(file);
 }
- 
+
 function processFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -1535,7 +1484,7 @@ function processFile(file) {
   };
   reader.readAsText(file);
 }
- 
+
 function parseCSV(text) {
   const lines = text.split('\n').filter(l => l.trim());
   if (lines.length < 2) {
@@ -1585,7 +1534,7 @@ function parseCSV(text) {
   varianceData = hands;
   renderVarianceAnalysis();
 }
- 
+
 function renderVarianceAnalysis() {
   if (!varianceData) return;
   
@@ -1663,7 +1612,7 @@ function renderVarianceAnalysis() {
   
   document.getElementById('variance-results').style.display = 'block';
 }
- 
+
 function renderMainChart() {
   const canvas = document.getElementById('variance-chart');
   const ctx = canvas.getContext('2d');
@@ -1765,7 +1714,7 @@ function renderMainChart() {
   ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text');
   ctx.fillText('EV Gewinn', padding.left + 205, 15);
 }
- 
+
 function renderDownswingChart() {
   const canvas = document.getElementById('downswing-chart');
   const ctx = canvas.getContext('2d');
@@ -1834,7 +1783,7 @@ function renderDownswingChart() {
   });
   ctx.stroke();
 }
- 
+
 function renderDataTable() {
   const maxRows = 100;
   const displayData = varianceData.slice(0, maxRows);
@@ -1879,7 +1828,7 @@ function renderDataTable() {
    INIT
 ══════════════════════════════════════════════════════════════════ */
 renderPreflopRange(true);
+initVarianceCalculator();
 </script>
 </body>
 </html>
- 
