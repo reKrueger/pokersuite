@@ -571,9 +571,17 @@ body {
   <div class="sec-sub">GTO-Näherung. Klick auf eine Position oder eine Hand für Details.</div>
  
   <div class="pos-btns" id="pos-tabs"></div>
+  <div class="pos-btns" id="bb-opp-tabs" style="display:none; align-items:center; margin-top:-6px; margin-bottom:6px; padding: 6px 10px; background:var(--bg3); border: 1px solid var(--border);">
+    <span style="font-size:11px;font-weight:bold;color:var(--muted);margin-right:8px;white-space:nowrap;">BB vs Raiser:</span>
+    <button class="pos-btn" onclick="switchBBOpp('UTG')">UTG</button>
+    <button class="pos-btn" onclick="switchBBOpp('MP')">MP</button>
+    <button class="pos-btn" onclick="switchBBOpp('CO')">CO</button>
+    <button class="pos-btn active" onclick="switchBBOpp('BTN')">BTN</button>
+    <button class="pos-btn" onclick="switchBBOpp('SB')">SB</button>
+  </div>
   <div class="pos-info" id="pos-banner"></div>
  
-  <div class="legend">
+  <div class="legend" id="range-legend">
     <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>4-Bet / Immer raisen</div>
     <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Raise + 3-Bet callen</div>
     <div class="leg"><div class="leg-sq" style="background:#e65100"></div>Raise + Fold vs 3-Bet</div>
@@ -595,7 +603,7 @@ body {
       <div class="pov-card"        id="pov-co"  onclick="switchPos('CO')"> <div class="pov-pos">CO</div> <div class="pov-pct" style="color:var(--amber)">28%</div></div>
       <div class="pov-card"        id="pov-btn" onclick="switchPos('BTN')"><div class="pov-pos">BTN</div><div class="pov-pct" style="color:var(--green)">48%</div></div>
       <div class="pov-card"        id="pov-sb"  onclick="switchPos('SB')"> <div class="pov-pos">SB</div> <div class="pov-pct" style="color:var(--blue)">37%</div></div>
-      <div class="pov-card"        id="pov-bb"  onclick="switchPos('BB')"> <div class="pov-pos">BB</div> <div class="pov-pct" style="color:var(--blue)">65%</div></div>
+      <div class="pov-card"        id="pov-bb"  onclick="switchPos('BB')"> <div class="pov-pos">BB</div> <div class="pov-pct" style="color:var(--blue)" id="pov-bb-pct">28–62%</div></div>
     </div>
   </div>
 </div>
@@ -721,12 +729,53 @@ const PF_RANGES = {
     r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'])
   },
   BB: {
-    note: 'Defend vs BTN (call + 3-bet)',
+    note: 'BB vs BTN · 3-Bet / Call / Fold',
     b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
     c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo']),
     r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','97o','87o','76o','65o'])
   }
 };
+
+/* ── BB-Defend-Sub-Ranges (vs jede Position) ─── */
+let currentBBOpp = 'BTN';
+
+const BB_RANGES = {
+  UTG: {
+    note: 'BB vs UTG · 3-Bet / Call / Fold (ca. 28%)',
+    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
+    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','JTs','AQo','KQo']),
+    r: new Set(['77','66','55','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','QTs','Q9s','J9s','J8s','T9s','T8s','98s','87s','76s','65s','AJo','ATo','KJo'])
+  },
+  MP: {
+    note: 'BB vs MP · 3-Bet / Call / Fold (ca. 33%)',
+    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
+    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','JTs','T9s','AQo','KQo']),
+    r: new Set(['77','66','55','44','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','QTs','Q9s','Q8s','J9s','J8s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','KJo','KTo','QJo'])
+  },
+  CO: {
+    note: 'BB vs CO · 3-Bet / Call / Fold (ca. 40%)',
+    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
+    c: new Set(['TT','99','88','77','AQs','AJs','ATs','A9s','KQs','KJs','QJs','JTs','T9s','98s','AQo','AJo','KQo','KJo']),
+    r: new Set(['66','55','44','33','22','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','87s','86s','76s','75s','65s','54s','43s','ATo','A9o','A8o','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'])
+  },
+  BTN: {
+    note: 'BB vs BTN · 3-Bet / Call / Fold (ca. 53%)',
+    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
+    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo']),
+    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','97o','87o','76o','65o'])
+  },
+  SB: {
+    note: 'BB vs SB · 3-Bet / Call / Fold (ca. 62%)',
+    b: new Set(['AA','KK','QQ','JJ','TT','AKs','AQs','AKo']),
+    c: new Set(['99','88','77','AJs','ATs','KQs','KJs','QJs','JTs','T9s','AQo','AJo','KQo','KJo']),
+    r: new Set(['66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','J9s','J8s','J7s','J6s','J5s','T9s','T8s','T7s','T6s','T5s','98s','97s','96s','95s','87s','86s','85s','84s','76s','75s','74s','65s','64s','54s','53s','43s','32s','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KTo','K9o','K8o','K7o','K6o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','T7o','98o','97o','87o','86o','76o','65o','54o'])
+  }
+};
+
+function getRangeData(pos) {
+  if (pos === 'BB') return BB_RANGES[currentBBOpp];
+  return PF_RANGES[pos];
+}
  
 const PF_POSITIONS = ['UTG','MP','CO','BTN','SB','BB'];
 let currentPFPos = 'UTG';
@@ -738,6 +787,16 @@ function switchPos(pos) {
   if (el) el.classList.add('active');
   document.querySelectorAll('.pos-btn').forEach(b => {
     b.classList.toggle('active', b.textContent === pos);
+  });
+  const bbTabs = document.getElementById('bb-opp-tabs');
+  if (bbTabs) bbTabs.style.display = pos === 'BB' ? 'flex' : 'none';
+  renderPreflopRange(false);
+}
+
+function switchBBOpp(opp) {
+  currentBBOpp = opp;
+  document.querySelectorAll('#bb-opp-tabs .pos-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === opp);
   });
   renderPreflopRange(false);
 }
@@ -755,18 +814,37 @@ function renderPreflopRange(buildTabs) {
     });
   }
  
-  const {b, c, r, note} = PF_RANGES[currentPFPos];
+  const {b, c, r, note} = getRangeData(currentPFPos);
   const bc = countCombos(b), cc = countCombos(c), rc = countCombos(r);
   const total = bc + cc + rc;
   const pct   = ((total / 1326) * 100).toFixed(1);
  
   document.getElementById('pos-banner').innerHTML = `
-    <div class="pos-name-big">${currentPFPos}</div>
+    <div class="pos-name-big">${currentPFPos}${currentPFPos === 'BB' ? '<span style="font-size:13px;color:var(--muted)"> vs '+currentBBOpp+'</span>' : ''}</div>
     <div class="pos-note-txt">${note}</div>
     <div style="margin-left:auto;text-align:right;">
       <div class="pos-pct-big">${pct}%</div>
       <div class="pos-combos">4-bet: ${bc} · Call: ${cc} · Raise/fold: ${rc} combos</div>
     </div>`;
+  if (currentPFPos === 'BB') {
+    const bbPctEl = document.getElementById('pov-bb-pct');
+    if (bbPctEl) bbPctEl.textContent = pct + '%';
+    const leg = document.getElementById('range-legend');
+    if (leg) leg.innerHTML = `
+      <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>3-Bet (Value + Bluff)</div>
+      <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Callen (Flat)</div>
+      <div class="leg"><div class="leg-sq" style="background:#e65100"></div>Callen (Mix / Grenzhand)</div>
+      <div class="leg"><div class="leg-sq" style="background:#222;border-color:#444"></div>Fold</div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted);">Oben rechts = suited &nbsp;|&nbsp; Unten links = offsuit</div>`;
+  } else {
+    const leg = document.getElementById('range-legend');
+    if (leg) leg.innerHTML = `
+      <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>4-Bet / Immer raisen</div>
+      <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Raise + 3-Bet callen</div>
+      <div class="leg"><div class="leg-sq" style="background:#e65100"></div>Raise + Fold vs 3-Bet</div>
+      <div class="leg"><div class="leg-sq" style="background:#222;border-color:#444"></div>Fold</div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted);">Oben rechts = suited &nbsp;|&nbsp; Unten links = offsuit</div>`;
+  }
  
   let html = '<thead><tr><th class="rl"></th>';
   PF_RANKS.forEach(rk => { html += `<th class="ct">${rk}</th>`; });
@@ -777,9 +855,9 @@ function renderPreflopRange(buildTabs) {
     PF_RANKS.forEach((_, ci) => {
       const hand = pfHandName(ri, ci);
       const cls  = b.has(hand) ? 'h4' : c.has(hand) ? 'hc' : r.has(hand) ? 'hr' : 'hf';
-      const cat  = b.has(hand) ? '4-Bet / Immer Raise'
-                 : c.has(hand) ? 'Raise + 3-Bet callen'
-                 : r.has(hand) ? 'Raise + Fold vs 3-Bet' : 'Fold';
+      const cat  = b.has(hand) ? (currentPFPos === 'BB' ? '3-Bet (Value/Bluff)' : '4-Bet / Immer Raise')
+                 : c.has(hand) ? (currentPFPos === 'BB' ? 'Callen (Flat)' : 'Raise + 3-Bet callen')
+                 : r.has(hand) ? (currentPFPos === 'BB' ? 'Callen (Mix / Grenzhand)' : 'Raise + Fold vs 3-Bet') : 'Fold';
       html += `<td class="${cls}" title="${hand} — ${cat}" onclick="showHandTip('${hand}','${cat}')">${hand}</td>`;
     });
     html += '</tr>';
