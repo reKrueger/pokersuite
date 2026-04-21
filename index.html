@@ -579,8 +579,20 @@ body {
     <button class="pos-btn active" onclick="switchBBOpp('BTN')">BTN</button>
     <button class="pos-btn" onclick="switchBBOpp('SB')">SB</button>
   </div>
+  <div class="pos-btns" id="sb-opp-tabs" style="display:none; align-items:center; margin-top:-6px; margin-bottom:6px; padding: 6px 10px; background:var(--bg3); border: 1px solid var(--border); flex-wrap:wrap; gap:6px;">
+    <span style="font-size:11px;font-weight:bold;color:var(--muted);margin-right:4px;white-space:nowrap;">SB Situation:</span>
+    <button class="pos-btn active" id="sb-btn-rfi" onclick="switchSBMode('rfi')">RFI (Raise 1st In)</button>
+    <button class="pos-btn" id="sb-btn-face" onclick="switchSBMode('face')">vs Raiser</button>
+    <span style="width:100%;display:none" id="sb-opp-row" style="display:none;">&nbsp;</span>
+    <div id="sb-opp-row" style="display:none; align-items:center; gap:5px; flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:bold;color:var(--dim);margin-right:4px;">vs:</span>
+      <button class="pos-btn" onclick="switchSBOpp('UTG')">UTG</button>
+      <button class="pos-btn" onclick="switchSBOpp('MP')">MP</button>
+      <button class="pos-btn" onclick="switchSBOpp('CO')">CO</button>
+      <button class="pos-btn active" onclick="switchSBOpp('BTN')">BTN</button>
+    </div>
+  </div>
   <div class="pos-info" id="pos-banner"></div>
- 
   <div class="legend" id="range-legend">
     <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>4-Bet / Immer raisen</div>
     <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Raise + 3-Bet callen</div>
@@ -601,7 +613,7 @@ body {
       <div class="pov-card active" id="pov-utg" onclick="switchPos('UTG')"><div class="pov-pos">UTG</div><div class="pov-pct" style="color:var(--red)">14%</div></div>
       <div class="pov-card"        id="pov-mp"  onclick="switchPos('MP')"> <div class="pov-pos">MP</div> <div class="pov-pct" style="color:var(--amber)">20%</div></div>
       <div class="pov-card"        id="pov-co"  onclick="switchPos('CO')"> <div class="pov-pos">CO</div> <div class="pov-pct" style="color:var(--amber)">28%</div></div>
-      <div class="pov-card"        id="pov-btn" onclick="switchPos('BTN')"><div class="pov-pos">BTN</div><div class="pov-pct" style="color:var(--green)">48%</div></div>
+      <div class="pov-card"        id="pov-btn" onclick="switchPos('BTN')"><div class="pov-pos">BTN</div><div class="pov-pct" style="color:var(--green)" id="pov-btn-pct">44%</div></div>
       <div class="pov-card"        id="pov-sb"  onclick="switchPos('SB')"> <div class="pov-pos">SB</div> <div class="pov-pct" style="color:var(--blue)">37%</div></div>
       <div class="pov-card"        id="pov-bb"  onclick="switchPos('BB')"> <div class="pov-pos">BB</div> <div class="pov-pct" style="color:var(--blue)" id="pov-bb-pct">28–62%</div></div>
     </div>
@@ -720,7 +732,26 @@ const PF_RANGES = {
     note: 'Raise First In · Raise auf 2.5 BB',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo']),
-    r: new Set(['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','96s','86s','85s','75s','65s','54s','A9o','A8o','A7o','A6o','K9o','K8o','Q9o','J9o','T9o','T8o','98o','87o','76o','65o'])
+    r: new Set([
+      '66','55','44','33','22',
+      'A7s','A6s','A5s','A4s','A3s','A2s',
+      'KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s',
+      'QTs','Q9s','Q8s','Q7s','Q6s','Q5s',
+      'J9s','J8s','J7s','J6s',
+      'T8s','T7s','T6s','T5s',
+      '97s','96s','95s',
+      '86s','85s','84s',
+      '76s','75s','74s','73s',
+      '65s','64s','63s',
+      '54s','53s','52s',
+      '43s','42s','32s',
+      'A9o','A8o','A7o','A6o',
+      'KTo','K9o','K8o',
+      'QJo','Q9o',
+      'JTo','J9o',
+      'T9o','T8o',
+      '98o','87o','76o','65o'
+    ])
   },
   SB: {
     note: 'Raise vs BB · Rest limp oder fold',
@@ -772,8 +803,40 @@ const BB_RANGES = {
   }
 };
 
+/* ── SB-Ranges (vs Raiser, wenn jemand vor SB openraiset) ─── */
+let currentSBMode = 'rfi';   // 'rfi' | 'face'
+let currentSBOpp  = 'BTN';
+
+const SB_FACE_RANGES = {
+  UTG: {
+    note: 'SB vs UTG · 3-Bet / Call / Fold (ca. 10%) — OOP vs starker Range',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','AQs','AJs','KQs']),
+    r: new Set(['99','88','A9s','A8s','A7s','A6s','A5s','KJs','QJs','JTs'])
+  },
+  MP: {
+    note: 'SB vs MP · 3-Bet / Call / Fold (ca. 15%) — OOP, defensiv spielen',
+    b: new Set(['AA','KK','QQ','AKs','AKo']),
+    c: new Set(['JJ','TT','99','AQs','AJs','ATs','KQs','QJs','JTs']),
+    r: new Set(['88','77','A9s','A8s','A7s','A6s','A5s','KJs','KTs','T9s','98s'])
+  },
+  CO: {
+    note: 'SB vs CO · 3-Bet / Call / Fold (ca. 20%) — 3-Bet weiter als vs UTG/MP',
+    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
+    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','JTs','T9s']),
+    r: new Set(['77','66','A9s','A8s','A7s','A6s','A5s','KTs','K9s','Q9s','J9s','98s','87s'])
+  },
+  BTN: {
+    note: 'SB vs BTN · 3-Bet / Call / Fold (ca. 27%) — BTN steal ⇒ aggressiv kontern',
+    b: new Set(['AA','KK','QQ','JJ','TT','AKs','AQs','AKo']),
+    c: new Set(['99','88','77','AJs','ATs','A9s','KQs','KJs','QJs','JTs','T9s','98s','87s']),
+    r: new Set(['66','55','A8s','A7s','A6s','A5s','A4s','A3s','KTs','K9s','QTs','J9s','T8s','76s','65s','AQo','AJo','KQo'])
+  }
+};
+
 function getRangeData(pos) {
   if (pos === 'BB') return BB_RANGES[currentBBOpp];
+  if (pos === 'SB' && currentSBMode === 'face') return SB_FACE_RANGES[currentSBOpp];
   return PF_RANGES[pos];
 }
  
@@ -790,12 +853,33 @@ function switchPos(pos) {
   });
   const bbTabs = document.getElementById('bb-opp-tabs');
   if (bbTabs) bbTabs.style.display = pos === 'BB' ? 'flex' : 'none';
+  const sbTabs = document.getElementById('sb-opp-tabs');
+  if (sbTabs) sbTabs.style.display = pos === 'SB' ? 'flex' : 'none';
   renderPreflopRange(false);
 }
 
 function switchBBOpp(opp) {
   currentBBOpp = opp;
   document.querySelectorAll('#bb-opp-tabs .pos-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === opp);
+  });
+  renderPreflopRange(false);
+}
+
+function switchSBMode(mode) {
+  currentSBMode = mode;
+  const rfiBtn  = document.getElementById('sb-btn-rfi');
+  const faceBtn = document.getElementById('sb-btn-face');
+  if (rfiBtn)  rfiBtn.classList.toggle('active',  mode === 'rfi');
+  if (faceBtn) faceBtn.classList.toggle('active', mode === 'face');
+  const oppRow = document.getElementById('sb-opp-row');
+  if (oppRow) oppRow.style.display = mode === 'face' ? 'flex' : 'none';
+  renderPreflopRange(false);
+}
+
+function switchSBOpp(opp) {
+  currentSBOpp = opp;
+  document.querySelectorAll('#sb-opp-row .pos-btn').forEach(b => {
     b.classList.toggle('active', b.textContent === opp);
   });
   renderPreflopRange(false);
@@ -829,6 +913,12 @@ function renderPreflopRange(buildTabs) {
   if (currentPFPos === 'BB') {
     const bbPctEl = document.getElementById('pov-bb-pct');
     if (bbPctEl) bbPctEl.textContent = pct + '%';
+  }
+  if (currentPFPos === 'BTN') {
+    const btnPctEl = document.getElementById('pov-btn-pct');
+    if (btnPctEl) btnPctEl.textContent = pct + '%';
+  }
+  if (currentPFPos === 'BB') {
     const leg = document.getElementById('range-legend');
     if (leg) leg.innerHTML = `
       <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>3-Bet (Value + Bluff)</div>
@@ -1171,7 +1261,7 @@ const TRAINER_RANGES = {
   UTG: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','AQs','AQo','KQs'], r:['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'] },
   MP:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'] },
   CO:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'], r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo','J9o'] },
-  BTN: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'], r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','96s','86s','85s','75s','65s','54s','A9o','A8o','A7o','A6o','K9o','K8o','Q9o','J9o','T9o','T8o','98o','87o','76o','65o'] },
+  BTN: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'], r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','J9s','J8s','J7s','J6s','T8s','T7s','T6s','T5s','97s','96s','95s','86s','85s','84s','76s','75s','74s','73s','65s','64s','63s','54s','53s','52s','43s','42s','32s','A9o','A8o','A7o','A6o','KTo','K9o','K8o','QJo','Q9o','JTo','J9o','T9o','T8o','98o','87o','76o','65o'] },
   SB:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'] }
 };
  
