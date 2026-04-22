@@ -720,13 +720,13 @@ const PF_RANGES = {
     note: 'Raise First In · Raise auf 3 BB',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
-    r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'])
+    r: new Set(['88','77','66','55','44','33','22','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'])
   },
   CO: {
     note: 'Raise First In · Raise auf 3 BB',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo']),
-    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo','J9o'])
+    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','Q9o','JTo','J9o'])
   },
   BTN: {
     note: 'Raise First In · Raise auf 2.5 BB',
@@ -757,7 +757,25 @@ const PF_RANGES = {
     note: 'Raise vs BB · Rest limp oder fold',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
-    r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'])
+    r: new Set([
+      '88','77','66','55','44','33','22',
+      'ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
+      'KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s',
+      'QJs','QTs','Q9s','Q8s','Q7s',
+      'JTs','J9s','J8s','J7s',
+      'T9s','T8s','T7s','T6s',
+      '98s','97s','96s','95s',
+      '87s','86s','85s','84s',
+      '76s','75s','74s',
+      '65s','64s','63s',
+      '54s','53s','52s',
+      '43s','42s','32s',
+      'AJo','ATo','A9o','A8o',
+      'KJo','KTo','K9o',
+      'QJo','QTo',
+      'JTo','J9o',
+      'T9o','98o','87o'
+    ])
   },
   BB: {
     note: 'BB vs BTN · 3-Bet / Call / Fold',
@@ -918,7 +936,8 @@ function renderPreflopRange(buildTabs) {
     const btnPctEl = document.getElementById('pov-btn-pct');
     if (btnPctEl) btnPctEl.textContent = pct + '%';
   }
-  if (currentPFPos === 'BB') {
+  // Legende
+  if (currentPFPos === 'BB' || (currentPFPos === 'SB' && currentSBMode === 'face')) {
     const leg = document.getElementById('range-legend');
     if (leg) leg.innerHTML = `
       <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>3-Bet (Value + Bluff)</div>
@@ -1259,10 +1278,10 @@ function madeEquityStr(str) {
 ══════════════════════════════════════════════════════════════════ */
 const TRAINER_RANGES = {
   UTG: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','AQs','AQo','KQs'], r:['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'] },
-  MP:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'] },
-  CO:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'], r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo','J9o'] },
+  MP:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','33','22','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'] },
+  CO:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'], r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','Q9o','JTo','J9o'] },
   BTN: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'], r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','J9s','J8s','J7s','J6s','T8s','T7s','T6s','T5s','97s','96s','95s','86s','85s','84s','76s','75s','74s','73s','65s','64s','63s','54s','53s','52s','43s','42s','32s','A9o','A8o','A7o','A6o','KTo','K9o','K8o','QJo','Q9o','JTo','J9o','T9o','T8o','98o','87o','76o','65o'] },
-  SB:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'] }
+  SB:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','33','22','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','QJs','QTs','Q9s','Q8s','Q7s','JTs','J9s','J8s','J7s','T9s','T8s','T7s','T6s','98s','97s','96s','95s','87s','86s','85s','84s','76s','75s','74s','65s','64s','63s','54s','53s','52s','43s','42s','32s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'] }
 };
  
 const BB_DEFEND_RANGE = {
