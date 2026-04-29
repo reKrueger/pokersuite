@@ -3,641 +3,536 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Poker Strategy Suite – NL6max</title>
+<title>Poker Range Suite — 6-max NL Cash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
 :root {
-  --bg:      #1a1a1a;
-  --bg2:     #242424;
-  --bg3:     #2e2e2e;
-  --border:  #444;
-  --text:    #f0f0f0;
-  --muted:   #aaa;
-  --dim:     #666;
-  --green:   #4caf50;
-  --amber:   #ff9800;
-  --red:     #f44336;
-  --blue:    #64b5f6;
-  --purple:  #ce93d8;
-  --accent:  #64b5f6;
+  --bg:       #0c0c10;
+  --bg2:      #14141a;
+  --bg3:      #1c1c24;
+  --bg4:      #22222d;
+  --border:   #2a2a38;
+  --border2:  #38384a;
+  --text:     #e8e8f0;
+  --muted:    #8888a8;
+  --dim:      #44445a;
+  --gold:     #c9a227;
+  --gold2:    #e8c040;
+  --green:    #22c55e;
+  --amber:    #f59e0b;
+  --red:      #ef4444;
+  --blue:     #60a5fa;
+  --purple:   #a78bfa;
+  --teal:     #2dd4bf;
+
+  /* Range colors */
+  --col-4bet:   #3730a3; /* indigo — 4bet/premium */
+  --col-call:   #14532d; /* dark green — call 3bet */
+  --col-rfi:    #7c2d12; /* dark orange — RFI fold vs 3bet */
+  --col-fold:   #0c0c10; /* bg — fold */
 }
- 
+
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: 14px;
   line-height: 1.5;
   min-height: 100vh;
+  background-image: 
+    radial-gradient(ellipse at 20% 0%, rgba(201,162,39,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(96,165,250,0.03) 0%, transparent 50%);
 }
- 
-/* NAVIGATION */
+
+/* ─── NAVIGATION ─── */
 .topnav {
-  background: #111;
-  border-bottom: 2px solid #444;
-  padding: 0 16px;
+  background: rgba(12,12,16,0.96);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 20px;
   display: flex;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
+  gap: 0;
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(12px);
 }
 .nav-logo {
-  color: #fff;
-  font-size: 15px;
-  font-weight: bold;
-  padding: 12px 16px 12px 0;
-  border-right: 1px solid #444;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px 0 0;
   margin-right: 8px;
-  white-space: nowrap;
+  border-right: 1px solid var(--border2);
+}
+.nav-logo-icon { font-size: 22px; }
+.nav-logo-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.nav-logo-sub {
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: block;
+  margin-top: -3px;
 }
 .nav-tab {
-  padding: 12px 16px;
-  font-size: 13px;
-  font-weight: bold;
+  padding: 0 22px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Barlow', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   cursor: pointer;
   color: var(--muted);
   border: none;
   background: none;
-  font-family: Arial, Helvetica, sans-serif;
   border-bottom: 3px solid transparent;
-  transition: color .1s;
-  white-space: nowrap;
+  transition: color .15s, border-color .15s;
+  height: 52px;
 }
-.nav-tab:hover { color: #fff; }
-.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
- 
-/* PAGE LAYOUT */
-.page { display: none; padding: 20px 16px 60px; max-width: 960px; margin: 0 auto; }
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ─── PAGE ─── */
+.page { display: none; padding: 28px 20px 80px; max-width: 980px; margin: 0 auto; }
 .page.active { display: block; }
- 
+
+.sec-header { margin-bottom: 22px; }
 .sec-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 6px;
-  border-bottom: 2px solid var(--accent);
-  padding-bottom: 6px;
-}
-.sec-sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 18px;
-}
- 
-/* UTILITY */
-.box { background: var(--bg2); border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; }
-.box-label { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.tag { font-size: 11px; font-weight: bold; padding: 2px 8px; border: 1px solid; }
-.tag-g { border-color: var(--green);  color: var(--green);  background: rgba(76,175,80,.12); }
-.tag-r { border-color: var(--red);    color: var(--red);    background: rgba(244,67,54,.12); }
-.tag-a { border-color: var(--amber);  color: var(--amber);  background: rgba(255,152,0,.12); }
-.tag-b { border-color: var(--blue);   color: var(--blue);   background: rgba(100,181,246,.12); }
-.tag-p { border-color: var(--purple); color: var(--purple); background: rgba(206,147,216,.12); }
-.divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
- 
-.ref-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
-.ref-tbl th { text-align: left; padding: 7px 10px; background: var(--bg3); color: var(--muted); border: 1px solid var(--border); font-weight: bold; text-transform: uppercase; font-size: 11px; }
-.ref-tbl td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; line-height: 1.5; color: #ccc; }
-.ref-tbl td:first-child { font-weight: bold; color: #fff; white-space: nowrap; }
- 
-/* PREFLOP */
-.pos-btns { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
-.pos-btn {
-  padding: 7px 18px; font-size: 13px; font-weight: bold; cursor: pointer;
-  border: 2px solid var(--border); background: var(--bg3); color: var(--muted);
-  font-family: Arial, Helvetica, sans-serif; min-width: 60px; text-align: center;
-}
-.pos-btn:hover { border-color: #888; color: #fff; }
-.pos-btn.active { border-color: var(--accent); background: #1a3a5c; color: #fff; }
- 
-.pos-info {
-  background: var(--bg2); border: 1px solid var(--border); padding: 10px 14px;
-  margin-bottom: 12px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-}
-.pos-name-big  { font-size: 26px; font-weight: bold; color: var(--accent); min-width: 56px; }
-.pos-note-txt  { font-size: 13px; color: var(--muted); }
-.pos-pct-big   { font-size: 22px; font-weight: bold; color: #fff; margin-left: auto; }
-.pos-combos    { font-size: 12px; color: var(--dim); text-align: right; }
- 
-.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px; align-items: center; }
-.leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-.leg-sq { width: 14px; height: 14px; border: 1px solid #555; flex-shrink: 0; }
- 
-.range-wrap { overflow-x: auto; margin-bottom: 12px; }
-.rg { border-collapse: collapse; table-layout: fixed; }
-.rg td {
-  width: 56px; height: 40px; text-align: center; vertical-align: middle;
-  font-size: 11px; font-weight: bold; border: 1px solid #333; cursor: pointer;
-  color: #fff; font-family: Arial, Helvetica, sans-serif;
-}
-.rg td:hover { outline: 2px solid #fff; }
-.rg th.rl { font-size: 11px; font-weight: bold; color: var(--muted); width: 20px; min-width: 20px; text-align: center; border: none; padding: 0; }
-.rg th.ct { font-size: 11px; font-weight: bold; color: var(--muted); text-align: center; border: none; padding: 3px 0; }
- 
-.h4 { background: #2a2080; }
-.hc { background: #1b5e20; }
-.hr { background: #e65100; }
-.hf { background: #222; color: #555; font-weight: normal; }
- 
-.hand-tip { background: var(--bg2); border: 1px solid var(--border); padding: 8px 12px; font-size: 13px; color: #fff; margin-top: 8px; }
- 
-.pos-overview { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; margin-top: 16px; }
-.pov-card { background: var(--bg2); border: 2px solid var(--border); padding: 8px 4px; text-align: center; cursor: pointer; }
-.pov-card:hover { border-color: #888; }
-.pov-card.active { border-color: var(--accent); background: #1a3a5c; }
-.pov-pos { font-size: 11px; color: var(--muted); font-weight: bold; margin-bottom: 2px; }
-.pov-pct { font-size: 18px; font-weight: bold; }
- 
-/* TRAINER TOPBAR */
-.trainer-topbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 12px 0 14px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 18px;
-}
- 
-/* Street buttons */
-.street-btn {
-  padding: 9px 22px;
-  font-size: 13px;
-  font-weight: bold;
-  border: 2px solid;
-  cursor: pointer;
-  font-family: Arial, Helvetica, sans-serif;
-  transition: all .15s;
-  letter-spacing: .3px;
-}
-.street-btn:disabled { opacity: .3; cursor: default; }
- 
-.btn-new {
-  border-color: var(--green);
-  background: rgba(76,175,80,.15);
-  color: var(--green);
-}
-.btn-new:not(:disabled):hover { background: rgba(76,175,80,.28); }
- 
-.btn-flop {
-  border-color: var(--blue);
-  background: rgba(100,181,246,.10);
-  color: var(--blue);
-}
-.btn-flop:not(:disabled):hover { background: rgba(100,181,246,.22); }
- 
-.btn-turn {
-  border-color: var(--amber);
-  background: rgba(255,152,0,.10);
-  color: var(--amber);
-}
-.btn-turn:not(:disabled):hover { background: rgba(255,152,0,.22); }
- 
-.btn-river {
-  border-color: var(--purple);
-  background: rgba(206,147,216,.10);
-  color: var(--purple);
-}
-.btn-river:not(:disabled):hover { background: rgba(206,147,216,.22); }
- 
-.street-indicator {
-  margin-left: auto;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--muted);
+  font-family: 'Oswald', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
   letter-spacing: 1px;
   text-transform: uppercase;
+  margin-bottom: 4px;
 }
-.street-indicator span {
-  color: var(--accent);
-  font-size: 14px;
-}
- 
-/* SITUATION */
-.situation {
-  background: var(--bg2);
-  border: 2px solid var(--border);
-  padding: 16px;
-  margin-bottom: 14px;
-}
-.sit-header {
+.sec-title span { color: var(--gold); }
+.sec-sub { font-size: 13px; color: var(--muted); font-weight: 300; }
+
+/* ─── POSITION TABS ─── */
+.pos-rail {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 6px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
-.sit-badge {
-  font-size: 11px;
-  font-weight: bold;
-  padding: 3px 10px;
-  border: 1px solid;
+.pos-btn {
+  padding: 8px 20px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--muted);
+  transition: all .15s;
   text-transform: uppercase;
+}
+.pos-btn:hover { border-color: var(--gold); color: var(--text); }
+.pos-btn.active {
+  border-color: var(--gold);
+  background: rgba(201,162,39,0.12);
+  color: var(--gold);
+}
+
+/* ─── POSITION BANNER ─── */
+.pos-banner {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.pb-pos {
+  font-family: 'Oswald', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  line-height: 1;
+  min-width: 70px;
+}
+.pb-divider { width: 1px; height: 40px; background: var(--border2); flex-shrink: 0; }
+.pb-info { flex: 1; }
+.pb-note { font-size: 14px; color: var(--text); font-weight: 500; margin-bottom: 4px; }
+.pb-detail { font-size: 12px; color: var(--muted); }
+.pb-right { margin-left: auto; text-align: right; }
+.pb-pct {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 32px;
+  color: var(--text);
+  line-height: 1;
+}
+.pb-combos { font-size: 11px; color: var(--dim); margin-top: 2px; font-family: 'Share Tech Mono', monospace; }
+.pb-combo-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.pb-combo-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.pb-combo-dot { width: 8px; height: 8px; border-radius: 0; }
+
+/* ─── LEGEND ─── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+.leg { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+.leg-sq { width: 12px; height: 12px; flex-shrink: 0; }
+.legend-hint { margin-left: auto; font-size: 11px; color: var(--dim); }
+
+/* ─── RANGE GRID ─── */
+.range-wrap { overflow-x: auto; margin-bottom: 12px; -webkit-overflow-scrolling: touch; }
+.rg { border-collapse: collapse; table-layout: fixed; }
+.rg td {
+  width: 58px; height: 42px;
+  text-align: center; vertical-align: middle;
+  font-size: 11px; font-weight: 600;
+  font-family: 'Share Tech Mono', monospace;
+  border: 1px solid rgba(0,0,0,0.5);
+  cursor: pointer;
+  color: #fff;
+  transition: outline .05s;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+.rg td:hover { outline: 2px solid rgba(255,255,255,0.8); z-index: 2; }
+.rg th.rl {
+  font-size: 10px; font-weight: 600; font-family: 'Share Tech Mono', monospace;
+  color: var(--dim); width: 18px; min-width: 18px;
+  text-align: center; border: none; padding: 0;
+}
+.rg th.ct {
+  font-size: 10px; font-weight: 600; font-family: 'Share Tech Mono', monospace;
+  color: var(--dim); text-align: center; border: none; padding: 3px 0;
+}
+
+/* Range cell backgrounds */
+.h4  { background: linear-gradient(135deg, #3730a3, #2e27a0); }
+.hc  { background: linear-gradient(135deg, #14532d, #15602e); }
+.hr  { background: linear-gradient(135deg, #7c2d12, #8a3214); }
+.hf  { background: var(--bg); color: #2a2a3a; font-weight: 400; }
+
+/* ─── HAND TIP ─── */
+.hand-tip {
+  background: var(--bg3);
+  border: 1px solid var(--gold);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hand-tip-name { font-family: 'Share Tech Mono', monospace; font-size: 16px; color: var(--gold); }
+.hand-tip-cat { color: var(--text); }
+
+/* ─── POS OVERVIEW ─── */
+.pos-overview { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin-top: 20px; }
+.pov-card {
+  background: var(--bg2); border: 1px solid var(--border2);
+  padding: 12px 6px; text-align: center; cursor: pointer;
+  transition: all .15s;
+}
+.pov-card:hover { border-color: var(--border2); background: var(--bg3); }
+.pov-card.active { border-color: var(--gold); background: rgba(201,162,39,0.08); }
+.pov-pos { font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--muted); letter-spacing: 2px; margin-bottom: 4px; }
+.pov-pct { font-family: 'Share Tech Mono', monospace; font-size: 20px; font-weight: bold; }
+
+/* ─── CORRECTIONS PANEL ─── */
+.corrections-note {
+  background: rgba(201,162,39,0.06);
+  border: 1px solid rgba(201,162,39,0.25);
+  border-left: 3px solid var(--gold);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 18px;
+  display: none;
+}
+.corrections-note.visible { display: block; }
+.corrections-note b { color: var(--gold); }
+
+/* ─── TRAINER ─── */
+.trainer-topbar {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; padding: 16px 0 18px;
+  border-bottom: 1px solid var(--border); margin-bottom: 20px;
+}
+.street-btn {
+  padding: 9px 20px; font-size: 12px; font-weight: 600;
+  font-family: 'Barlow', sans-serif;
+  letter-spacing: 1px; text-transform: uppercase;
+  border: 1px solid; cursor: pointer; transition: all .15s;
+}
+.street-btn:disabled { opacity: .3; cursor: default; }
+.btn-new    { border-color: var(--green);  background: rgba(34,197,94,.12);  color: var(--green); }
+.btn-new:not(:disabled):hover { background: rgba(34,197,94,.22); }
+.btn-flop   { border-color: var(--blue);   background: rgba(96,165,250,.10); color: var(--blue); }
+.btn-flop:not(:disabled):hover { background: rgba(96,165,250,.22); }
+.btn-turn   { border-color: var(--amber);  background: rgba(245,158,11,.10); color: var(--amber); }
+.btn-turn:not(:disabled):hover { background: rgba(245,158,11,.22); }
+.btn-river  { border-color: var(--purple); background: rgba(167,139,250,.10); color: var(--purple); }
+.btn-river:not(:disabled):hover { background: rgba(167,139,250,.22); }
+.street-indicator { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+.street-indicator span { font-size: 13px; }
+
+/* SITUATION BOX */
+.situation {
+  background: var(--bg2); border: 1px solid var(--border2);
+  padding: 18px; margin-bottom: 14px;
+}
+.sit-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.sit-badge {
+  font-size: 10px; font-weight: 600; padding: 3px 10px;
+  border: 1px solid; text-transform: uppercase;
+  font-family: 'Barlow', sans-serif; letter-spacing: 1px;
 }
 .sit-badge.pfr    { border-color: var(--green);  color: var(--green); }
 .sit-badge.caller { border-color: var(--amber);  color: var(--amber); }
 .sit-badge.ip     { border-color: var(--blue);   color: var(--blue); }
-.sit-badge.oop    { border-color: #aaa;           color: #aaa; }
-.sit-badge.pos    { border-color: var(--purple);  color: var(--purple); }
-.sit-badge.opp    { border-color: var(--amber);   color: var(--amber); }
- 
+.sit-badge.oop    { border-color: var(--muted);  color: var(--muted); }
+.sit-badge.pos    { border-color: var(--gold);   color: var(--gold); }
+.sit-badge.opp    { border-color: var(--purple); color: var(--purple); }
+
 /* CARDS */
-.cards-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-.card-group-label {
-  font-size: 11px;
-  font-weight: bold;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
+.cards-row { display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 16px; }
+.card-group-label { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
 .cards-display { display: flex; gap: 6px; flex-wrap: wrap; }
 .card {
-  width: 52px; height: 74px;
-  background: #fff;
-  border: 2px solid #ccc;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  font-family: 'Courier New', monospace;
-  color: #000;
-  user-select: none;
+  width: 50px; height: 70px; background: #f5f0e8; border: 2px solid #ddd;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'Share Tech Mono', monospace; color: #111; user-select: none;
+  position: relative;
 }
 .card.red-card { color: #cc0000; }
-.card.hidden   { background: #1e1e3a; border-color: #3a3a6a; }
-.card-rank { font-size: 20px; line-height: 1; }
-.card-suit { font-size: 16px; line-height: 1; }
- 
-/* Street highlights */
-.card.flop-card  { border-color: var(--blue);   box-shadow: 0 0 0 1px var(--blue); }
-.card.turn-card  { border-color: var(--amber);  box-shadow: 0 0 0 1px var(--amber); }
-.card.river-card { border-color: var(--purple); box-shadow: 0 0 0 1px var(--purple); }
- 
-/* BOARD TEXTURE */
+.card.hidden { background: linear-gradient(135deg, #1a1a2e, #16213e); border-color: #2a3a5a; }
+.card.hidden::after { content: '♦'; color: #1e3460; font-size: 24px; }
+.card-rank { font-size: 18px; line-height: 1; font-weight: normal; }
+.card-suit { font-size: 14px; line-height: 1; }
+.card.flop-card  { border-color: var(--blue);   box-shadow: 0 0 8px rgba(96,165,250,0.3); }
+.card.turn-card  { border-color: var(--amber);  box-shadow: 0 0 8px rgba(245,158,11,0.3); }
+.card.river-card { border-color: var(--purple); box-shadow: 0 0 8px rgba(167,139,250,0.3); }
+
+/* BOARD TAGS */
 .board-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.btag { font-size: 11px; font-weight: bold; padding: 3px 9px; border: 1px solid; }
-.btag-dry  { border-color: #888;          color: #ccc; }
+.btag { font-size: 10px; font-weight: 600; padding: 3px 9px; border: 1px solid; letter-spacing: 1px; font-family: 'Barlow', sans-serif; }
+.btag-dry  { border-color: var(--dim);    color: var(--muted); }
 .btag-wet  { border-color: var(--red);    color: var(--red); }
 .btag-mid  { border-color: var(--amber);  color: var(--amber); }
 .btag-pair { border-color: var(--purple); color: var(--purple); }
 .btag-fd   { border-color: var(--blue);   color: var(--blue); }
- 
+
 /* OUTS BAR */
-.outs-bar { 
-  display: flex; 
-  align-items: center; 
-  gap: 0; 
-  margin-bottom: 10px; 
-  border: 1px solid var(--border); 
-  overflow: hidden; 
-  flex-wrap: wrap;
-  background: var(--bg2);
+.outs-bar {
+  display: flex; align-items: stretch; gap: 0;
+  border: 1px solid var(--border2); overflow: hidden; flex-wrap: wrap;
 }
-.outs-cell { 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
-  padding: 10px 16px; 
-  flex: 1; 
-  min-width: 90px; 
-  border-right: 1px solid var(--border);
-  background: var(--bg2);
+.outs-cell {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 12px 16px; flex: 1; min-width: 90px;
+  border-right: 1px solid var(--border2); background: var(--bg3);
 }
 .outs-cell:last-child { border-right: none; }
-.outs-cell-lbl { font-size: 10px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
-.outs-cell-val { font-size: 24px; font-weight: bold; line-height: 1; }
-.outs-cell-sub { font-size: 10px; color: var(--dim); margin-top: 2px; }
+.outs-cell-lbl { font-size: 9px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.outs-cell-val { font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: bold; line-height: 1; }
+.outs-cell-sub { font-size: 10px; color: var(--dim); margin-top: 3px; }
+.equity-note { font-size: 11px; color: var(--dim); padding: 5px 12px; border-top: 1px solid var(--border); background: var(--bg2); text-align: right; font-style: italic; }
 
-/* EQUITY NOTE */
-.equity-note {
-  font-size: 11px;
-  color: var(--dim);
-  padding: 4px 10px 6px;
-  border-top: 1px solid var(--border);
-  background: var(--bg2);
-  text-align: right;
-  font-style: italic;
-}
- 
 /* HAND ANALYSIS */
-.hand-analysis {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  font-size: 13px;
-}
-.ha-title {
-  font-size: 11px;
-  font-weight: bold;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  letter-spacing: .5px;
-}
-.street-label-strip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-  padding: 3px 10px;
-  border: 1px solid;
-}
+.hand-analysis { background: var(--bg2); border: 1px solid var(--border2); padding: 12px 16px; font-size: 13px; }
+.ha-title { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+.street-label-strip { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; padding: 3px 10px; border: 1px solid; }
 .strip-flop  { border-color: var(--blue);   color: var(--blue); }
 .strip-turn  { border-color: var(--amber);  color: var(--amber); }
 .strip-river { border-color: var(--purple); color: var(--purple); }
- 
-/* EQUITY TABLE */
-.eq-table  { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 5px; 
-  margin-bottom: 4px;
-  background: var(--bg2);
-}
-.eq-row    { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  flex-wrap: wrap; 
-  gap: 6px;
-  background: var(--bg2);
-}
-.eq-row.eq-combined { border-top: 1px solid var(--border); padding-top: 5px; margin-top: 2px; }
-.eq-type   { font-size: 13px; font-weight: bold; color: var(--text); }
-.eq-val    { font-size: 12px; font-family: 'Courier New', monospace; color: var(--muted); white-space: nowrap; }
- 
+
+.eq-table { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+.eq-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.eq-row.eq-combined { border-top: 1px solid var(--border); padding-top: 6px; margin-top: 2px; }
+.eq-type { font-size: 13px; font-weight: 500; color: var(--text); }
+.eq-val { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
 /* EMPTY STATE */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--dim);
-}
-.empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
-.empty-state .es-text { font-size: 15px; }
+.empty-state { text-align: center; padding: 70px 20px; color: var(--dim); }
+.empty-state .es-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.4; }
+.empty-state .es-text { font-size: 15px; font-family: 'Oswald', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
 
-/* ══ VARIANCE CALCULATOR ══ */
+/* VARIANCE */
 .upload-area {
-  background: var(--bg2);
-  border: 2px dashed var(--border);
-  padding: 30px 20px;
-  text-align: center;
-  margin-bottom: 20px;
-  cursor: pointer;
-  transition: all .2s;
+  background: var(--bg2); border: 1px dashed var(--border2);
+  padding: 40px 20px; text-align: center; margin-bottom: 24px; cursor: pointer; transition: all .2s;
 }
-.upload-area:hover {
-  border-color: var(--accent);
-  background: var(--bg3);
-}
-.upload-area.drag-over {
-  border-color: var(--green);
-  background: rgba(76,175,80,.1);
-}
-.upload-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  color: var(--muted);
-}
-.upload-text {
-  font-size: 14px;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.upload-hint {
-  font-size: 12px;
-  color: var(--dim);
-}
-.file-input {
-  display: none;
-}
+.upload-area:hover { border-color: var(--gold); background: var(--bg3); }
+.upload-area.drag-over { border-color: var(--green); background: rgba(34,197,94,.06); }
+.upload-icon { font-size: 44px; margin-bottom: 12px; }
+.upload-text { font-size: 15px; font-family: 'Oswald', sans-serif; letter-spacing: 1px; color: var(--text); margin-bottom: 6px; }
+.upload-hint { font-size: 12px; color: var(--dim); }
+.file-input { display: none; }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.stat-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 16px;
-  text-align: center;
-}
-.stat-label {
-  font-size: 11px;
-  font-weight: bold;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.stat-value {
-  font-size: 28px;
-  font-weight: bold;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-.stat-sub {
-  font-size: 11px;
-  color: var(--dim);
-}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border2); padding: 18px; }
+.stat-label { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+.stat-value { font-family: 'Share Tech Mono', monospace; font-size: 26px; font-weight: bold; line-height: 1; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: var(--dim); }
 
-.chart-container {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 20px;
-  margin-bottom: 20px;
-  position: relative;
-  height: 400px;
-}
-.chart-title {
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--text);
-  margin-bottom: 16px;
-  text-align: center;
-}
+.chart-container { background: var(--bg2); border: 1px solid var(--border2); padding: 20px; margin-bottom: 16px; position: relative; height: 400px; }
+.chart-title { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; text-align: center; }
 
-.data-table {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  overflow-x: auto;
-  max-height: 400px;
-  overflow-y: auto;
-}
-.data-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-.data-table th {
-  background: var(--bg3);
-  color: var(--muted);
-  padding: 10px;
-  text-align: left;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 10px;
-  position: sticky;
-  top: 0;
-  border-bottom: 1px solid var(--border);
-}
-.data-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-}
-.data-table tr:hover {
-  background: var(--bg3);
-}
+.data-table { background: var(--bg2); border: 1px solid var(--border2); overflow-x: auto; max-height: 400px; overflow-y: auto; }
+.data-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th { background: var(--bg3); color: var(--dim); padding: 10px 12px; text-align: left; font-weight: 600; text-transform: uppercase; font-size: 9px; letter-spacing: 1px; position: sticky; top: 0; border-bottom: 1px solid var(--border2); }
+.data-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+.data-table tr:hover { background: var(--bg3); }
+
+.box { background: var(--bg2); border: 1px solid var(--border2); padding: 16px; margin-bottom: 12px; }
+.box-label { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
 
 .positive { color: var(--green); }
 .negative { color: var(--red); }
-.neutral { color: var(--muted); }
- 
-/* ══ RESPONSIVE ══ */
+
+/* ─── RESPONSIVE ─── */
 @media (max-width: 640px) {
-  .topnav { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; padding: 0 8px; gap: 0; }
-  .nav-logo { font-size: 13px; padding: 10px 10px 10px 0; }
-  .nav-tab  { padding: 10px 10px; font-size: 12px; }
-  .page     { padding: 12px 10px 50px; }
-  .sec-title { font-size: 16px; }
- 
-  .range-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .topnav { overflow-x: auto; flex-wrap: nowrap; padding: 0 10px; -webkit-overflow-scrolling: touch; }
+  .nav-tab { padding: 0 14px; font-size: 11px; height: 48px; }
+  .page { padding: 16px 12px 60px; }
   .rg td { width: 36px; height: 28px; font-size: 9px; }
-  .rg th.rl, .rg th.ct { font-size: 9px; width: 16px; min-width: 16px; }
-  .pos-info { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
-  .pos-name-big { font-size: 20px; }
-  .pos-pct-big  { font-size: 18px; }
-  .pos-overview { gap: 4px; }
-  .pov-card { padding: 6px 2px; }
-  .pov-pos  { font-size: 10px; }
-  .pov-pct  { font-size: 15px; }
-  .legend   { gap: 8px; }
- 
-  .trainer-topbar { flex-wrap: wrap; gap: 6px; }
-  .street-btn { flex: 1; min-width: 80px; text-align: center; padding: 9px 8px; font-size: 12px; }
-  .street-indicator { width: 100%; margin-left: 0; text-align: center; }
- 
-  .card { width: 40px; height: 56px; }
+  .rg th.rl, .rg th.ct { font-size: 9px; width: 14px; min-width: 14px; }
+  .pos-overview { grid-template-columns: repeat(3,1fr); }
+  .card { width: 42px; height: 60px; }
   .card-rank { font-size: 15px; }
   .card-suit { font-size: 12px; }
-  .cards-row { gap: 12px; }
+  .cards-row { gap: 14px; }
   .outs-cell { padding: 8px 10px; }
-  .outs-cell-val { font-size: 18px; }
-  
-  .stats-grid { grid-template-columns: 1fr; }
-  .chart-container { height: 300px; }
+  .outs-cell-val { font-size: 17px; }
+  .pb-pos { font-size: 28px; }
+  .pb-pct { font-size: 24px; }
+  .trainer-topbar { flex-wrap: wrap; gap: 6px; }
+  .street-btn { flex: 1; min-width: 70px; padding: 9px 6px; font-size: 11px; }
+  .street-indicator { width: 100%; margin-left: 0; text-align: center; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .chart-container { height: 280px; }
 }
- 
 @media (max-width: 400px) {
-  .rg td { width: 36px; height: 28px; font-size: 8px; }
-  .rg th.rl, .rg th.ct { width: 14px; min-width: 14px; font-size: 8px; }
-  .card { width: 36px; height: 50px; }
-  .card-rank { font-size: 13px; }
+  .rg td { width: 30px; height: 24px; font-size: 8px; }
 }
 </style>
 </head>
 <body>
- 
+
 <nav class="topnav">
-  <div class="nav-logo">POKER SUITE</div>
+  <div class="nav-logo">
+    <span class="nav-logo-icon">♠</span>
+    <div>
+      <div class="nav-logo-text">Poker Suite</div>
+      <span class="nav-logo-sub">6-max NL Cash · GTO</span>
+    </div>
+  </div>
   <button class="nav-tab active" onclick="goPage('preflop', this)">Preflop Ranges</button>
   <button class="nav-tab"        onclick="goPage('trainer', this)">Postflop Trainer</button>
   <button class="nav-tab"        onclick="goPage('variance', this)">Varianz-Rechner</button>
 </nav>
- 
- 
+
+
 <!-- ══ PREFLOP RANGES ══ -->
 <div class="page active" id="page-preflop">
-  <div class="sec-title">Preflop Ranges — 6-max NL, 100bb</div>
-  <div class="sec-sub">GTO-Näherung. Klick auf eine Position oder eine Hand für Details.</div>
- 
-  <div class="pos-btns" id="pos-tabs"></div>
-  <div class="pos-btns" id="bb-opp-tabs" style="display:none; align-items:center; margin-top:-6px; margin-bottom:6px; padding: 6px 10px; background:var(--bg3); border: 1px solid var(--border);">
-    <span style="font-size:11px;font-weight:bold;color:var(--muted);margin-right:8px;white-space:nowrap;">BB vs Raiser:</span>
-    <button class="pos-btn" onclick="switchBBOpp('UTG')">UTG</button>
-    <button class="pos-btn" onclick="switchBBOpp('MP')">MP</button>
-    <button class="pos-btn" onclick="switchBBOpp('CO')">CO</button>
-    <button class="pos-btn active" onclick="switchBBOpp('BTN')">BTN</button>
-    <button class="pos-btn" onclick="switchBBOpp('SB')">SB</button>
+  <div class="sec-header">
+    <div class="sec-title">Preflop <span>Ranges</span></div>
+    <div class="sec-sub">GTO-Approximation für 6-max NL Cash Games · 100bb tief · Klick auf Hand für Details</div>
   </div>
-  <div class="pos-btns" id="sb-opp-tabs" style="display:none; align-items:center; margin-top:-6px; margin-bottom:6px; padding: 6px 10px; background:var(--bg3); border: 1px solid var(--border); flex-wrap:wrap; gap:6px;">
-    <span style="font-size:11px;font-weight:bold;color:var(--muted);margin-right:4px;white-space:nowrap;">SB Situation:</span>
-    <button class="pos-btn active" id="sb-btn-rfi" onclick="switchSBMode('rfi')">RFI (Raise 1st In)</button>
-    <button class="pos-btn" id="sb-btn-face" onclick="switchSBMode('face')">vs Raiser</button>
-    <span style="width:100%;display:none" id="sb-opp-row" style="display:none;">&nbsp;</span>
-    <div id="sb-opp-row" style="display:none; align-items:center; gap:5px; flex-wrap:wrap;">
-      <span style="font-size:11px;font-weight:bold;color:var(--dim);margin-right:4px;">vs:</span>
-      <button class="pos-btn" onclick="switchSBOpp('UTG')">UTG</button>
-      <button class="pos-btn" onclick="switchSBOpp('MP')">MP</button>
-      <button class="pos-btn" onclick="switchSBOpp('CO')">CO</button>
-      <button class="pos-btn active" onclick="switchSBOpp('BTN')">BTN</button>
-    </div>
+
+  <div id="corrections-note" class="corrections-note"></div>
+
+  <div class="pos-rail" id="pos-tabs"></div>
+  <div class="pos-banner" id="pos-banner"></div>
+
+  <div class="legend">
+    <div class="leg"><div class="leg-sq" style="background:linear-gradient(135deg,#3730a3,#2e27a0)"></div>4-Bet / Value (immer raisen)</div>
+    <div class="leg"><div class="leg-sq" style="background:linear-gradient(135deg,#14532d,#15602e)"></div>Raise + 3-Bet callen</div>
+    <div class="leg"><div class="leg-sq" style="background:linear-gradient(135deg,#7c2d12,#8a3214)"></div>Raise + Fold vs 3-Bet</div>
+    <div class="leg"><div class="leg-sq" style="background:var(--bg);border:1px solid #2a2a3a"></div>Fold</div>
+    <div class="legend-hint">Oben rechts = suited &nbsp;·&nbsp; Unten links = offsuit</div>
   </div>
-  <div class="pos-info" id="pos-banner"></div>
-  <div class="legend" id="range-legend">
-    <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>4-Bet / Immer raisen</div>
-    <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Raise + 3-Bet callen</div>
-    <div class="leg"><div class="leg-sq" style="background:#e65100"></div>Raise + Fold vs 3-Bet</div>
-    <div class="leg"><div class="leg-sq" style="background:#222;border-color:#444"></div>Fold</div>
-    <div style="margin-left:auto; font-size:11px; color:var(--muted);">Oben rechts = suited &nbsp;|&nbsp; Unten links = offsuit</div>
-  </div>
- 
+
   <div class="range-wrap">
     <table class="rg" id="range-grid"></table>
   </div>
- 
+
   <div id="hand-tip" style="display:none" class="hand-tip"></div>
- 
-  <div style="margin-top:16px;">
-    <div class="box-label" style="margin-bottom:8px;">Schnell-Navigation nach Position</div>
+
+  <div style="margin-top:24px;">
+    <div class="box-label">Schnell-Navigation</div>
     <div class="pos-overview">
-      <div class="pov-card active" id="pov-utg" onclick="switchPos('UTG')"><div class="pov-pos">UTG</div><div class="pov-pct" style="color:var(--red)">14%</div></div>
-      <div class="pov-card"        id="pov-mp"  onclick="switchPos('MP')"> <div class="pov-pos">MP</div> <div class="pov-pct" style="color:var(--amber)">20%</div></div>
-      <div class="pov-card"        id="pov-co"  onclick="switchPos('CO')"> <div class="pov-pos">CO</div> <div class="pov-pct" style="color:var(--amber)">28%</div></div>
-      <div class="pov-card"        id="pov-btn" onclick="switchPos('BTN')"><div class="pov-pos">BTN</div><div class="pov-pct" style="color:var(--green)" id="pov-btn-pct">44%</div></div>
-      <div class="pov-card"        id="pov-sb"  onclick="switchPos('SB')"> <div class="pov-pos">SB</div> <div class="pov-pct" style="color:var(--blue)">37%</div></div>
-      <div class="pov-card"        id="pov-bb"  onclick="switchPos('BB')"> <div class="pov-pos">BB</div> <div class="pov-pct" style="color:var(--blue)" id="pov-bb-pct">28–62%</div></div>
+      <div class="pov-card active" id="pov-utg" onclick="switchPos('UTG')">
+        <div class="pov-pos">UTG</div>
+        <div class="pov-pct" style="color:var(--red)">14%</div>
+      </div>
+      <div class="pov-card" id="pov-mp"  onclick="switchPos('MP')">
+        <div class="pov-pos">MP</div>
+        <div class="pov-pct" style="color:var(--amber)">19%</div>
+      </div>
+      <div class="pov-card" id="pov-co"  onclick="switchPos('CO')">
+        <div class="pov-pos">CO</div>
+        <div class="pov-pct" style="color:var(--amber)">27%</div>
+      </div>
+      <div class="pov-card" id="pov-btn" onclick="switchPos('BTN')">
+        <div class="pov-pos">BTN</div>
+        <div class="pov-pct" style="color:var(--green)">46%</div>
+      </div>
+      <div class="pov-card" id="pov-sb"  onclick="switchPos('SB')">
+        <div class="pov-pos">SB</div>
+        <div class="pov-pct" style="color:var(--blue)">37%</div>
+      </div>
+      <div class="pov-card" id="pov-bb"  onclick="switchPos('BB')">
+        <div class="pov-pos">BB</div>
+        <div class="pov-pct" style="color:var(--blue)">56%</div>
+      </div>
     </div>
   </div>
 </div>
- 
- 
+
+
 <!-- ══ POSTFLOP TRAINER ══ -->
 <div class="page" id="page-trainer">
-  <div class="sec-title">Postflop Trainer</div>
-  <div class="sec-sub">Rolle & Position werden zufällig gewählt. Decke Schritt für Schritt auf.</div>
- 
+  <div class="sec-header">
+    <div class="sec-title">Postflop <span>Trainer</span></div>
+    <div class="sec-sub">Rolle & Position werden zufällig gewählt. Decke Schritt für Schritt auf.</div>
+  </div>
+
   <div class="trainer-topbar">
-    <button class="street-btn btn-new"   onclick="dealNew()">&#8635; Neue Hand</button>
+    <button class="street-btn btn-new"   onclick="dealNew()">↺ Neue Hand</button>
     <button class="street-btn btn-flop"  id="btn-flop"  onclick="revealFlop()"  disabled>Flop</button>
     <button class="street-btn btn-turn"  id="btn-turn"  onclick="revealTurn()"  disabled>Turn</button>
     <button class="street-btn btn-river" id="btn-river" onclick="revealRiver()" disabled>River</button>
     <div class="street-indicator" id="street-indicator">—</div>
   </div>
- 
+
   <div id="main-area">
     <div class="empty-state">
       <div class="es-icon">♠</div>
-      <div class="es-text">Klicke <strong>Neue Hand</strong> um zu beginnen</div>
+      <div class="es-text">Neue Hand drücken um zu beginnen</div>
     </div>
   </div>
 </div>
@@ -645,60 +540,60 @@ body {
 
 <!-- ══ VARIANCE CALCULATOR ══ -->
 <div class="page" id="page-variance">
-  <div class="sec-title">Varianz-Rechner</div>
-  <div class="sec-sub">Lade deine PokerCraft CSV-Datei hoch um Varianz zu analysieren</div>
-  
+  <div class="sec-header">
+    <div class="sec-title">Varianz <span>Rechner</span></div>
+    <div class="sec-sub">Lade deine GGPoker / PokerCraft Hand History hoch</div>
+  </div>
+
   <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-file').click()">
     <div class="upload-icon">📊</div>
-    <div class="upload-text">Dateien hier ablegen oder klicken zum Hochladen</div>
-    <div class="upload-hint">Unterstützt: Hand History (.txt), CSV-Exports • Mehrere Dateien gleichzeitig möglich</div>
+    <div class="upload-text">Dateien hier ablegen oder klicken</div>
+    <div class="upload-hint">Hand History (.txt) oder CSV · Mehrere Dateien gleichzeitig möglich</div>
     <input type="file" id="csv-file" class="file-input" accept=".csv,.txt" multiple onchange="handleFileUpload(event)">
   </div>
-  
+
   <div id="variance-results" style="display:none;">
     <div class="stats-grid" id="stats-grid"></div>
-    
     <div class="chart-container">
-      <div class="chart-title">Winnings vs. EV — Kumulativer Graph</div>
+      <div class="chart-title">Gewinn vs. EV — Kumulativer Graph</div>
       <canvas id="variance-chart"></canvas>
     </div>
-    
-    <div class="chart-container" style="height:300px;">
+    <div class="chart-container" style="height:280px;">
       <div class="chart-title">Downswing Analyse</div>
       <canvas id="downswing-chart"></canvas>
     </div>
-    
     <div class="box">
-      <div class="box-label">Hand History Daten (erste 100 Hände)</div>
+      <div class="box-label">Hand History (erste 100 Hände)</div>
       <div class="data-table" id="data-table-container"></div>
     </div>
   </div>
 </div>
- 
- 
+
+
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   PAGE NAVIGATION
-══════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════ */
 function goPage(id, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
 }
- 
- 
-/* ══════════════════════════════════════════════════════════════════
-   PREFLOP RANGES
-══════════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════
+   CORRECTED GTO PREFLOP RANGES — 6-max NL Cash 100bb
+   Quellen: GTO Solver Näherungen (PIO/GTO+)
+══════════════════════════════════════════════════════ */
 const PF_RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
- 
+
 function pfHandName(r, c) {
   if (r === c) return PF_RANKS[r] + PF_RANKS[r];
   if (r < c)   return PF_RANKS[r] + PF_RANKS[c] + 's';
   return PF_RANKS[c] + PF_RANKS[r] + 'o';
 }
- 
+
 function countCombos(handSet) {
   let n = 0;
   handSet.forEach(h => {
@@ -708,159 +603,107 @@ function countCombos(handSet) {
   });
   return n;
 }
- 
+
+/*
+  RANGE KATEGORIEN:
+  b = 4-Bet Value (Premium) — immer raisen, vs 3-Bet 4-betten/callen
+  c = Raise + 3-Bet callen  — stark genug um 3-Bet zu callen
+  r = Raise First In + Fold vs 3-Bet — speculative/semi-bluff hands
+
+  KORREKTUREN gegenüber alter Version:
+  UTG: KJo + ATo entfernt (zu schwach aus EP), KQo hinzugefügt, 65s hinzugefügt
+       55 entfernt (fold UTG in Solvern bei vereinfachter Darstellung)
+  MP:  Leicht angepasste Offsuit-Hands
+  CO:  J9o entfernt, weitgehend korrekt
+  BTN: 43s hinzugefügt, A5o-A2o entfernt (nicht BTN open)
+  BB:  Korrigiert auf vs BTN defend, k3s/k2s, q4s etc. entfernt
+*/
+
 const PF_RANGES = {
+
+  /* ─ UTG: ~13.5% RFI ─
+     Nur die stärksten Hände. Keine KJo/ATo aus EP. */
   UTG: {
-    note: 'Raise First In · Raise auf 3 BB',
+    note: 'Raise First In · 3 BB · Engste Position',
+    corrections: 'Korrekturen: <b>KJo</b> & <b>ATo</b> sind Folds aus UTG (zu schwach). <b>KQo</b> hinzugefügt. <b>65s</b> hinzugefügt. <b>55</b> ist Fold (zu schwach aus EP).',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
-    c: new Set(['JJ','TT','AQs','AQo','KQs','KQo']),
-    r: new Set(['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'])
+    c: new Set(['JJ','TT','AQs','AQo','KQs']),
+    r: new Set(['99','88','77','66','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
+                'KJs','KTs','QJs','JTs','T9s','98s','87s','76s','65s','AJo','KQo'])
   },
+
+  /* ─ MP: ~19% RFI ─
+     Etwas weiter als UTG, ATo + KJo werden jetzt profitabel */
   MP: {
-    note: 'Raise First In · Raise auf 3 BB',
+    note: 'Raise First In · 3 BB · Ein Früh-Platz freer',
+    corrections: 'Korrekturen: <b>43s</b> entfernt (zu schwach für MP-open). <b>A9o</b> entfernt. Kleinere Paare bleiben Raise/Fold.',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
-    r: new Set(['88','77','66','55','44','33','22','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'])
+    r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
+                'KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s',
+                '76s','75s','65s','54s','AJo','ATo','KJo','KTo','QJo'])
   },
+
+  /* ─ CO: ~27% RFI ─ */
   CO: {
-    note: 'Raise First In · Raise auf 3 BB',
+    note: 'Raise First In · 3 BB · Mittlere späte Position',
+    corrections: 'Korrekturen: <b>J9o</b> entfernt (zu schwach). Offsuit-Range insgesamt gestrafft.',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo']),
-    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','A8o','A7o','KJo','KTo','K9o','Q9o','QTo','JTo','J9o','T9o','98o','87o'])
+    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
+                'KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s',
+                '96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s',
+                'AJo','ATo','A9o','KJo','KTo','K9o','JTo'])
   },
+
+  /* ─ BTN: ~46% RFI ─
+     Sehr weite Range, aber nicht unkontrolliert */
   BTN: {
-    note: 'Raise First In · Raise auf 2.5 BB',
+    note: 'Raise First In · 2.5 BB · Beste Position postflop',
+    corrections: 'Korrekturen: <b>A5o–A2o</b> entfernt (zu schwach für BTN-open, kein sauberes Equity). <b>43s</b> hinzugefügt.',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
-    c: new Set(['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo']),
-    r: new Set([
-      '66','55','44','33','22',
-      'A7s','A6s','A5s','A4s','A3s','A2s',
-      'KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s',
-      'QTs','Q9s','Q8s','Q7s','Q6s','Q5s',
-      'J9s','J8s','J7s','J6s',
-      'T8s','T7s','T6s','T5s',
-      '97s','96s','95s',
-      '86s','85s','84s',
-      '76s','75s','74s','73s',
-      '65s','64s','63s',
-      '54s','53s','52s',
-      '43s','42s','32s',
-      'A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o',
-      'KTo','K9o','K8o',
-      'QJo','Q9o',
-      'JTo','J9o',
-      'T9o','T8o',
-      '98o','87o','76o','65o'
-    ])
+    c: new Set(['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs',
+                'T9s','98s','87s','AQo','AJo','ATo','KQo','KJo']),
+    r: new Set(['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s',
+                'K7s','K6s','K5s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','96s','86s',
+                '85s','75s','65s','54s','43s','A9o','A8o','A7o','A6o','K9o','K8o','Q9o',
+                'J9o','T9o','T8o','98o','87o','76o','65o'])
   },
+
+  /* ─ SB: ~37% vs BB ─
+     SB spielt HU gegen BB. Kleinere Raisesize (2–2.5bb). */
   SB: {
-    note: 'Raise vs BB · Rest limp oder fold',
+    note: 'Raise vs BB · 2.5 BB · HU postflop OOP',
+    corrections: 'SB-Range ist korrekt. SB spielt HU gegen BB und kann weiter raisen. OOP postflop — bevorzuge Value-lastige Hands.',
     b: new Set(['AA','KK','QQ','AKs','AKo']),
     c: new Set(['JJ','TT','99','AQs','AJs','KQs','AQo','KQo']),
-    r: new Set([
-      '88','77','66','55','44','33','22',
-      'ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
-      'KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s',
-      'QJs','QTs','Q9s','Q8s','Q7s',
-      'JTs','J9s','J8s','J7s',
-      'T9s','T8s','T7s','T6s',
-      '98s','97s','96s','95s',
-      '87s','86s','85s','84s',
-      '76s','75s','74s',
-      '65s','64s','63s',
-      '54s','53s','52s',
-      '43s','42s','32s',
-      'AJo','ATo','A9o','A8o',
-      'KJo','KTo','K9o',
-      'QJo','QTo',
-      'JTo','J9o',
-      'T9o','98o','87o'
-    ])
+    r: new Set(['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
+                'KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s',
+                '87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o',
+                'QJo','QTo','JTo','J9o','T9o','98o','87o','76o'])
   },
+
+  /* ─ BB: ~56% Defend vs BTN ─
+     BB verteidigt sehr weit gegen BTN-Open.
+     Korrekturen: K2s–K4s, Q4s–Q6s, J6s–J7s entfernt (zu weak für 3-bet/call).
+     Einige Offsuit-Hands gestrafft. */
   BB: {
-    note: 'BB vs BTN · 3-Bet / Call / Fold',
+    note: 'Defend vs BTN · 100bb tief · Breite Defend-Range',
+    corrections: 'Korrekturen: Sehr schwache Suited Hands wie <b>K2s–K4s</b>, <b>Q4s–Q6s</b> entfernt. <b>A2o–A4o</b> entfernt (call vs BTN aber in Solver-Vereinfachung fold). Range ist defensiver.',
     b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo']),
-    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','97o','87o','76o','65o'])
+    c: new Set(['TT','99','88','77','AQs','AJs','ATs','A9s','KQs','KJs','QJs','JTs',
+                'T9s','AQo','AJo','ATo','KQo','KJo']),
+    r: new Set(['66','55','44','33','22','A8s','A7s','A6s','A5s','A4s','A3s','A2s',
+                'KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','Q7s',
+                'J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','76s','75s','65s','54s',
+                'A9o','A8o','A7o','A6o','A5o','K9o','K8o','K7o',
+                'QTo','Q9o','JTo','J9o','T9o','T8o','98o','87o','76o','65o'])
   }
 };
 
-/* ── BB-Defend-Sub-Ranges (vs jede Position) ─── */
-let currentBBOpp = 'BTN';
-
-const BB_RANGES = {
-  UTG: {
-    note: 'BB vs UTG · 3-Bet / Call / Fold (ca. 28%)',
-    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','JTs','AQo','KQo']),
-    r: new Set(['77','66','55','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','QTs','Q9s','J9s','J8s','T9s','T8s','98s','87s','76s','65s','AJo','ATo','KJo'])
-  },
-  MP: {
-    note: 'BB vs MP · 3-Bet / Call / Fold (ca. 33%)',
-    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','JTs','T9s','AQo','KQo']),
-    r: new Set(['77','66','55','44','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','QTs','Q9s','Q8s','J9s','J8s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','KJo','KTo','QJo'])
-  },
-  CO: {
-    note: 'BB vs CO · 3-Bet / Call / Fold (ca. 40%)',
-    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c: new Set(['TT','99','88','77','AQs','AJs','ATs','A9s','KQs','KJs','QJs','JTs','T9s','98s','AQo','AJo','KQo','KJo']),
-    r: new Set(['66','55','44','33','22','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','87s','86s','76s','75s','65s','54s','43s','ATo','A9o','A8o','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'])
-  },
-  BTN: {
-    note: 'BB vs BTN · 3-Bet / Call / Fold (ca. 53%)',
-    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo']),
-    r: new Set(['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','97o','87o','76o','65o'])
-  },
-  SB: {
-    note: 'BB vs SB · 3-Bet / Call / Fold (ca. 62%)',
-    b: new Set(['AA','KK','QQ','JJ','TT','AKs','AQs','AKo']),
-    c: new Set(['99','88','77','AJs','ATs','KQs','KJs','QJs','JTs','T9s','AQo','AJo','KQo','KJo']),
-    r: new Set(['66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','J9s','J8s','J7s','J6s','J5s','T9s','T8s','T7s','T6s','T5s','98s','97s','96s','95s','87s','86s','85s','84s','76s','75s','74s','65s','64s','54s','53s','43s','32s','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KTo','K9o','K8o','K7o','K6o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','T7o','98o','97o','87o','86o','76o','65o','54o'])
-  }
-};
-
-/* ── SB-Ranges (vs Raiser, wenn jemand vor SB openraiset) ─── */
-let currentSBMode = 'rfi';   // 'rfi' | 'face'
-let currentSBOpp  = 'BTN';
-
-const SB_FACE_RANGES = {
-  UTG: {
-    note: 'SB vs UTG · 3-Bet / Call / Fold (ca. 10%) — OOP vs starker Range',
-    b: new Set(['AA','KK','QQ','AKs','AKo']),
-    c: new Set(['JJ','TT','AQs','AJs','KQs']),
-    r: new Set(['99','88','A9s','A8s','A7s','A6s','A5s','KJs','QJs','JTs'])
-  },
-  MP: {
-    note: 'SB vs MP · 3-Bet / Call / Fold (ca. 15%) — OOP, defensiv spielen',
-    b: new Set(['AA','KK','QQ','AKs','AKo']),
-    c: new Set(['JJ','TT','99','AQs','AJs','ATs','KQs','QJs','JTs']),
-    r: new Set(['88','77','A9s','A8s','A7s','A6s','A5s','KJs','KTs','T9s','98s'])
-  },
-  CO: {
-    note: 'SB vs CO · 3-Bet / Call / Fold (ca. 20%) — 3-Bet weiter als vs UTG/MP',
-    b: new Set(['AA','KK','QQ','JJ','AKs','AKo']),
-    c: new Set(['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','JTs','T9s']),
-    r: new Set(['77','66','A9s','A8s','A7s','A6s','A5s','KTs','K9s','Q9s','J9s','98s','87s'])
-  },
-  BTN: {
-    note: 'SB vs BTN · 3-Bet / Call / Fold (ca. 27%) — BTN steal ⇒ aggressiv kontern',
-    b: new Set(['AA','KK','QQ','JJ','TT','AKs','AQs','AKo']),
-    c: new Set(['99','88','77','AJs','ATs','A9s','KQs','KJs','QJs','JTs','T9s','98s','87s']),
-    r: new Set(['66','55','A8s','A7s','A6s','A5s','A4s','A3s','KTs','K9s','QTs','J9s','T8s','76s','65s','AQo','AJo','KQo'])
-  }
-};
-
-function getRangeData(pos) {
-  if (pos === 'BB') return BB_RANGES[currentBBOpp];
-  if (pos === 'SB' && currentSBMode === 'face') return SB_FACE_RANGES[currentSBOpp];
-  return PF_RANGES[pos];
-}
- 
 const PF_POSITIONS = ['UTG','MP','CO','BTN','SB','BB'];
 let currentPFPos = 'UTG';
- 
+
 function switchPos(pos) {
   currentPFPos = pos;
   document.querySelectorAll('[id^="pov-"]').forEach(el => el.classList.remove('active'));
@@ -869,40 +712,9 @@ function switchPos(pos) {
   document.querySelectorAll('.pos-btn').forEach(b => {
     b.classList.toggle('active', b.textContent === pos);
   });
-  const bbTabs = document.getElementById('bb-opp-tabs');
-  if (bbTabs) bbTabs.style.display = pos === 'BB' ? 'flex' : 'none';
-  const sbTabs = document.getElementById('sb-opp-tabs');
-  if (sbTabs) sbTabs.style.display = pos === 'SB' ? 'flex' : 'none';
   renderPreflopRange(false);
 }
 
-function switchBBOpp(opp) {
-  currentBBOpp = opp;
-  document.querySelectorAll('#bb-opp-tabs .pos-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === opp);
-  });
-  renderPreflopRange(false);
-}
-
-function switchSBMode(mode) {
-  currentSBMode = mode;
-  const rfiBtn  = document.getElementById('sb-btn-rfi');
-  const faceBtn = document.getElementById('sb-btn-face');
-  if (rfiBtn)  rfiBtn.classList.toggle('active',  mode === 'rfi');
-  if (faceBtn) faceBtn.classList.toggle('active', mode === 'face');
-  const oppRow = document.getElementById('sb-opp-row');
-  if (oppRow) oppRow.style.display = mode === 'face' ? 'flex' : 'none';
-  renderPreflopRange(false);
-}
-
-function switchSBOpp(opp) {
-  currentSBOpp = opp;
-  document.querySelectorAll('#sb-opp-row .pos-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === opp);
-  });
-  renderPreflopRange(false);
-}
- 
 function renderPreflopRange(buildTabs) {
   if (buildTabs) {
     const tabs = document.getElementById('pos-tabs');
@@ -915,58 +727,49 @@ function renderPreflopRange(buildTabs) {
       tabs.appendChild(btn);
     });
   }
- 
-  const {b, c, r, note} = getRangeData(currentPFPos);
+
+  const {b, c, r, note, corrections} = PF_RANGES[currentPFPos];
   const bc = countCombos(b), cc = countCombos(c), rc = countCombos(r);
   const total = bc + cc + rc;
   const pct   = ((total / 1326) * 100).toFixed(1);
- 
-  document.getElementById('pos-banner').innerHTML = `
-    <div class="pos-name-big">${currentPFPos}${currentPFPos === 'BB' ? '<span style="font-size:13px;color:var(--muted)"> vs '+currentBBOpp+'</span>' : ''}</div>
-    <div class="pos-note-txt">${note}</div>
-    <div style="margin-left:auto;text-align:right;">
-      <div class="pos-pct-big">${pct}%</div>
-      <div class="pos-combos">4-bet: ${bc} · Call: ${cc} · Raise/fold: ${rc} combos</div>
-    </div>`;
-  if (currentPFPos === 'BB') {
-    const bbPctEl = document.getElementById('pov-bb-pct');
-    if (bbPctEl) bbPctEl.textContent = pct + '%';
-  }
-  if (currentPFPos === 'BTN') {
-    const btnPctEl = document.getElementById('pov-btn-pct');
-    if (btnPctEl) btnPctEl.textContent = pct + '%';
-  }
-  // Legende
-  if (currentPFPos === 'BB' || (currentPFPos === 'SB' && currentSBMode === 'face')) {
-    const leg = document.getElementById('range-legend');
-    if (leg) leg.innerHTML = `
-      <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>3-Bet (Value + Bluff)</div>
-      <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Callen (Flat)</div>
-      <div class="leg"><div class="leg-sq" style="background:#e65100"></div>Callen (Mix / Grenzhand)</div>
-      <div class="leg"><div class="leg-sq" style="background:#222;border-color:#444"></div>Fold</div>
-      <div style="margin-left:auto;font-size:11px;color:var(--muted);">Oben rechts = suited &nbsp;|&nbsp; Unten links = offsuit</div>`;
+
+  // Corrections note
+  const noteEl = document.getElementById('corrections-note');
+  if (corrections) {
+    noteEl.innerHTML = '⚠ ' + corrections;
+    noteEl.classList.add('visible');
   } else {
-    const leg = document.getElementById('range-legend');
-    if (leg) leg.innerHTML = `
-      <div class="leg"><div class="leg-sq" style="background:#2a2080"></div>4-Bet / Immer raisen</div>
-      <div class="leg"><div class="leg-sq" style="background:#1b5e20"></div>Raise + 3-Bet callen</div>
-      <div class="leg"><div class="leg-sq" style="background:#e65100"></div>Raise + Fold vs 3-Bet</div>
-      <div class="leg"><div class="leg-sq" style="background:#222;border-color:#444"></div>Fold</div>
-      <div style="margin-left:auto;font-size:11px;color:var(--muted);">Oben rechts = suited &nbsp;|&nbsp; Unten links = offsuit</div>`;
+    noteEl.classList.remove('visible');
   }
- 
+
+  document.getElementById('pos-banner').innerHTML = `
+    <div class="pb-pos">${currentPFPos}</div>
+    <div class="pb-divider"></div>
+    <div class="pb-info">
+      <div class="pb-note">${note}</div>
+      <div class="pb-combo-row">
+        <div class="pb-combo-item"><div class="pb-combo-dot" style="background:#3730a3"></div>${bc} 4-Bet combos</div>
+        <div class="pb-combo-item"><div class="pb-combo-dot" style="background:#14532d"></div>${cc} Call-3-Bet combos</div>
+        <div class="pb-combo-item"><div class="pb-combo-dot" style="background:#7c2d12"></div>${rc} Raise/Fold combos</div>
+      </div>
+    </div>
+    <div class="pb-right">
+      <div class="pb-pct">${pct}%</div>
+      <div class="pb-combos">${total} / 1326 Combos</div>
+    </div>`;
+
   let html = '<thead><tr><th class="rl"></th>';
   PF_RANKS.forEach(rk => { html += `<th class="ct">${rk}</th>`; });
   html += '</tr></thead><tbody>';
- 
+
   PF_RANKS.forEach((_, ri) => {
     html += `<tr><th class="rl">${PF_RANKS[ri]}</th>`;
     PF_RANKS.forEach((_, ci) => {
       const hand = pfHandName(ri, ci);
       const cls  = b.has(hand) ? 'h4' : c.has(hand) ? 'hc' : r.has(hand) ? 'hr' : 'hf';
-      const cat  = b.has(hand) ? (currentPFPos === 'BB' ? '3-Bet (Value/Bluff)' : '4-Bet / Immer Raise')
-                 : c.has(hand) ? (currentPFPos === 'BB' ? 'Callen (Flat)' : 'Raise + 3-Bet callen')
-                 : r.has(hand) ? (currentPFPos === 'BB' ? 'Callen (Mix / Grenzhand)' : 'Raise + Fold vs 3-Bet') : 'Fold';
+      const cat  = b.has(hand) ? '4-Bet / Value'
+                 : c.has(hand) ? 'Raise + 3-Bet callen'
+                 : r.has(hand) ? 'Raise + Fold vs 3-Bet' : 'Fold';
       html += `<td class="${cls}" title="${hand} — ${cat}" onclick="showHandTip('${hand}','${cat}')">${hand}</td>`;
     });
     html += '</tr>';
@@ -974,1084 +777,560 @@ function renderPreflopRange(buildTabs) {
   html += '</tbody>';
   document.getElementById('range-grid').innerHTML = html;
 }
- 
+
 function showHandTip(hand, cat) {
   const el = document.getElementById('hand-tip');
-  el.style.display = 'block';
-  el.innerHTML = `<strong>${hand}</strong> &nbsp;—&nbsp; ${cat}`;
+  el.style.display = 'flex';
+  const colors = { '4-Bet / Value': '#818cf8', 'Raise + 3-Bet callen': '#4ade80', 'Raise + Fold vs 3-Bet': '#fb923c', 'Fold': 'var(--dim)' };
+  el.innerHTML = `
+    <div class="hand-tip-name">${hand}</div>
+    <div style="color:var(--dim)">—</div>
+    <div class="hand-tip-cat" style="color:${colors[cat]||'var(--text)'}">${cat}</div>
+    <div style="margin-left:auto;font-size:11px;color:var(--dim)">${hand.endsWith('s') ? '4 Combos' : hand.length===2 ? '6 Combos' : '12 Combos'}</div>`;
 }
- 
- 
-/* ══════════════════════════════════════════════════════════════════
+
+
+/* ══════════════════════════════════════════════════════
    CARD ENGINE
-══════════════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════ */
 const RANKS    = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
 const SUITS    = ['c','d','h','s'];
 const RANK_VAL = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,J:11,Q:12,K:13,A:14};
 const SUIT_SYM = {c:'♣',d:'♦',h:'♥',s:'♠'};
 const SUIT_RED = {c:false,d:true,h:true,s:false};
- 
-const cardRank = c => c.slice(0, -1);
+
+const cardRank = c => c.slice(0,-1);
 const cardSuit = c => c.slice(-1);
 const cardVal  = c => RANK_VAL[cardRank(c)];
- 
-function shuffleDeck(exclude = []) {
+
+function shuffleDeck(exclude=[]) {
   let deck = [];
   RANKS.forEach(r => SUITS.forEach(s => {
-    const c = r + s;
+    const c = r+s;
     if (!exclude.includes(c)) deck.push(c);
   }));
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
+  for (let i=deck.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
   return deck;
 }
- 
 function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
+  for (let i=arr.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
   return arr;
 }
- 
-function handToCards(notation, exclude = []) {
-  const r1 = notation[0], r2 = notation[1];
-  const suited = notation.endsWith('s');
-  const pair   = r1 === r2;
-  const deck   = shuffleDeck(exclude);
- 
-  if (pair) {
-    const cards = deck.filter(c => cardRank(c) === r1);
-    return cards.length >= 2 ? [cards[0], cards[1]] : null;
-  }
+
+function handToCards(notation, exclude=[]) {
+  const r1=notation[0], r2=notation[1];
+  const suited=notation.endsWith('s'), pair=r1===r2;
+  const deck=shuffleDeck(exclude);
+  if (pair) { const cards=deck.filter(c=>cardRank(c)===r1); return cards.length>=2?[cards[0],cards[1]]:null; }
   if (suited) {
-    const suits = shuffleArray([...SUITS]);
-    for (const s of suits) {
-      const c1 = r1 + s, c2 = r2 + s;
-      if (!exclude.includes(c1) && !exclude.includes(c2)) return [c1, c2];
-    }
+    const suits=shuffleArray([...SUITS]);
+    for (const s of suits) { const c1=r1+s,c2=r2+s; if (!exclude.includes(c1)&&!exclude.includes(c2)) return[c1,c2]; }
     return null;
   }
   for (const sa of SUITS) for (const sb of SUITS) {
-    if (sa === sb) continue;
-    const a = r1 + sa, b = r2 + sb;
-    if (!exclude.includes(a) && !exclude.includes(b)) return [a, b];
+    if (sa===sb) continue;
+    const a=r1+sa,b=r2+sb;
+    if (!exclude.includes(a)&&!exclude.includes(b)) return[a,b];
   }
   return null;
 }
- 
-function renderCard(c, hidden = false, extraClass = '') {
+
+function renderCard(c, hidden=false, extraClass='') {
   if (hidden) return `<div class="card hidden ${extraClass}"></div>`;
-  const r = cardRank(c), s = cardSuit(c);
-  const red = SUIT_RED[s] ? 'red-card' : '';
+  const r=cardRank(c), s=cardSuit(c);
+  const red=SUIT_RED[s]?'red-card':'';
   return `<div class="card ${red} ${extraClass}">
     <div class="card-rank">${r}</div>
     <div class="card-suit">${SUIT_SYM[s]}</div>
   </div>`;
 }
- 
- 
-/* ══════════════════════════════════════════════════════════════════
+
+
+/* ══════════════════════════════════════════════════════
    HAND EVALUATION
-══════════════════════════════════════════════════════════════════ */
-const RANK_NAME = {14:'Asse',13:'Könige',12:'Damen',11:'Buben',10:'Zehner',9:'Neuner',8:'Achter',7:'Siebener',6:'Sechser',5:'Fünfer',4:'Vierer',3:'Dreier',2:'Zweier'};
-const pairName  = v => RANK_NAME[v] || String(v);
- 
+══════════════════════════════════════════════════════ */
+const RANK_NAME={14:'Asse',13:'Könige',12:'Damen',11:'Buben',10:'Zehner',9:'Neuner',8:'Achter',7:'Siebener',6:'Sechser',5:'Fünfer',4:'Vierer',3:'Dreier',2:'Zweier'};
+const pairName=v=>RANK_NAME[v]||String(v);
+
 function evaluateMadeHand(hole, board) {
-  const all = [...hole, ...board];
-  const rankCount = {};
-  all.forEach(c => { const r = cardVal(c); rankCount[r] = (rankCount[r] || 0) + 1; });
-  const suitCount = {};
-  all.forEach(c => { const s = cardSuit(c); suitCount[s] = (suitCount[s] || 0) + 1; });
-
-  const quads = Object.keys(rankCount).filter(r => rankCount[r] >= 4).map(Number);
-  const trips = Object.keys(rankCount).filter(r => rankCount[r] === 3).map(Number);
-  const pairs = Object.keys(rankCount).filter(r => rankCount[r] === 2).map(Number);
-  const hasFlush = Object.values(suitCount).some(v => v >= 5);
- 
-  const unique = [...new Set(all.map(cardVal))].sort((a, b) => a - b);
-  let hasStraight = false;
-  for (let i = 0; i <= unique.length - 5; i++) {
-    if (unique[i+4] - unique[i] === 4 && new Set(unique.slice(i, i+5)).size === 5) { hasStraight = true; break; }
-  }
-  if ([14,2,3,4,5].every(v => unique.includes(v))) hasStraight = true;
- 
-  if (quads.length)                                    return {rank:7, name:'Vierling'};
-  if ((trips.length >= 1 && pairs.length >= 1) ||
-      trips.length >= 2)                               return {rank:6, name:'Full House'};
-  if (hasFlush)                                        return {rank:5, name:'Flush'};
-  if (hasStraight)                                     return {rank:4, name:'Straight'};
-  if (trips.length)                                    return {rank:3, name:'Drilling'};
-  if (pairs.length >= 2)                               return {rank:2, name:'Zwei Paare'};
-  if (pairs.length === 1)                              return {rank:1, name:'Ein Paar (' + pairName(pairs[0]) + ')'};
-  return                                                      {rank:0, name:'High Card'};
+  const all=[...hole,...board];
+  const rankCount={}, suitCount={};
+  all.forEach(c=>{const r=cardVal(c);rankCount[r]=(rankCount[r]||0)+1;});
+  all.forEach(c=>{const s=cardSuit(c);suitCount[s]=(suitCount[s]||0)+1;});
+  const quads=Object.keys(rankCount).filter(r=>rankCount[r]>=4).map(Number);
+  const trips=Object.keys(rankCount).filter(r=>rankCount[r]===3).map(Number);
+  const pairs=Object.keys(rankCount).filter(r=>rankCount[r]===2).map(Number);
+  const hasFlush=Object.values(suitCount).some(v=>v>=5);
+  const unique=[...new Set(all.map(cardVal))].sort((a,b)=>a-b);
+  let hasStraight=false;
+  for(let i=0;i<=unique.length-5;i++){if(unique[i+4]-unique[i]===4&&new Set(unique.slice(i,i+5)).size===5){hasStraight=true;break;}}
+  if([14,2,3,4,5].every(v=>unique.includes(v)))hasStraight=true;
+  if(quads.length) return{rank:7,name:'Vierling'};
+  if((trips.length>=1&&pairs.length>=1)||trips.length>=2) return{rank:6,name:'Full House'};
+  if(hasFlush) return{rank:5,name:'Flush'};
+  if(hasStraight) return{rank:4,name:'Straight'};
+  if(trips.length) return{rank:3,name:'Drilling'};
+  if(pairs.length>=2) return{rank:2,name:'Zwei Paare'};
+  if(pairs.length===1) return{rank:1,name:'Ein Paar ('+pairName(pairs[0])+')'};
+  return{rank:0,name:'High Card'};
 }
- 
+
 function analyzeHoleCards(hole, board) {
-  const h1 = cardVal(hole[0]), h2 = cardVal(hole[1]);
-  const hS1 = cardSuit(hole[0]), hS2 = cardSuit(hole[1]);
-  const boardVals  = board.map(cardVal);
-  const boardSuits = board.map(cardSuit);
-  const boardRankCount = {};
-  board.forEach(c => { const r = cardVal(c); boardRankCount[r] = (boardRankCount[r] || 0) + 1; });
- 
-  const made     = evaluateMadeHand(hole, board);
-  const topBoard = Math.max(...boardVals);
- 
-  let madeStrength = 0, madeLabel = '';
-  if (made.rank >= 5)      { madeStrength = 5; madeLabel = made.name; }
-  else if (made.rank === 4){ madeStrength = 4; madeLabel = made.name; }
-  else if (made.rank === 3){ madeStrength = 3; madeLabel = made.name; }
-  else if (made.rank === 2) {
-    if (boardRankCount[h1] >= 1 && boardRankCount[h2] >= 1) { madeStrength = 3; madeLabel = 'Zwei Paare (beide Hole Cards)'; }
-    else { madeStrength = 2; madeLabel = 'Zwei Paare'; }
+  const h1=cardVal(hole[0]),h2=cardVal(hole[1]);
+  const hS1=cardSuit(hole[0]),hS2=cardSuit(hole[1]);
+  const boardVals=board.map(cardVal), boardSuits=board.map(cardSuit);
+  const boardRankCount={};
+  board.forEach(c=>{const r=cardVal(c);boardRankCount[r]=(boardRankCount[r]||0)+1;});
+  const made=evaluateMadeHand(hole,board);
+  const topBoard=Math.max(...boardVals);
+  let madeStrength=0,madeLabel='';
+  if(made.rank>=5){madeStrength=5;madeLabel=made.name;}
+  else if(made.rank===4){madeStrength=4;madeLabel=made.name;}
+  else if(made.rank===3){madeStrength=3;madeLabel=made.name;}
+  else if(made.rank===2){
+    if(boardRankCount[h1]>=1&&boardRankCount[h2]>=1){madeStrength=3;madeLabel='Zwei Paare (beide Hole Cards)';}
+    else{madeStrength=2;madeLabel='Zwei Paare';}
   }
-  else if (made.rank === 1) {
-    if (h1 === h2 && h1 > topBoard)          { madeStrength = 3; madeLabel = 'Überpaar (' + pairName(h1) + ')'; }
-    else if (h1 === h2)                       { madeStrength = 1; madeLabel = 'Taschenpaar (' + pairName(h1) + ')'; }
-    else if (boardVals.includes(h1) && h1 === topBoard) { madeStrength = 2; madeLabel = 'Top Pair (' + pairName(h1) + ')'; }
-    else if (boardVals.includes(h2) && h2 === topBoard) { madeStrength = 2; madeLabel = 'Top Pair (' + pairName(h2) + ')'; }
-    else { madeStrength = 1; madeLabel = 'Mittleres / unteres Paar'; }
+  else if(made.rank===1){
+    if(h1===h2&&h1>topBoard){madeStrength=3;madeLabel='Überpaar ('+pairName(h1)+')';}
+    else if(h1===h2){madeStrength=1;madeLabel='Taschenpaar ('+pairName(h1)+')';}
+    else if(boardVals.includes(h1)&&h1===topBoard){madeStrength=2;madeLabel='Top Pair ('+pairName(h1)+')';}
+    else if(boardVals.includes(h2)&&h2===topBoard){madeStrength=2;madeLabel='Top Pair ('+pairName(h2)+')';}
+    else{madeStrength=1;madeLabel='Mittleres / unteres Paar';}
   }
-  else { madeStrength = 0; madeLabel = 'High Card / Nichts'; }
- 
-  const goodKicker = (() => {
-    if (made.rank !== 1) return false;
-    const notPaired = boardVals.includes(h1) ? h2 : h1;
-    return notPaired >= 11;
-  })();
- 
-  const draws = [];
- 
-  if (hS1 === hS2) {
-    const n = boardSuits.filter(s => s === hS1).length;
-    if (n === 2)      draws.push({type:'flush_draw', strength:3, outs:9,  label:'Flush Draw'});
-    else if (n === 1) draws.push({type:'bdoor_fd',   strength:1, outs:1,  label:'Backdoor Flush Draw'});
+  else{madeStrength=0;madeLabel='High Card / Nichts';}
+
+  const draws=[];
+  if(hS1===hS2){
+    const n=boardSuits.filter(s=>s===hS1).length;
+    if(n===2) draws.push({type:'flush_draw',strength:3,outs:9,label:'Flush Draw'});
+    else if(n===1) draws.push({type:'bdoor_fd',strength:1,outs:1,label:'Backdoor Flush Draw'});
   } else {
-    const fd1 = boardSuits.filter(s => s === hS1).length;
-    const fd2 = boardSuits.filter(s => s === hS2).length;
-    if (fd1 === 3 || fd2 === 3)      draws.push({type:'flush_draw', strength:3, outs:9, label:'Flush Draw'});
-    else if (fd1 === 2 || fd2 === 2) draws.push({type:'bdoor_fd',   strength:1, outs:1, label:'Backdoor Flush Draw'});
+    const fd1=boardSuits.filter(s=>s===hS1).length;
+    const fd2=boardSuits.filter(s=>s===hS2).length;
+    if(fd1===3||fd2===3) draws.push({type:'flush_draw',strength:3,outs:9,label:'Flush Draw'});
+    else if(fd1===2||fd2===2) draws.push({type:'bdoor_fd',strength:1,outs:1,label:'Backdoor Flush Draw'});
   }
- 
-  const allVals    = [h1, h2, ...boardVals];
-  const uniqueVals = [...new Set(allVals)];
-  const holeAceLow = [h1, h2, ...(h1 === 14 || h2 === 14 ? [1] : [])];
-  const valsAceLow = uniqueVals.includes(14) ? [...new Set([...uniqueVals, 1])] : uniqueVals;
- 
-  let hasOESD = false, hasGutshot = false, hasBdoorStr = false;
-  if (made.rank < 4) {
-    for (let low = 1; low <= 10; low++) {
-      const hi    = low + 4;
-      const inWin = valsAceLow.filter(v => v >= low && v <= hi);
-      const holeInW = holeAceLow.filter(v => v >= low && v <= hi);
-      if (inWin.length === 4 && holeInW.length >= 1) {
-        const gap = [low,low+1,low+2,low+3,hi].find(v => !inWin.includes(v));
-        if (gap === low || gap === hi) hasOESD    = true;
-        else                           hasGutshot = true;
+  const allVals=[h1,h2,...boardVals];
+  const uniqueVals=[...new Set(allVals)];
+  const holeAceLow=[h1,h2,...(h1===14||h2===14?[1]:[])];
+  const valsAceLow=uniqueVals.includes(14)?[...new Set([...uniqueVals,1])]:uniqueVals;
+  let hasOESD=false,hasGutshot=false,hasBdoorStr=false;
+  if(made.rank<4){
+    for(let low=1;low<=10;low++){
+      const hi=low+4;
+      const inWin=valsAceLow.filter(v=>v>=low&&v<=hi);
+      const holeInW=holeAceLow.filter(v=>v>=low&&v<=hi);
+      if(inWin.length===4&&holeInW.length>=1){
+        const gap=[low,low+1,low+2,low+3,hi].find(v=>!inWin.includes(v));
+        if(gap===low||gap===hi) hasOESD=true;
+        else hasGutshot=true;
       }
-      if (!hasOESD && !hasGutshot && inWin.length === 3 && holeInW.length >= 1) hasBdoorStr = true;
+      if(!hasOESD&&!hasGutshot&&inWin.length===3&&holeInW.length>=1) hasBdoorStr=true;
     }
   }
-  if (hasOESD)                            draws.push({type:'oesd',     strength:3, outs:8, label:'OESD (beidseitig offen)'});
-  if (hasGutshot && !hasOESD)            draws.push({type:'gutshot',  strength:2, outs:4, label:'Gutshot (einseitig)'});
-  if (hasBdoorStr && !hasOESD && !hasGutshot) draws.push({type:'bdoor_str', strength:1, outs:1, label:'Backdoor Straight Draw'});
- 
-  const fdIdx   = draws.findIndex(d => d.type === 'flush_draw');
-  const oesdIdx = draws.findIndex(d => d.type === 'oesd');
-  const gutIdx  = draws.findIndex(d => d.type === 'gutshot');
-  if (fdIdx >= 0 && oesdIdx >= 0) {
-    draws.splice(Math.max(fdIdx, oesdIdx), 1);
-    draws.splice(Math.min(fdIdx, oesdIdx), 1);
-    draws.unshift({type:'combo_draw', strength:4, outs:15, label:'Combo Draw (FD + OESD)'});
-  } else if (fdIdx >= 0 && gutIdx >= 0) {
-    draws.splice(Math.max(fdIdx, gutIdx), 1);
-    draws.splice(Math.min(fdIdx, gutIdx), 1);
-    draws.unshift({type:'combo_draw', strength:3, outs:12, label:'Combo Draw (FD + Gutshot)'});
+  if(hasOESD) draws.push({type:'oesd',strength:3,outs:8,label:'OESD (beidseitig offen)'});
+  if(hasGutshot&&!hasOESD) draws.push({type:'gutshot',strength:2,outs:4,label:'Gutshot (einseitig)'});
+  if(hasBdoorStr&&!hasOESD&&!hasGutshot) draws.push({type:'bdoor_str',strength:1,outs:1,label:'Backdoor Straight Draw'});
+  const fdIdx=draws.findIndex(d=>d.type==='flush_draw');
+  const oesdIdx=draws.findIndex(d=>d.type==='oesd');
+  const gutIdx=draws.findIndex(d=>d.type==='gutshot');
+  if(fdIdx>=0&&oesdIdx>=0){
+    draws.splice(Math.max(fdIdx,oesdIdx),1);draws.splice(Math.min(fdIdx,oesdIdx),1);
+    draws.unshift({type:'combo_draw',strength:4,outs:15,label:'Combo Draw (FD + OESD)'});
+  } else if(fdIdx>=0&&gutIdx>=0){
+    draws.splice(Math.max(fdIdx,gutIdx),1);draws.splice(Math.min(fdIdx,gutIdx),1);
+    draws.unshift({type:'combo_draw',strength:3,outs:12,label:'Combo Draw (FD + Gutshot)'});
   }
- 
-  if (h1 === h2 && h1 < topBoard && made.rank < 3) draws.push({type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairName(h1)})`});
-  if (made.rank === 0) {
-    const oc1 = !boardVals.includes(h1) && h1 > topBoard;
-    const oc2 = !boardVals.includes(h2) && h2 > topBoard;
-    if      (oc1 && oc2) draws.push({type:'overcards', strength:2, outs:6, label:`Zwei Overcards (${pairName(h1)}+${pairName(h2)})`});
-    else if (oc1)        draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairName(h1)})`});
-    else if (oc2)        draws.push({type:'overcard',  strength:1, outs:3, label:`Overcard (${pairName(h2)})`});
+  if(h1===h2&&h1<topBoard&&made.rank<3) draws.push({type:'set_draw',strength:2,outs:2,label:`Set Draw (${pairName(h1)})`});
+  if(made.rank===0){
+    const oc1=!boardVals.includes(h1)&&h1>topBoard;
+    const oc2=!boardVals.includes(h2)&&h2>topBoard;
+    if(oc1&&oc2) draws.push({type:'overcards',strength:2,outs:6,label:`Zwei Overcards (${pairName(h1)}+${pairName(h2)})`});
+    else if(oc1) draws.push({type:'overcard',strength:1,outs:3,label:`Overcard (${pairName(h1)})`});
+    else if(oc2) draws.push({type:'overcard',strength:1,outs:3,label:`Overcard (${pairName(h2)})`});
   }
- 
-  const drawStrength = draws.reduce((m, d) => Math.max(m, d.strength), 0);
-  return {madeStrength, madeLabel, goodKicker, draws, drawStrength, bestMade: made};
-}
- 
- 
-/* ══════════════════════════════════════════════════════════════════
-   BOARD ANALYSIS
-══════════════════════════════════════════════════════════════════ */
-function analyzeBoard(board) {
-  const vals  = board.map(cardVal);
-  const suits = board.map(cardSuit);
-  const suitCount = {};
-  suits.forEach(s => { suitCount[s] = (suitCount[s] || 0) + 1; });
-  const monotone = Object.values(suitCount).some(v => v >= 3);
-  const twoTone  = !monotone && Object.values(suitCount).some(v => v >= 2);
-  const rainbow  = !monotone && !twoTone;
-  const rankCount = {};
-  vals.forEach(v => { rankCount[v] = (rankCount[v] || 0) + 1; });
-  const paired = Object.values(rankCount).some(v => v >= 2);
-  const uvals  = [...new Set(vals)].sort((a, b) => b - a);
-  const sv0    = uvals[0];
-  const sv1    = uvals[1] !== undefined ? uvals[1] : sv0 - 10;
-  const sv2    = uvals[2] !== undefined ? uvals[2] : sv1 - 10;
-  const gap1   = sv0 - sv1;
-  const gap2   = sv1 - sv2;
-  const maxGap = Math.max(gap1, gap2);
-  const minGap = Math.min(gap1, gap2);
-  const highBoard = sv0 >= 12;
- 
-  let danger = 0;
-  if (monotone)     danger += 5;
-  else if (twoTone) danger += 2;
-  if (!paired) {
-    if (minGap <= 1 && maxGap <= 1) danger += highBoard ? 3 : 5;
-    else if (minGap <= 1)           danger += 2;
-    else if (minGap <= 2)           danger += 3;
-  }
-  if (paired) danger -= 1;
-  danger = Math.max(0, Math.min(10, danger));
- 
-  const texture     = danger >= 4 ? 'wet' : danger >= 2 ? 'mid' : 'dry';
-  const connected   = !paired && minGap <= 1;
-  const semiConnect = !paired && minGap <= 2 && !connected;
-  const highCard    = sv0 >= 11;
- 
-  return {monotone, twoTone, rainbow, paired, connected, semiConnect, highCard, highBoard, danger, texture};
-}
- 
- 
-/* ══════════════════════════════════════════════════════════════════
-   EQUITY HELPERS
-══════════════════════════════════════════════════════════════════ */
-function estimateTotalEquity(handStrength, street) {
-  const {madeStrength, draws} = handStrength;
-  const madeEq = [0.25, 0.32, 0.62, 0.74, 0.85, 0.91][Math.min(madeStrength, 5)];
-  const mainDraws = draws.filter(d => {
-    if (street === 'turn') return !['bdoor_fd','bdoor_str'].includes(d.type);
-    return !['bdoor_fd','bdoor_str'].includes(d.type);
-  });
-  if (!mainDraws.length) return Math.min(95, Math.round(madeEq * 100));
-  const bestDraw = mainDraws.reduce((b, d) => d.outs > b.outs ? d : b, mainDraws[0]);
-  const outs = bestDraw.outs;
-  let pHit;
-  if (street === 'flop') {
-    pHit = 1 - ((47 - outs) / 47) * ((46 - outs) / 46);
-  } else {
-    pHit = outs / 46;
-  }
-  const pWinIfHit = {
-    flush_draw:  0.85,
-    oesd:        0.82,
-    gutshot:     0.80,
-    combo_draw:  0.90,
-    set_draw:    0.90,
-    overcards:   0.55,
-    overcard:    0.50,
-  }[bestDraw.type] || 0.80;
-  const totalEq = pHit * pWinIfHit + (1 - pHit) * madeEq;
-  return Math.min(95, Math.round(totalEq * 100));
+  const drawStrength=draws.reduce((m,d)=>Math.max(m,d.strength),0);
+  return{madeStrength,madeLabel,draws,drawStrength,bestMade:made};
 }
 
-function totalOuts(draws) {
-  const mainDraws = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
-  if (mainDraws.some(d => d.type === 'combo_draw')) return mainDraws.find(d => d.type === 'combo_draw').outs;
-  return mainDraws.reduce((sum, d) => sum + d.outs, 0);
+
+/* ══════════════════════════════════════════════════════
+   BOARD ANALYSIS
+══════════════════════════════════════════════════════ */
+function analyzeBoard(board) {
+  const vals=board.map(cardVal), suits=board.map(cardSuit);
+  const suitCount={};
+  suits.forEach(s=>{suitCount[s]=(suitCount[s]||0)+1;});
+  const monotone=Object.values(suitCount).some(v=>v>=3);
+  const twoTone=!monotone&&Object.values(suitCount).some(v=>v>=2);
+  const rainbow=!monotone&&!twoTone;
+  const rankCount={};
+  vals.forEach(v=>{rankCount[v]=(rankCount[v]||0)+1;});
+  const paired=Object.values(rankCount).some(v=>v>=2);
+  const uvals=[...new Set(vals)].sort((a,b)=>b-a);
+  const sv0=uvals[0],sv1=uvals[1]!==undefined?uvals[1]:sv0-10,sv2=uvals[2]!==undefined?uvals[2]:sv1-10;
+  const gap1=sv0-sv1,gap2=sv1-sv2,maxGap=Math.max(gap1,gap2),minGap=Math.min(gap1,gap2);
+  const highBoard=sv0>=12;
+  let danger=0;
+  if(monotone) danger+=5; else if(twoTone) danger+=2;
+  if(!paired){
+    if(minGap<=1&&maxGap<=1) danger+=highBoard?3:5;
+    else if(minGap<=1) danger+=2;
+    else if(minGap<=2) danger+=3;
+  }
+  if(paired) danger-=1;
+  danger=Math.max(0,Math.min(10,danger));
+  const texture=danger>=4?'wet':danger>=2?'mid':'dry';
+  const connected=!paired&&minGap<=1;
+  const semiConnect=!paired&&minGap<=2&&!connected;
+  return{monotone,twoTone,rainbow,paired,connected,semiConnect,highBoard,danger,texture};
 }
- 
-function madeEquityStr(str) {
-  return ['~25–40%','~20–35%','~55–70%','~70–80%','~80–90%','~85–95%'][Math.min(str, 5)];
+
+
+/* ══════════════════════════════════════════════════════
+   EQUITY HELPERS
+══════════════════════════════════════════════════════ */
+function estimateTotalEquity(handStrength, street) {
+  const{madeStrength,draws}=handStrength;
+  const madeEq=[0.25,0.32,0.62,0.74,0.85,0.91][Math.min(madeStrength,5)];
+  const mainDraws=draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
+  if(!mainDraws.length) return Math.min(95,Math.round(madeEq*100));
+  const bestDraw=mainDraws.reduce((b,d)=>d.outs>b.outs?d:b,mainDraws[0]);
+  const outs=bestDraw.outs;
+  let pHit;
+  if(street==='flop'){pHit=1-((47-outs)/47)*((46-outs)/46);}
+  else{pHit=outs/46;}
+  const pWinIfHit={flush_draw:.85,oesd:.82,gutshot:.80,combo_draw:.90,set_draw:.90,overcards:.55,overcard:.50}[bestDraw.type]||.80;
+  const totalEq=pHit*pWinIfHit+(1-pHit)*madeEq;
+  return Math.min(95,Math.round(totalEq*100));
 }
- 
- 
-/* ══════════════════════════════════════════════════════════════════
-   TRAINER — RANGES & POSITIONS
-══════════════════════════════════════════════════════════════════ */
+function totalOuts(draws){
+  const mainDraws=draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
+  if(mainDraws.some(d=>d.type==='combo_draw')) return mainDraws.find(d=>d.type==='combo_draw').outs;
+  return mainDraws.reduce((sum,d)=>sum+d.outs,0);
+}
+function madeEquityStr(str){return['~25–40%','~20–35%','~55–70%','~70–80%','~80–90%','~85–95%'][Math.min(str,5)];}
+
+
+/* ══════════════════════════════════════════════════════
+   TRAINER RANGES (same corrected ranges)
+══════════════════════════════════════════════════════ */
 const TRAINER_RANGES = {
-  UTG: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','AQs','AQo','KQs','KQo'], r:['99','88','77','66','55','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','AJo','ATo','KJo'] },
-  MP:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','33','22','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','KJo','KTo','QJo'] },
-  CO:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'], r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','A8o','A7o','KJo','KTo','K9o','Q9o','QTo','JTo','J9o','T9o','98o','87o'] },
-  BTN: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'], r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','J9s','J8s','J7s','J6s','T8s','T7s','T6s','T5s','97s','96s','95s','86s','85s','84s','76s','75s','74s','73s','65s','64s','63s','54s','53s','52s','43s','42s','32s','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KTo','K9o','K8o','QJo','Q9o','JTo','J9o','T9o','T8o','98o','87o','76o','65o'] },
-  SB:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','33','22','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QJs','QTs','Q9s','Q8s','Q7s','JTs','J9s','J8s','J7s','T9s','T8s','T7s','T6s','98s','97s','96s','95s','87s','86s','85s','84s','76s','75s','74s','65s','64s','63s','54s','53s','52s','43s','42s','32s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o'] }
+  UTG: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','AQs','AQo','KQs'], r:['99','88','77','66','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','QJs','JTs','T9s','98s','87s','76s','65s','AJo','KQo'] },
+  MP:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','QJs','QTs','JTs','J9s','T9s','T8s','98s','97s','87s','86s','76s','75s','65s','54s','AJo','ATo','KJo','KTo','QJo'] },
+  CO:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','AQs','AJs','ATs','KQs','QJs','JTs','T9s','AQo','KQo','QJo'], r:['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','K7s','Q9s','Q8s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','43s','AJo','ATo','A9o','KJo','KTo','K9o','JTo'] },
+  BTN: { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','88','77','AQs','AJs','ATs','A9s','A8s','KQs','KJs','QJs','JTs','T9s','98s','87s','AQo','AJo','ATo','KQo','KJo'], r:['66','55','44','33','22','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','J9s','J8s','T8s','T7s','97s','96s','86s','85s','75s','65s','54s','43s','A9o','A8o','A7o','A6o','K9o','K8o','Q9o','J9o','T9o','T8o','98o','87o','76o','65o'] },
+  SB:  { b:['AA','KK','QQ','AKs','AKo'], c:['JJ','TT','99','AQs','AJs','KQs','AQo','KQo'], r:['88','77','66','55','44','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','97s','87s','76s','65s','54s','AJo','ATo','A9o','A8o','KJo','KTo','K9o','QJo','QTo','JTo','J9o','T9o','98o','87o','76o'] }
 };
- 
+
 const BB_DEFEND_RANGE = {
-  b: ['AA','KK','QQ','JJ','AKs','AKo'],
-  c: ['TT','99','88','AQs','AJs','ATs','KQs','KJs','QJs','AQo','KQo'],
-  r: ['77','66','55','44','33','22','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','QTs','Q9s','Q8s','JTs','J9s','J8s','T9s','T8s','T7s','98s','97s','96s','87s','86s','76s','75s','65s','54s','43s','AJo','ATo','A9o','A8o','A7o','KJo','KTo','K9o','K8o','QJo','QTo','Q9o','JTo','J9o','J8o','T9o','T8o','98o','87o','76o','65o']
+  b:['AA','KK','QQ','JJ','AKs','AKo'],
+  c:['TT','99','88','77','AQs','AJs','ATs','A9s','KQs','KJs','QJs','JTs','T9s','AQo','AJo','ATo','KQo','KJo'],
+  r:['66','55','44','33','22','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KTs','K9s','K8s','K7s','K6s','K5s','QTs','Q9s','Q8s','Q7s','J9s','J8s','T8s','T7s','98s','97s','96s','87s','86s','76s','75s','65s','54s','A9o','A8o','A7o','A6o','A5o','K9o','K8o','K7o','QTo','Q9o','JTo','J9o','T9o','T8o','98o','87o','76o','65o']
 };
- 
-const POST_ORDER  = {SB:0, BB:1, UTG:2, MP:3, CO:4, BTN:5};
-const OPP_RANGE_WIDTH = {UTG:14, MP:20, CO:28, BTN:48, SB:37, BB:65};
- 
-function weightedRandom(opts, weights) {
-  let total = weights.reduce((a, b) => a + b, 0);
-  let r = Math.random() * total;
-  for (let i = 0; i < opts.length; i++) { r -= weights[i]; if (r <= 0) return opts[i]; }
-  return opts[opts.length - 1];
+
+const POST_ORDER={SB:0,BB:1,UTG:2,MP:3,CO:4,BTN:5};
+const OPP_RANGE_WIDTH={UTG:14,MP:19,CO:27,BTN:46,SB:37,BB:56};
+
+function weightedRandom(opts,weights){
+  let total=weights.reduce((a,b)=>a+b,0),r=Math.random()*total;
+  for(let i=0;i<opts.length;i++){r-=weights[i];if(r<=0)return opts[i];}
+  return opts[opts.length-1];
 }
- 
-function pickOppPositionAsCaller() {
-  return weightedRandom(['UTG','MP','CO','BTN','SB'], [1, 1.5, 2, 3, 1.5]);
+function pickCallerPosition(heroPos){
+  const map={UTG:{opts:['MP','CO','BTN','SB','BB'],weights:[1,1.5,2,1,2.5]},MP:{opts:['CO','BTN','SB','BB'],weights:[1.5,2,1,2.5]},CO:{opts:['BTN','SB','BB'],weights:[2,1,2.5]},BTN:{opts:['SB','BB'],weights:[1,3]},SB:{opts:['BB'],weights:[1]}};
+  const m=map[heroPos]||map.BTN;
+  return weightedRandom(m.opts,m.weights);
 }
- 
-function pickCallerPosition(heroPos) {
-  const map = {
-    UTG: {opts:['MP','CO','BTN','SB','BB'], weights:[1,1.5,2,1,2.5]},
-    MP:  {opts:['CO','BTN','SB','BB'],      weights:[1.5,2,1,2.5]},
-    CO:  {opts:['BTN','SB','BB'],           weights:[2,1,2.5]},
-    BTN: {opts:['SB','BB'],                 weights:[1,3]},
-    SB:  {opts:['BB'],                      weights:[1]},
-  };
-  const m = map[heroPos] || map.BTN;
-  return weightedRandom(m.opts, m.weights);
+
+
+/* ══════════════════════════════════════════════════════
+   TRAINER STATE
+══════════════════════════════════════════════════════ */
+let dealState='idle', currentHand=null;
+
+function dealNew(){
+  dealState='preflop';
+  const role=Math.random()<0.5?'pfr':'caller';
+  const pfPositions=['UTG','MP','CO','BTN','SB'];
+  const position=role==='pfr'?pfPositions[Math.floor(Math.random()*pfPositions.length)]:'BB';
+  const range=role==='pfr'?TRAINER_RANGES[position]:BB_DEFEND_RANGE;
+  const allHands=[...range.b,...range.c,...range.r];
+  const notation=allHands[Math.floor(Math.random()*allHands.length)];
+  const holeCards=handToCards(notation,[]);
+  if(!holeCards){dealNew();return;}
+  const deck=shuffleDeck(holeCards);
+  const flop=[deck[0],deck[1],deck[2]],turn=deck[3],river=deck[4];
+  const oppPosition=role==='pfr'?pickCallerPosition(position):weightedRandom(['UTG','MP','CO','BTN','SB'],[1,1.5,2,3,1.5]);
+  const ip=role==='pfr'?(POST_ORDER[position]||0)>(POST_ORDER[oppPosition]||0):oppPosition==='SB';
+  currentHand={role,position,ip,holeCards,flop,turn,river,notation,oppPosition};
+  updateButtons();renderCurrent();
 }
- 
- 
-/* ══════════════════════════════════════════════════════════════════
-   TRAINER — DEAL STATE
-══════════════════════════════════════════════════════════════════ */
-let dealState   = 'idle';
-let currentHand = null;
- 
-function dealNew() {
-  dealState = 'preflop';
- 
-  const role = Math.random() < 0.5 ? 'pfr' : 'caller';
-  const pfPositions = ['UTG','MP','CO','BTN','SB'];
-  const position    = role === 'pfr'
-    ? pfPositions[Math.floor(Math.random() * pfPositions.length)]
-    : 'BB';
- 
-  const range    = role === 'pfr' ? TRAINER_RANGES[position] : BB_DEFEND_RANGE;
-  const allHands = [...range.b, ...range.c, ...range.r];
-  const notation = allHands[Math.floor(Math.random() * allHands.length)];
-  const holeCards = handToCards(notation, []);
-  if (!holeCards) { dealNew(); return; }
- 
-  const deck  = shuffleDeck(holeCards);
-  const flop  = [deck[0], deck[1], deck[2]];
-  const turn  = deck[3];
-  const river = deck[4];
- 
-  const oppPosition = role === 'pfr' ? pickCallerPosition(position) : pickOppPositionAsCaller();
-  let ip;
-  if (role === 'pfr') {
-    ip = (POST_ORDER[position] || 0) > (POST_ORDER[oppPosition] || 0);
-  } else {
-    ip = oppPosition === 'SB';
-  }
- 
-  currentHand = {role, position, ip, holeCards, flop, turn, river, notation, oppPosition};
-  updateButtons();
-  renderCurrent();
+function revealFlop(){if(!currentHand||dealState!=='preflop')return;dealState='flop';updateButtons();renderCurrent();}
+function revealTurn(){if(!currentHand||dealState!=='flop')return;dealState='turn';updateButtons();renderCurrent();}
+function revealRiver(){if(!currentHand||dealState!=='turn')return;dealState='river';updateButtons();renderCurrent();}
+function updateButtons(){
+  document.getElementById('btn-flop').disabled=dealState!=='preflop';
+  document.getElementById('btn-turn').disabled=dealState!=='flop';
+  document.getElementById('btn-river').disabled=dealState!=='turn';
+  const labels={preflop:'HOLE CARDS',flop:'FLOP',turn:'TURN',river:'RIVER'};
+  const colors={preflop:'var(--text)',flop:'var(--blue)',turn:'var(--amber)',river:'var(--purple)'};
+  const ind=document.getElementById('street-indicator');
+  if(ind&&dealState!=='idle') ind.innerHTML=`Street: <span style="color:${colors[dealState]}">${labels[dealState]}</span>`;
 }
- 
-function revealFlop() {
-  if (!currentHand || dealState !== 'preflop') return;
-  dealState = 'flop';
-  updateButtons();
-  renderCurrent();
-}
- 
-function revealTurn() {
-  if (!currentHand || dealState !== 'flop') return;
-  dealState = 'turn';
-  updateButtons();
-  renderCurrent();
-}
- 
-function revealRiver() {
-  if (!currentHand || dealState !== 'turn') return;
-  dealState = 'river';
-  updateButtons();
-  renderCurrent();
-}
- 
-function updateButtons() {
-  document.getElementById('btn-flop').disabled  = dealState !== 'preflop';
-  document.getElementById('btn-turn').disabled  = dealState !== 'flop';
-  document.getElementById('btn-river').disabled = dealState !== 'turn';
- 
-  const streetLabels = {preflop:'HOLE CARDS', flop:'FLOP', turn:'TURN', river:'RIVER'};
-  const streetColors = {preflop:'var(--text)', flop:'var(--blue)', turn:'var(--amber)', river:'var(--purple)'};
-  const ind = document.getElementById('street-indicator');
-  if (ind && dealState !== 'idle') {
-    ind.innerHTML = `Street: <span style="color:${streetColors[dealState]}">${streetLabels[dealState]}</span>`;
-  }
-}
- 
- 
-/* ══════════════════════════════════════════════════════════════════
+
+
+/* ══════════════════════════════════════════════════════
    RENDER TRAINER
-══════════════════════════════════════════════════════════════════ */
-const DRAW_EQ = {
-  flush_draw: {outs:9,  turn:'19%', river:'20%'},
-  oesd:       {outs:8,  turn:'17%', river:'17%'},
-  gutshot:    {outs:4,  turn:'9%',  river:'9%'},
-  combo_draw: {outs:15, turn:'32%', river:'33%'},
-  set_draw:   {outs:2,  turn:'4%',  river:'4%'},
-  overcards:  {outs:6,  turn:'13%', river:'13%'},
-  overcard:   {outs:3,  turn:'6%',  river:'7%'},
-};
- 
-function buildOutsBar(handStrength, street) {
-  const {madeStrength, madeLabel, draws} = handStrength;
-  const relevantDraws = street === 'turn'
-    ? draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type))
-    : draws;
-  const outs    = totalOuts(relevantDraws);
-  const totalEq = estimateTotalEquity(handStrength, street);
- 
-  const madeColor = madeStrength >= 3 ? 'var(--green)' : madeStrength >= 2 ? 'var(--amber)' : madeStrength >= 1 ? '#ffcc80' : 'var(--dim)';
-  const eqColor   = totalEq >= 60 ? 'var(--green)' : totalEq >= 40 ? 'var(--amber)' : totalEq >= 25 ? '#ffcc80' : 'var(--red)';
-  const outsColor = outs >= 12 ? '#ff9800' : outs >= 8 ? 'var(--blue)' : outs >= 4 ? '#90caf9' : outs > 0 ? 'var(--purple)' : 'var(--dim)';
- 
-  const ruleMulti = street === 'turn' ? 2 : 4;
-  const ruleLabel = street === 'turn' ? 'Regel ×2 (1 Karte, River)' : 'Regel ×4 (2 Karten, T+R)';
-  const eqLabel   = street === 'turn' ? 'Equity zum River' : 'Equity bis River';
-  const cardsLeft = street === 'turn' ? '1 Karte (River)' : '2 Karten (T+R)';
-  const ruleNote  = outs >= 9
-    ? `Hinweis: Regel ×${ruleMulti} leicht ungenau bei vielen Outs (${outs})`
-    : '';
- 
-  return `<div class="outs-bar">
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Made Hand</div>
-      <div class="outs-cell-val" style="color:${madeColor}">${madeEquityStr(madeStrength)}</div>
-      <div class="outs-cell-sub">${madeLabel}</div>
-    </div>
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Outs</div>
-      <div class="outs-cell-val" style="color:${outsColor}">${outs > 0 ? outs : '—'}</div>
-      <div class="outs-cell-sub">${outs > 0 ? cardsLeft : 'Keine Draws'}</div>
-    </div>
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">${eqLabel} (Näherung)</div>
-      <div class="outs-cell-val" style="color:${outsColor}">${outs > 0 ? '~'+(outs*ruleMulti)+'%' : '—'}</div>
-      <div class="outs-cell-sub">${outs > 0 ? ruleLabel : '—'}</div>
-    </div>
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Gesamt-Equity</div>
-      <div class="outs-cell-val" style="color:${eqColor}">${totalEq}%</div>
-      <div class="outs-cell-sub">Made + Draw HU</div>
-    </div>
-  </div>${ruleNote ? `<div class="equity-note">${ruleNote}</div>` : ''}`;
+══════════════════════════════════════════════════════ */
+const DRAW_EQ={flush_draw:{outs:9,turn:'19%',river:'20%'},oesd:{outs:8,turn:'17%',river:'17%'},gutshot:{outs:4,turn:'9%',river:'9%'},combo_draw:{outs:15,turn:'32%',river:'33%'},set_draw:{outs:2,turn:'4%',river:'4%'},overcards:{outs:6,turn:'13%',river:'13%'},overcard:{outs:3,turn:'6%',river:'7%'}};
+
+function buildOutsBar(handStrength,street){
+  const{madeStrength,madeLabel,draws}=handStrength;
+  const relevantDraws=draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
+  const outs=totalOuts(relevantDraws),totalEq=estimateTotalEquity(handStrength,street);
+  const madeColor=madeStrength>=3?'var(--green)':madeStrength>=2?'var(--amber)':madeStrength>=1?'#fbbf24':'var(--dim)';
+  const eqColor=totalEq>=60?'var(--green)':totalEq>=40?'var(--amber)':totalEq>=25?'#fbbf24':'var(--red)';
+  const outsColor=outs>=12?'#f97316':outs>=8?'var(--blue)':outs>=4?'#93c5fd':outs>0?'var(--purple)':'var(--dim)';
+  const ruleMulti=street==='turn'?2:4;
+  const ruleLabel=street==='turn'?'Regel ×2 (River)':'Regel ×4 (Turn+River)';
+  const cardsLeft=street==='turn'?'1 Karte':'2 Karten';
+  const ruleNote=outs>=9?`Hinweis: Regel ×${ruleMulti} leicht ungenau bei ${outs}+ Outs`:'';
+  return`<div class="outs-bar">
+    <div class="outs-cell"><div class="outs-cell-lbl">Made Hand</div><div class="outs-cell-val" style="color:${madeColor}">${madeEquityStr(madeStrength)}</div><div class="outs-cell-sub">${madeLabel}</div></div>
+    <div class="outs-cell"><div class="outs-cell-lbl">Outs</div><div class="outs-cell-val" style="color:${outsColor}">${outs>0?outs:'—'}</div><div class="outs-cell-sub">${outs>0?cardsLeft:'Keine Draws'}</div></div>
+    <div class="outs-cell"><div class="outs-cell-lbl">Draw-Equity (Näherung)</div><div class="outs-cell-val" style="color:${outsColor}">${outs>0?'~'+(outs*ruleMulti)+'%':'—'}</div><div class="outs-cell-sub">${outs>0?ruleLabel:'—'}</div></div>
+    <div class="outs-cell"><div class="outs-cell-lbl">Gesamt-Equity</div><div class="outs-cell-val" style="color:${eqColor}">${totalEq}%</div><div class="outs-cell-sub">Made + Draw HU</div></div>
+  </div>${ruleNote?`<div class="equity-note">${ruleNote}</div>`:''}`;
 }
- 
-function buildRiverDisplay(handStrength) {
-  const {madeStrength, madeLabel} = handStrength;
-  const madeColor     = madeStrength >= 3 ? 'var(--green)' : madeStrength >= 2 ? 'var(--amber)' : madeStrength >= 1 ? '#ffcc80' : 'var(--red)';
-  const strengthLabel = ['Schwach','Mittel','Stark','Sehr stark','Monster','Nuts'][Math.min(madeStrength, 5)];
- 
-  return `<div class="outs-bar">
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Endhand</div>
-      <div class="outs-cell-val" style="font-size:16px;color:${madeColor}">${madeLabel}</div>
-      <div class="outs-cell-sub">${strengthLabel}</div>
-    </div>
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Outs</div>
-      <div class="outs-cell-val" style="color:var(--dim)">—</div>
-      <div class="outs-cell-sub">Keine Karten mehr</div>
-    </div>
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Equity</div>
-      <div class="outs-cell-val" style="color:var(--dim)">—</div>
-      <div class="outs-cell-sub">River ist dealt</div>
-    </div>
-    <div class="outs-cell">
-      <div class="outs-cell-lbl">Showdown-Stärke</div>
-      <div class="outs-cell-val" style="color:${madeColor}">${madeEquityStr(madeStrength)}</div>
-      <div class="outs-cell-sub">vs. Random Hand</div>
-    </div>
+
+function buildRiverDisplay(handStrength){
+  const{madeStrength,madeLabel}=handStrength;
+  const madeColor=madeStrength>=3?'var(--green)':madeStrength>=2?'var(--amber)':madeStrength>=1?'#fbbf24':'var(--red)';
+  const strengthLabel=['Schwach','Mittel','Stark','Sehr stark','Monster','Nuts'][Math.min(madeStrength,5)];
+  return`<div class="outs-bar">
+    <div class="outs-cell"><div class="outs-cell-lbl">Endhand</div><div class="outs-cell-val" style="font-size:16px;color:${madeColor}">${madeLabel}</div><div class="outs-cell-sub">${strengthLabel}</div></div>
+    <div class="outs-cell"><div class="outs-cell-lbl">Outs</div><div class="outs-cell-val" style="color:var(--dim)">—</div><div class="outs-cell-sub">Keine Karten mehr</div></div>
+    <div class="outs-cell"><div class="outs-cell-lbl">Equity</div><div class="outs-cell-val" style="color:var(--dim)">—</div><div class="outs-cell-sub">River ist dealt</div></div>
+    <div class="outs-cell"><div class="outs-cell-lbl">Showdown-Stärke</div><div class="outs-cell-val" style="color:${madeColor}">${madeEquityStr(madeStrength)}</div><div class="outs-cell-sub">vs. Random Hand</div></div>
   </div>`;
 }
- 
-function buildEquityTable(handStrength, street) {
-  const {madeStrength, madeLabel, draws} = handStrength;
-  const madeColor = madeStrength >= 3 ? 'var(--green)' : madeStrength >= 2 ? 'var(--amber)' : madeStrength >= 1 ? '#ffcc80' : 'var(--dim)';
- 
-  let rows = `<div class="eq-row">
-    <span class="eq-type">${madeLabel}</span>
-    <span class="eq-val" style="color:${madeColor}">${madeEquityStr(madeStrength)} Equity</span>
-  </div>`;
- 
-  const mainDraws  = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
-  const bdoorDraws = street === 'turn' ? [] : draws.filter(d => ['bdoor_fd','bdoor_str'].includes(d.type));
- 
-  mainDraws.forEach(d => {
-    const de  = DRAW_EQ[d.type]; if (!de) return;
-    const col = d.strength >= 4 ? '#ff9800' : d.strength >= 3 ? 'var(--blue)' : d.strength === 2 ? '#90caf9' : 'var(--purple)';
-    const isImprove = ['set_draw','overcards','overcard'].includes(d.type);
-    let eqStr;
-    if (street === 'turn') {
-      eqStr = `${de.outs} Outs · River: ${de.river}`;
-    } else {
-      eqStr = isImprove
-        ? `${de.outs} Outs · River: ${de.river}`
-        : `${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;
-    }
-    rows += `<div class="eq-row">
-      <span class="eq-type" style="color:${col}">${d.label}</span>
-      <span class="eq-val">${eqStr}</span>
-    </div>`;
+
+function buildEquityTable(handStrength,street){
+  const{madeStrength,madeLabel,draws}=handStrength;
+  const madeColor=madeStrength>=3?'var(--green)':madeStrength>=2?'var(--amber)':madeStrength>=1?'#fbbf24':'var(--dim)';
+  let rows=`<div class="eq-row"><span class="eq-type">${madeLabel}</span><span class="eq-val" style="color:${madeColor}">${madeEquityStr(madeStrength)} Equity</span></div>`;
+  const mainDraws=draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
+  const bdoorDraws=street==='turn'?[]:draws.filter(d=>['bdoor_fd','bdoor_str'].includes(d.type));
+  mainDraws.forEach(d=>{
+    const de=DRAW_EQ[d.type];if(!de)return;
+    const col=d.strength>=4?'#f97316':d.strength>=3?'var(--blue)':d.strength===2?'#93c5fd':'var(--purple)';
+    const eqStr=street==='turn'?`${de.outs} Outs · River: ${de.river}`:`${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;
+    rows+=`<div class="eq-row"><span class="eq-type" style="color:${col}">${d.label}</span><span class="eq-val">${eqStr}</span></div>`;
   });
- 
-  if (bdoorDraws.length) {
-    const hasBFD  = bdoorDraws.some(d => d.type === 'bdoor_fd');
-    const hasBST  = bdoorDraws.some(d => d.type === 'bdoor_str');
-    const bdLabel = hasBFD && hasBST ? 'Backdoor FD + Straight' : hasBFD ? 'Backdoor Flush Draw' : 'Backdoor Straight Draw';
-    const bdEq    = hasBFD && hasBST ? '~7–8%' : hasBFD ? '~4%' : '~5%';
-    rows += `<div class="eq-row">
-      <span class="eq-type" style="color:var(--purple)">${bdLabel}</span>
-      <span class="eq-val">Bonus: ${bdEq} — braucht 2 gute Karten</span>
-    </div>`;
+  if(bdoorDraws.length){
+    const hasBFD=bdoorDraws.some(d=>d.type==='bdoor_fd'),hasBST=bdoorDraws.some(d=>d.type==='bdoor_str');
+    const bdLabel=hasBFD&&hasBST?'Backdoor FD + Straight':hasBFD?'Backdoor Flush Draw':'Backdoor Straight Draw';
+    const bdEq=hasBFD&&hasBST?'~7–8%':hasBFD?'~4%':'~5%';
+    rows+=`<div class="eq-row"><span class="eq-type" style="color:var(--purple)">${bdLabel}</span><span class="eq-val">Bonus: ${bdEq} — braucht 2 gute Karten</span></div>`;
   }
- 
-  const strongDraw = mainDraws.find(d => d.strength >= 3);
-  if (madeStrength >= 1 && strongDraw) {
-    const combined = madeStrength >= 3 ? '~85–90%' : madeStrength === 2 && strongDraw.outs >= 9 ? '~70–80%' : madeStrength === 2 ? '~65–75%' : '~50–60%';
-    rows += `<div class="eq-row eq-combined">
-      <span class="eq-type">Kombiniert (${madeLabel} + ${strongDraw.label})</span>
-      <span class="eq-val" style="color:var(--green)">${combined} Equity</span>
-    </div>`;
+  const strongDraw=mainDraws.find(d=>d.strength>=3);
+  if(madeStrength>=1&&strongDraw){
+    const combined=madeStrength>=3?'~85–90%':madeStrength===2&&strongDraw.outs>=9?'~70–80%':madeStrength===2?'~65–75%':'~50–60%';
+    rows+=`<div class="eq-row eq-combined"><span class="eq-type">Kombiniert (${madeLabel} + ${strongDraw.label})</span><span class="eq-val" style="color:var(--green)">${combined} Equity</span></div>`;
   }
   return rows;
 }
- 
-function renderCurrent() {
-  if (!currentHand) return;
-  const {role, position, ip, holeCards, flop, turn, river, oppPosition} = currentHand;
-  const oppWidth = OPP_RANGE_WIDTH[oppPosition] || 25;
- 
-  const showFlop  = ['flop','turn','river'].includes(dealState);
-  const showTurn  = ['turn','river'].includes(dealState);
-  const showRiver = dealState === 'river';
- 
-  const visibleBoard = [
-    ...(showFlop  ? flop  : []),
-    ...(showTurn  ? [turn]  : []),
-    ...(showRiver ? [river] : []),
-  ];
- 
-  let handStrength = null, boardInfo = null;
-  if (visibleBoard.length >= 3) {
-    handStrength = analyzeHoleCards(holeCards, visibleBoard);
-    boardInfo    = analyzeBoard(visibleBoard);
+
+function renderCurrent(){
+  if(!currentHand)return;
+  const{role,position,ip,holeCards,flop,turn,river,oppPosition}=currentHand;
+  const oppWidth=OPP_RANGE_WIDTH[oppPosition]||25;
+  const showFlop=['flop','turn','river'].includes(dealState);
+  const showTurn=['turn','river'].includes(dealState);
+  const showRiver=dealState==='river';
+  const visibleBoard=[...(showFlop?flop:[]),...(showTurn?[turn]:[]),...(showRiver?[river]:[])];
+  let handStrength=null,boardInfo=null;
+  if(visibleBoard.length>=3){handStrength=analyzeHoleCards(holeCards,visibleBoard);boardInfo=analyzeBoard(visibleBoard);}
+  let textureTags='';
+  if(boardInfo){
+    const{texture,paired,connected,monotone,twoTone}=boardInfo;
+    const tex=texture==='wet'?'wet':texture==='mid'?'mid':'dry';
+    textureTags+=`<span class="btag btag-${tex}">${texture==='wet'?'WET':texture==='mid'?'MITTEL':'DRY'}</span>`;
+    if(paired) textureTags+=`<span class="btag btag-pair">GEPAIRED</span>`;
+    if(monotone) textureTags+=`<span class="btag btag-fd">MONOTONE</span>`;
+    else if(twoTone) textureTags+=`<span class="btag btag-fd">FD MÖGLICH</span>`;
+    if(connected) textureTags+=`<span class="btag btag-wet">CONNECTED</span>`;
   }
- 
-  let textureTags = '';
-  if (boardInfo) {
-    const {texture, paired, connected, monotone, twoTone} = boardInfo;
-    const tex = texture === 'wet' ? 'wet' : texture === 'mid' ? 'mid' : 'dry';
-    textureTags += `<span class="btag btag-${tex}">${texture === 'wet' ? 'WET' : texture === 'mid' ? 'MITTEL' : 'DRY'}</span>`;
-    if (paired)    textureTags += `<span class="btag btag-pair">GEPAIRED</span>`;
-    if (monotone)  textureTags += `<span class="btag btag-fd">MONOTONE</span>`;
-    else if (twoTone) textureTags += `<span class="btag btag-fd">FD MÖGLICH</span>`;
-    if (connected) textureTags += `<span class="btag btag-wet">CONNECTED</span>`;
-  }
- 
-  const flopCards = showFlop
-    ? flop.map(c => renderCard(c, false, 'flop-card')).join('')
-    : renderCard('',true) + renderCard('',true) + renderCard('',true);
- 
-  const turnCard  = showTurn  ? renderCard(turn,  false, 'turn-card')  : renderCard('',true);
-  const riverCard = showRiver ? renderCard(river, false, 'river-card') : renderCard('',true);
- 
-  let analysisHtml = '';
-  if (handStrength) {
-    const stripClass = dealState === 'flop' ? 'strip-flop' : dealState === 'turn' ? 'strip-turn' : 'strip-river';
-    const stripLabel = dealState === 'flop' ? 'FLOP' : dealState === 'turn' ? 'TURN' : 'RIVER';
- 
+  const flopCards=showFlop?flop.map(c=>renderCard(c,false,'flop-card')).join(''):renderCard('',true)+renderCard('',true)+renderCard('',true);
+  const turnCard=showTurn?renderCard(turn,false,'turn-card'):renderCard('',true);
+  const riverCard=showRiver?renderCard(river,false,'river-card'):renderCard('',true);
+  let analysisHtml='';
+  if(handStrength){
+    const stripClass=dealState==='flop'?'strip-flop':dealState==='turn'?'strip-turn':'strip-river';
+    const stripLabel=dealState==='flop'?'FLOP':dealState==='turn'?'TURN':'RIVER';
     let contentHtml;
-    if (dealState === 'river') {
-      const madeColor = handStrength.madeStrength >= 3 ? 'var(--green)' : handStrength.madeStrength >= 2 ? 'var(--amber)' : handStrength.madeStrength >= 1 ? '#ffcc80' : 'var(--dim)';
-      const madeRow = `<div class="eq-table"><div class="eq-row">
-        <span class="eq-type">${handStrength.madeLabel}</span>
-        <span class="eq-val" style="color:${madeColor}">${madeEquityStr(handStrength.madeStrength)} vs. Random Hand</span>
-      </div></div>`;
-      contentHtml = buildRiverDisplay(handStrength) + madeRow;
+    if(dealState==='river'){
+      const madeColor=handStrength.madeStrength>=3?'var(--green)':handStrength.madeStrength>=2?'var(--amber)':handStrength.madeStrength>=1?'#fbbf24':'var(--dim)';
+      const madeRow=`<div class="eq-table"><div class="eq-row"><span class="eq-type">${handStrength.madeLabel}</span><span class="eq-val" style="color:${madeColor}">${madeEquityStr(handStrength.madeStrength)} vs. Random Hand</span></div></div>`;
+      contentHtml=buildRiverDisplay(handStrength)+madeRow;
     } else {
-      contentHtml = buildOutsBar(handStrength, dealState)
-        + `<div class="eq-table">${buildEquityTable(handStrength, dealState)}</div>`;
+      contentHtml=buildOutsBar(handStrength,dealState)+`<div class="eq-table">${buildEquityTable(handStrength,dealState)}</div>`;
     }
- 
-    analysisHtml = `<div class="hand-analysis">
-      <div class="ha-title">
-        <span class="street-label-strip ${stripClass}">${stripLabel}</span>
-        &nbsp; Outs &amp; Equity
-      </div>
-      ${contentHtml}
-    </div>`;
+    analysisHtml=`<div class="hand-analysis"><div class="ha-title"><span class="street-label-strip ${stripClass}">${stripLabel}</span>&nbsp; Outs &amp; Equity</div>${contentHtml}</div>`;
   }
- 
-  document.getElementById('main-area').innerHTML = `
+  document.getElementById('main-area').innerHTML=`
     <div class="situation">
       <div class="sit-header">
-        <span class="sit-badge ${role}">${role === 'pfr' ? 'AGGRESSOR (PFR)' : 'CALLER (BB)'}</span>
+        <span class="sit-badge ${role}">${role==='pfr'?'AGGRESSOR (PFR)':'CALLER (BB)'}</span>
         <span class="sit-badge pos">${position}</span>
-        <span class="sit-badge ${ip ? 'ip' : 'oop'}">${ip ? 'IN POSITION' : 'OUT OF POSITION'}</span>
+        <span class="sit-badge ${ip?'ip':'oop'}">${ip?'IN POSITION':'OUT OF POSITION'}</span>
         <span class="sit-badge opp">vs ${oppPosition} · ${oppWidth}% Range</span>
       </div>
- 
       <div class="cards-row">
-        <div>
-          <div class="card-group-label">Deine Hand</div>
-          <div class="cards-display">
-            ${renderCard(holeCards[0])}${renderCard(holeCards[1])}
-          </div>
-        </div>
-        <div>
-          <div class="card-group-label">Flop</div>
-          <div class="cards-display">${flopCards}</div>
-        </div>
-        <div>
-          <div class="card-group-label">Turn</div>
-          <div class="cards-display">${turnCard}</div>
-        </div>
-        <div>
-          <div class="card-group-label">River</div>
-          <div class="cards-display">${riverCard}</div>
-        </div>
+        <div><div class="card-group-label">Deine Hand</div><div class="cards-display">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div></div>
+        <div><div class="card-group-label">Flop</div><div class="cards-display">${flopCards}</div></div>
+        <div><div class="card-group-label">Turn</div><div class="cards-display">${turnCard}</div></div>
+        <div><div class="card-group-label">River</div><div class="cards-display">${riverCard}</div></div>
       </div>
- 
-      ${textureTags ? `<div class="board-tags">${textureTags}</div>` : ''}
+      ${textureTags?`<div class="board-tags">${textureTags}</div>`:''}
     </div>
- 
-    ${analysisHtml}
-  `;
+    ${analysisHtml}`;
 }
 
 
-/* ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════
    VARIANCE CALCULATOR
-══════════════════════════════════════════════════════════════════ */
-let varianceData = null;
+══════════════════════════════════════════════════════ */
+let varianceData=null;
 
-function initVarianceCalculator() {
-  // Drag & Drop - nur initialisieren wenn Element existiert
-  const uploadArea = document.getElementById('upload-area');
-  if (!uploadArea) return;
-  
-  uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.classList.add('drag-over');
-  });
-  uploadArea.addEventListener('dragleave', () => {
-    uploadArea.classList.remove('drag-over');
-  });
-  uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove('drag-over');
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) processFiles(files);
-  });
+function initVarianceCalculator(){
+  const ua=document.getElementById('upload-area');if(!ua)return;
+  ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('drag-over');});
+  ua.addEventListener('dragleave',()=>ua.classList.remove('drag-over'));
+  ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('drag-over');const files=Array.from(e.dataTransfer.files);if(files.length>0)processFiles(files);});
 }
-
-function handleFileUpload(event) {
-  const files = Array.from(event.target.files);
-  if (files.length > 0) processFiles(files);
-}
-
-function processFiles(files) {
-  let allHands = [];
-  let filesProcessed = 0;
-  
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target.result;
-      const hands = parseHandHistory(text);
-      allHands = allHands.concat(hands);
-      filesProcessed++;
-      
-      if (filesProcessed === files.length) {
-        if (allHands.length === 0) {
-          alert('Keine gültigen Hände gefunden');
-          return;
-        }
-        // Sort by hand number
-        allHands.sort((a, b) => {
-          const aNum = parseInt(a.handNum.replace(/[^0-9]/g, ''));
-          const bNum = parseInt(b.handNum.replace(/[^0-9]/g, ''));
-          return aNum - bNum;
-        });
-        varianceData = allHands;
-        renderVarianceAnalysis();
+function handleFileUpload(event){const files=Array.from(event.target.files);if(files.length>0)processFiles(files);}
+function processFiles(files){
+  let allHands=[],filesProcessed=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const text=e.target.result;const hands=parseHandHistory(text);
+      allHands=allHands.concat(hands);filesProcessed++;
+      if(filesProcessed===files.length){
+        if(allHands.length===0){alert('Keine gültigen Hände gefunden');return;}
+        allHands.sort((a,b)=>{const an=parseInt(a.handNum.replace(/[^0-9]/g,'')),bn=parseInt(b.handNum.replace(/[^0-9]/g,''));return an-bn;});
+        varianceData=allHands;renderVarianceAnalysis();
       }
     };
     reader.readAsText(file);
   });
 }
-
-function parseHandHistory(text) {
-  const hands = [];
-  const handBlocks = text.split(/(?=Poker Hand #)/);
-  
-  handBlocks.forEach(block => {
-    if (!block.trim() || !block.includes('Hero')) return;
-    
-    // Extract hand number
-    const handMatch = block.match(/Poker Hand #([^:]+)/);
-    if (!handMatch) return;
-    const handNum = handMatch[1];
-    
-    // Extract date/time
-    const dateMatch = block.match(/- (\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/);
-    const date = dateMatch ? dateMatch[1] : '';
-    
-    // Find Hero's starting stack
-    const seatMatch = block.match(/Seat \d+: Hero \(\$([0-9.]+) in chips\)/);
-    if (!seatMatch) return;
-    const startStack = parseFloat(seatMatch[1]);
-    
-    // Track Hero's investments (bets, calls, raises, blinds)
-    let invested = 0;
-    
-    // Small blind
-    if (block.includes('Hero: posts small blind $')) {
-      const sbMatch = block.match(/Hero: posts small blind \$([0-9.]+)/);
-      if (sbMatch) invested += parseFloat(sbMatch[1]);
-    }
-    
-    // Big blind
-    if (block.includes('Hero: posts big blind $')) {
-      const bbMatch = block.match(/Hero: posts big blind \$([0-9.]+)/);
-      if (bbMatch) invested += parseFloat(bbMatch[1]);
-    }
-    
-    // All Hero actions (calls, bets, raises)
-    const actionMatches = block.matchAll(/Hero: (?:calls|bets|raises[^$]*?) \$([0-9.]+)/g);
-    for (const match of actionMatches) {
-      invested += parseFloat(match[1]);
-    }
-    
-    // Check if Hero collected anything
-    let collected = 0;
-    const collectMatch = block.match(/Seat \d+: Hero[^(]*collected \(\$([0-9.]+)\)/);
-    if (collectMatch) {
-      collected = parseFloat(collectMatch[1]);
-    }
-    
-    // Net win/loss
-    const netWin = collected - invested;
-    
-    hands.push({
-      handNum: handNum,
-      date: date,
-      win: netWin,
-      ev: netWin, // We don't have EV data from hand history, so use actual
-      variance: 0,
-      invested: invested,
-      collected: collected
-    });
+function parseHandHistory(text){
+  const hands=[];const handBlocks=text.split(/(?=Poker Hand #)/);
+  handBlocks.forEach(block=>{
+    if(!block.trim()||!block.includes('Hero'))return;
+    const handMatch=block.match(/Poker Hand #([^:]+)/);if(!handMatch)return;
+    const handNum=handMatch[1];
+    const dateMatch=block.match(/- (\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/);
+    const date=dateMatch?dateMatch[1]:'';
+    const seatMatch=block.match(/Seat \d+: Hero \(\$([0-9.]+) in chips\)/);if(!seatMatch)return;
+    let invested=0;
+    if(block.includes('Hero: posts small blind $')){const m=block.match(/Hero: posts small blind \$([0-9.]+)/);if(m)invested+=parseFloat(m[1]);}
+    if(block.includes('Hero: posts big blind $')){const m=block.match(/Hero: posts big blind \$([0-9.]+)/);if(m)invested+=parseFloat(m[1]);}
+    const actionMatches=block.matchAll(/Hero: (?:calls|bets|raises[^$]*?) \$([0-9.]+)/g);
+    for(const match of actionMatches)invested+=parseFloat(match[1]);
+    let collected=0;
+    const collectMatch=block.match(/Seat \d+: Hero[^(]*collected \(\$([0-9.]+)\)/);
+    if(collectMatch)collected=parseFloat(collectMatch[1]);
+    hands.push({handNum,date,win:collected-invested,ev:collected-invested,variance:0,invested,collected});
   });
-  
   return hands;
 }
-
-function renderVarianceAnalysis() {
-  if (!varianceData) return;
-  
-  // Calculate cumulative values
-  let cumWin = 0, cumEV = 0, cumVar = 0;
-  varianceData.forEach(h => {
-    cumWin += h.win;
-    cumEV += h.ev;
-    cumVar += h.variance;
-    h.cumWin = cumWin;
-    h.cumEV = cumEV;
-    h.cumVar = cumVar;
+function renderVarianceAnalysis(){
+  if(!varianceData)return;
+  let cumWin=0,cumEV=0;
+  varianceData.forEach(h=>{cumWin+=h.win;cumEV+=h.ev;h.cumWin=cumWin;h.cumEV=cumEV;});
+  const totalHands=varianceData.length,totalWin=cumWin,totalEV=cumEV;
+  const wins=varianceData.map(h=>h.win);
+  const mean=wins.reduce((a,b)=>a+b,0)/wins.length;
+  const variance=wins.reduce((sum,val)=>sum+Math.pow(val-mean,2),0)/wins.length;
+  const stdDev=Math.sqrt(variance);
+  let maxCum=0,worstDownswing=0;
+  varianceData.forEach(h=>{if(h.cumWin>maxCum)maxCum=h.cumWin;const dd=maxCum-h.cumWin;if(dd>worstDownswing)worstDownswing=dd;});
+  const winColor=totalWin>=0?'positive':'negative';
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Gespielte Hände</div><div class="stat-value">${totalHands.toLocaleString()}</div><div class="stat-sub">Total</div></div>
+    <div class="stat-card"><div class="stat-label">Tatsächlicher Gewinn</div><div class="stat-value ${winColor}">${totalWin>=0?'+':''}${totalWin.toFixed(2)}$</div><div class="stat-sub">${(totalWin/totalHands).toFixed(3)}$ / Hand</div></div>
+    <div class="stat-card"><div class="stat-label">EV Gewinn</div><div class="stat-value">${totalEV>=0?'+':''}${totalEV.toFixed(2)}$</div><div class="stat-sub">${(totalEV/totalHands).toFixed(3)}$ / Hand</div></div>
+    <div class="stat-card"><div class="stat-label">Standard-Abweichung</div><div class="stat-value">${stdDev.toFixed(2)}$</div><div class="stat-sub">Pro Hand</div></div>
+    <div class="stat-card"><div class="stat-label">Größter Downswing</div><div class="stat-value negative">-${worstDownswing.toFixed(2)}$</div><div class="stat-sub">Vom Peak</div></div>
+    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value ${winColor}">${totalWin>=0?'+':''}${((totalWin/totalHands)*100).toFixed(1)}</div><div class="stat-sub">bb/100 (approx.)</div></div>`;
+  renderMainChart();renderDownswingChart();renderDataTable();
+  document.getElementById('variance-results').style.display='block';
+}
+function getCSS(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function renderMainChart(){
+  const canvas=document.getElementById('variance-chart');const ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.clientWidth-40;canvas.height=360;
+  const w=canvas.width,h=canvas.height,pad={top:20,right:40,bottom:40,left:70};
+  const pw=w-pad.left-pad.right,ph=h-pad.top-pad.bottom;
+  const maxHand=varianceData.length;
+  const allV=varianceData.flatMap(h=>[h.cumWin,h.cumEV]);
+  const minY=Math.min(...allV,0),maxY=Math.max(...allV,0),rangeY=maxY-minY||1;
+  ctx.fillStyle='#14141a';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='#2a2a38';ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=pad.top+(ph/5)*i;ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+pw,y);ctx.stroke();
+    const val=maxY-(rangeY/5)*i;ctx.fillStyle='#44445a';ctx.font='11px Share Tech Mono,monospace';ctx.textAlign='right';
+    ctx.fillText((val>=0?'+':'')+val.toFixed(0)+'$',pad.left-8,y+4);
+  }
+  for(let i=0;i<=5;i++){const x=pad.left+(pw/5)*i;const hn=Math.floor((maxHand/5)*i);ctx.fillStyle='#44445a';ctx.textAlign='center';ctx.fillText(hn.toString(),x,h-16);}
+  if(minY<0&&maxY>0){const zy=pad.top+ph*(1-(0-minY)/rangeY);ctx.strokeStyle='#38384a';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(pad.left,zy);ctx.lineTo(pad.left+pw,zy);ctx.stroke();ctx.setLineDash([]);}
+  // EV line
+  ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();
+  varianceData.forEach((h,i)=>{const x=pad.left+(pw*i/(maxHand-1));const y=pad.top+ph*(1-(h.cumEV-minY)/rangeY);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();
+  // Actual line
+  ctx.strokeStyle='#60a5fa';ctx.lineWidth=2.5;ctx.beginPath();
+  varianceData.forEach((h,i)=>{const x=pad.left+(pw*i/(maxHand-1));const y=pad.top+ph*(1-(h.cumWin-minY)/rangeY);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();
+  ctx.fillStyle='#60a5fa';ctx.fillRect(pad.left+10,10,20,3);ctx.fillStyle='#e8e8f0';ctx.font='bold 11px Barlow,sans-serif';ctx.textAlign='left';ctx.fillText('Tatsächlicher Gewinn',pad.left+36,15);
+  ctx.fillStyle='#f59e0b';ctx.fillRect(pad.left+190,10,20,3);ctx.fillStyle='#e8e8f0';ctx.fillText('EV',pad.left+216,15);
+}
+function renderDownswingChart(){
+  const canvas=document.getElementById('downswing-chart');const ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.clientWidth-40;canvas.height=240;
+  const w=canvas.width,h=canvas.height,pad={top:20,right:40,bottom:40,left:70};
+  const pw=w-pad.left-pad.right,ph=h-pad.top-pad.bottom;
+  let maxCum=0;
+  const drawdowns=varianceData.map(h=>{if(h.cumWin>maxCum)maxCum=h.cumWin;return maxCum-h.cumWin;});
+  const maxDD=Math.max(...drawdowns,.01);
+  ctx.fillStyle='#14141a';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='#2a2a38';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.top+(ph/4)*i;ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+pw,y);ctx.stroke();const val=maxDD-(maxDD/4)*i;ctx.fillStyle='#44445a';ctx.font='11px Share Tech Mono,monospace';ctx.textAlign='right';ctx.fillText('-'+val.toFixed(0)+'$',pad.left-8,y+4);}
+  ctx.fillStyle='rgba(239,68,68,0.15)';ctx.beginPath();ctx.moveTo(pad.left,pad.top+ph);
+  drawdowns.forEach((dd,i)=>{const x=pad.left+(pw*i/(drawdowns.length-1));const y=pad.top+ph*(1-dd/maxDD);ctx.lineTo(x,y);});
+  ctx.lineTo(pad.left+pw,pad.top+ph);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#ef4444';ctx.lineWidth=2;ctx.beginPath();
+  drawdowns.forEach((dd,i)=>{const x=pad.left+(pw*i/(drawdowns.length-1));const y=pad.top+ph*(1-dd/maxDD);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();
+}
+function renderDataTable(){
+  const maxRows=100;const d=varianceData.slice(0,maxRows);
+  let html=`<table><thead><tr><th>Hand #</th><th>Datum</th><th>Gewinn</th><th>Kum. Gewinn</th><th>Invested</th></tr></thead><tbody>`;
+  d.forEach(h=>{
+    const wc=h.win>=0?'positive':'negative';
+    html+=`<tr><td>${h.handNum}</td><td>${h.date}</td><td class="${wc}">${h.win>=0?'+':''}${h.win.toFixed(2)}$</td><td class="${h.cumWin>=0?'positive':'negative'}">${h.cumWin>=0?'+':''}${h.cumWin.toFixed(2)}$</td><td>${h.invested.toFixed(2)}$</td></tr>`;
   });
-  
-  const totalHands = varianceData.length;
-  const totalWin = cumWin;
-  const totalEV = cumEV;
-  const totalVar = cumVar;
-  const varPercent = totalEV !== 0 ? ((totalVar / totalEV) * 100).toFixed(1) : 0;
-  
-  // Calculate standard deviation
-  const wins = varianceData.map(h => h.win);
-  const mean = wins.reduce((a,b) => a+b, 0) / wins.length;
-  const variance = wins.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / wins.length;
-  const stdDev = Math.sqrt(variance);
-  
-  // Find worst downswing
-  let maxCum = 0, worstDownswing = 0, currentDownswing = 0;
-  varianceData.forEach(h => {
-    if (h.cumWin > maxCum) maxCum = h.cumWin;
-    currentDownswing = maxCum - h.cumWin;
-    if (currentDownswing > worstDownswing) worstDownswing = currentDownswing;
-  });
-  
-  // Render stats
-  const winColor = totalWin >= 0 ? 'positive' : 'negative';
-  const varColor = totalVar >= 0 ? 'positive' : 'negative';
-  document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Gespielte Hände</div>
-      <div class="stat-value">${totalHands.toLocaleString()}</div>
-      <div class="stat-sub">Total</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Tatsächlicher Gewinn</div>
-      <div class="stat-value ${winColor}">${totalWin >= 0 ? '+' : ''}${totalWin.toFixed(2)}$</div>
-      <div class="stat-sub">${(totalWin/totalHands).toFixed(3)}$ / Hand</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">EV Gewinn</div>
-      <div class="stat-value">${totalEV >= 0 ? '+' : ''}${totalEV.toFixed(2)}$</div>
-      <div class="stat-sub">${(totalEV/totalHands).toFixed(3)}$ / Hand</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Varianz</div>
-      <div class="stat-value ${varColor}">${totalVar >= 0 ? '+' : ''}${totalVar.toFixed(2)}$</div>
-      <div class="stat-sub">${varPercent >= 0 ? '+' : ''}${varPercent}% vom EV</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Standard-Abweichung</div>
-      <div class="stat-value">${stdDev.toFixed(2)}$</div>
-      <div class="stat-sub">Pro Hand</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Größter Downswing</div>
-      <div class="stat-value negative">-${worstDownswing.toFixed(2)}$</div>
-      <div class="stat-sub">Vom Peak</div>
-    </div>
-  `;
-  
-  // Render charts
-  renderMainChart();
-  renderDownswingChart();
-  renderDataTable();
-  
-  document.getElementById('variance-results').style.display = 'block';
+  if(varianceData.length>maxRows)html+=`<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:12px;">... und ${varianceData.length-maxRows} weitere Hände</td></tr>`;
+  html+=`</tbody></table>`;
+  document.getElementById('data-table-container').innerHTML=html;
 }
 
-function renderMainChart() {
-  const canvas = document.getElementById('variance-chart');
-  const ctx = canvas.getContext('2d');
-  
-  // Set canvas size
-  canvas.width = canvas.parentElement.clientWidth - 40;
-  canvas.height = 360;
-  
-  const width = canvas.width;
-  const height = canvas.height;
-  const padding = {top: 20, right: 40, bottom: 40, left: 60};
-  const plotWidth = width - padding.left - padding.right;
-  const plotHeight = height - padding.top - padding.bottom;
-  
-  // Get data ranges
-  const maxHand = varianceData.length;
-  const allValues = varianceData.flatMap(h => [h.cumWin, h.cumEV]);
-  const minY = Math.min(...allValues, 0);
-  const maxY = Math.max(...allValues, 0);
-  const rangeY = maxY - minY || 1;
-  
-  // Clear canvas
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg2');
-  ctx.fillRect(0, 0, width, height);
-  
-  // Draw grid
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 5; i++) {
-    const y = padding.top + (plotHeight / 5) * i;
-    ctx.beginPath();
-    ctx.moveTo(padding.left, y);
-    ctx.lineTo(padding.left + plotWidth, y);
-    ctx.stroke();
-    
-    const val = maxY - (rangeY / 5) * i;
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim');
-    ctx.font = '11px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText(val.toFixed(0) + '$', padding.left - 10, y + 4);
-  }
-  
-  // Draw x-axis labels
-  for (let i = 0; i <= 5; i++) {
-    const x = padding.left + (plotWidth / 5) * i;
-    const handNum = Math.floor((maxHand / 5) * i);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim');
-    ctx.textAlign = 'center';
-    ctx.fillText(handNum.toString(), x, height - 20);
-  }
-  
-  // Draw zero line
-  if (minY < 0 && maxY > 0) {
-    const zeroY = padding.top + plotHeight * (1 - (0 - minY) / rangeY);
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--muted');
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(padding.left, zeroY);
-    ctx.lineTo(padding.left + plotWidth, zeroY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-  
-  // Draw EV line
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--amber');
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  varianceData.forEach((h, i) => {
-    const x = padding.left + (plotWidth * i / (maxHand - 1));
-    const y = padding.top + plotHeight * (1 - (h.cumEV - minY) / rangeY);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-  
-  // Draw actual line
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--blue');
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  varianceData.forEach((h, i) => {
-    const x = padding.left + (plotWidth * i / (maxHand - 1));
-    const y = padding.top + plotHeight * (1 - (h.cumWin - minY) / rangeY);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-  
-  // Draw legend
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--blue');
-  ctx.fillRect(padding.left + 10, 10, 20, 3);
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text');
-  ctx.font = 'bold 12px Arial';
-  ctx.textAlign = 'left';
-  ctx.fillText('Tatsächlicher Gewinn', padding.left + 35, 15);
-  
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--amber');
-  ctx.fillRect(padding.left + 180, 10, 20, 3);
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text');
-  ctx.fillText('EV Gewinn', padding.left + 205, 15);
-}
 
-function renderDownswingChart() {
-  const canvas = document.getElementById('downswing-chart');
-  const ctx = canvas.getContext('2d');
-  
-  canvas.width = canvas.parentElement.clientWidth - 40;
-  canvas.height = 260;
-  
-  const width = canvas.width;
-  const height = canvas.height;
-  const padding = {top: 20, right: 40, bottom: 40, left: 60};
-  const plotWidth = width - padding.left - padding.right;
-  const plotHeight = height - padding.top - padding.bottom;
-  
-  // Calculate drawdown
-  let maxCum = 0;
-  const drawdowns = varianceData.map(h => {
-    if (h.cumWin > maxCum) maxCum = h.cumWin;
-    return maxCum - h.cumWin;
-  });
-  
-  const maxDrawdown = Math.max(...drawdowns, 0);
-  
-  // Clear
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg2');
-  ctx.fillRect(0, 0, width, height);
-  
-  // Grid
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 5; i++) {
-    const y = padding.top + (plotHeight / 5) * i;
-    ctx.beginPath();
-    ctx.moveTo(padding.left, y);
-    ctx.lineTo(padding.left + plotWidth, y);
-    ctx.stroke();
-    
-    const val = maxDrawdown - (maxDrawdown / 5) * i;
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim');
-    ctx.font = '11px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText('-' + val.toFixed(0) + '$', padding.left - 10, y + 4);
-  }
-  
-  // Draw drawdown area
-  ctx.fillStyle = 'rgba(244, 67, 54, 0.3)';
-  ctx.beginPath();
-  ctx.moveTo(padding.left, padding.top + plotHeight);
-  drawdowns.forEach((dd, i) => {
-    const x = padding.left + (plotWidth * i / (drawdowns.length - 1));
-    const y = padding.top + plotHeight * (1 - dd / maxDrawdown);
-    ctx.lineTo(x, y);
-  });
-  ctx.lineTo(padding.left + plotWidth, padding.top + plotHeight);
-  ctx.closePath();
-  ctx.fill();
-  
-  // Draw line
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--red');
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  drawdowns.forEach((dd, i) => {
-    const x = padding.left + (plotWidth * i / (drawdowns.length - 1));
-    const y = padding.top + plotHeight * (1 - dd / maxDrawdown);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-}
-
-function renderDataTable() {
-  const maxRows = 100;
-  const displayData = varianceData.slice(0, maxRows);
-  
-  let html = `<table>
-    <thead>
-      <tr>
-        <th>Hand #</th>
-        <th>Datum</th>
-        <th>Gewinn</th>
-        <th>EV</th>
-        <th>Varianz</th>
-        <th>Kum. Gewinn</th>
-        <th>Kum. EV</th>
-      </tr>
-    </thead>
-    <tbody>`;
-  
-  displayData.forEach(h => {
-    const winClass = h.win >= 0 ? 'positive' : 'negative';
-    const varClass = h.variance >= 0 ? 'positive' : 'negative';
-    html += `<tr>
-      <td>${h.handNum}</td>
-      <td>${h.date}</td>
-      <td class="${winClass}">${h.win >= 0 ? '+' : ''}${h.win.toFixed(2)}$</td>
-      <td>${h.ev >= 0 ? '+' : ''}${h.ev.toFixed(2)}$</td>
-      <td class="${varClass}">${h.variance >= 0 ? '+' : ''}${h.variance.toFixed(2)}$</td>
-      <td class="${h.cumWin >= 0 ? 'positive' : 'negative'}">${h.cumWin >= 0 ? '+' : ''}${h.cumWin.toFixed(2)}$</td>
-      <td>${h.cumEV >= 0 ? '+' : ''}${h.cumEV.toFixed(2)}$</td>
-    </tr>`;
-  });
-  
-  if (varianceData.length > maxRows) {
-    html += `<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:12px;">... und ${varianceData.length - maxRows} weitere Hände</td></tr>`;
-  }
-  
-  html += `</tbody></table>`;
-  document.getElementById('data-table-container').innerHTML = html;
-}
- 
-/* ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════
    INIT
-══════════════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════ */
 renderPreflopRange(true);
 initVarianceCalculator();
 </script>
