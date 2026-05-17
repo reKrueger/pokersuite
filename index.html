@@ -155,21 +155,15 @@ body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif;
 .empty-state .es-icon { font-size:50px; margin-bottom:12px; opacity:.4; }
 .empty-state .es-text { font-size:14px; font-family:'Oswald',sans-serif; letter-spacing:1px; text-transform:uppercase; }
 
-/* VARIANCE */
-.upload-area { background:var(--bg2); border:1px dashed var(--border2); padding:40px 20px; text-align:center; margin-bottom:22px; cursor:pointer; transition:all .2s; }
-.upload-area:hover { border-color:var(--gold); background:var(--bg3); }
-.upload-area.drag-over { border-color:var(--green); background:rgba(34,197,94,.06); }
-.upload-icon { font-size:42px; margin-bottom:10px; }
-.upload-text { font-size:14px; font-family:'Oswald',sans-serif; letter-spacing:1px; color:var(--text); margin-bottom:5px; }
-.upload-hint { font-size:12px; color:var(--dim); }
-.file-input { display:none; }
-.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:10px; margin-bottom:18px; }
-.stat-card { background:var(--bg2); border:1px solid var(--border2); padding:16px; }
-.stat-label { font-size:10px; font-weight:600; color:var(--dim); text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; }
-.stat-value { font-family:'Share Tech Mono',monospace; font-size:24px; font-weight:bold; line-height:1; margin-bottom:4px; }
-.stat-sub { font-size:11px; color:var(--dim); }
-.chart-container { background:var(--bg2); border:1px solid var(--border2); padding:18px; margin-bottom:14px; position:relative; height:380px; }
-.chart-title { font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; text-align:center; }
+/* OUTS & EQUITY */
+.outs-rule-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:20px; }
+.outs-rule-card { background:var(--bg2); border:1px solid var(--border2); padding:16px 18px; }
+.orc-icon { font-family:'Oswald',sans-serif; font-size:30px; font-weight:700; color:var(--gold); line-height:1; margin-bottom:3px; }
+.orc-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:6px; }
+.orc-desc { font-size:12px; color:var(--text); }
+.orc-warn .orc-icon { color:var(--amber); }
+.outs-key-row { background:rgba(201,162,39,.05) !important; }
+.outs-key-row td:first-child { border-left:2px solid var(--gold); }
 .data-table { background:var(--bg2); border:1px solid var(--border2); overflow-x:auto; max-height:380px; overflow-y:auto; }
 .data-table table { width:100%; border-collapse:collapse; font-size:12px; }
 .data-table th { background:var(--bg3); color:var(--dim); padding:9px 11px; text-align:left; font-weight:600; text-transform:uppercase; font-size:9px; letter-spacing:1px; position:sticky; top:0; border-bottom:1px solid var(--border2); }
@@ -197,8 +191,7 @@ body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif;
   .trainer-topbar { flex-wrap:wrap; gap:5px; }
   .street-btn { flex:1; min-width:68px; padding:8px 5px; font-size:10px; }
   .street-indicator { width:100%; margin-left:0; text-align:center; }
-  .stats-grid { grid-template-columns:1fr 1fr; }
-  .chart-container { height:260px; }
+
 }
 @media (max-width:400px) {
   .rg td { width:28px; height:22px; font-size:7px; }
@@ -217,7 +210,7 @@ body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif;
   </div>
   <button class="nav-tab active" onclick="goPage('preflop',this)">Preflop Ranges</button>
   <button class="nav-tab"        onclick="goPage('trainer',this)">Postflop Trainer</button>
-  <button class="nav-tab"        onclick="goPage('variance',this)">Varianz-Rechner</button>
+  <button class="nav-tab"        onclick="goPage('outs',this)">Outs &amp; Equity</button>
 </nav>
 
 <!-- ══ PREFLOP RANGES ══ -->
@@ -259,31 +252,68 @@ body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif;
   </div>
 </div>
 
-<!-- ══ VARIANCE ══ -->
-<div class="page" id="page-variance">
-  <div class="sec-title">Varianz <span>Rechner</span></div>
-  <div class="sec-sub">GGPoker / PokerCraft Hand History hochladen</div>
-  <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-file').click()">
-    <div class="upload-icon">📊</div>
-    <div class="upload-text">Dateien hier ablegen oder klicken</div>
-    <div class="upload-hint">Hand History (.txt) oder CSV · Mehrere Dateien gleichzeitig</div>
-    <input type="file" id="csv-file" class="file-input" accept=".csv,.txt" multiple onchange="handleFileUpload(event)">
-  </div>
-  <div id="variance-results" style="display:none;">
-    <div class="stats-grid" id="stats-grid"></div>
-    <div class="chart-container">
-      <div class="chart-title">Gewinn vs. EV — Kumulativer Graph</div>
-      <canvas id="variance-chart"></canvas>
+<!-- ══ OUTS & EQUITY ══ -->
+<div class="page" id="page-outs">
+  <div class="sec-title">Outs &amp; <span>Equity</span></div>
+  <div class="sec-sub">Exakte Wahrscheinlichkeiten &amp; Faustregeln · Flop (47 Karten offen) · Turn (46 Karten offen)</div>
+
+  <div class="outs-rule-grid">
+    <div class="outs-rule-card">
+      <div class="orc-icon">×2</div>
+      <div class="orc-label">Regel ×2</div>
+      <div class="orc-desc">Outs × 2 ≈ % für <strong>eine</strong> Karte (Turn oder River einzeln)</div>
     </div>
-    <div class="chart-container" style="height:260px;">
-      <div class="chart-title">Downswing Analyse</div>
-      <canvas id="downswing-chart"></canvas>
+    <div class="outs-rule-card">
+      <div class="orc-icon">×4</div>
+      <div class="orc-label">Regel ×4</div>
+      <div class="orc-desc">Outs × 4 ≈ % für <strong>zwei</strong> Karten (Flop → River gesamt)</div>
     </div>
-    <div class="box">
-      <div class="box-label">Hand History (erste 100 Hände)</div>
-      <div class="data-table" id="data-table-container"></div>
+    <div class="outs-rule-card orc-warn">
+      <div class="orc-icon">!</div>
+      <div class="orc-label">Achtung ×4</div>
+      <div class="orc-desc">Bei 9+ Outs überschätzt ×4 die Equity — exakte Werte bevorzugen</div>
     </div>
   </div>
+
+  <div class="data-table" style="max-height:none;">
+    <table>
+      <thead>
+        <tr>
+          <th>Outs</th>
+          <th>Draw / Beispiel</th>
+          <th>Turn %</th>
+          <th>River %</th>
+          <th>Flop → River</th>
+          <th>×2</th>
+          <th>×4</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td style="color:var(--muted)">Backdoor (1 Karte)</td><td>2.1%</td><td>2.2%</td><td style="color:var(--red)">4.3%</td><td style="color:var(--dim)">2%</td><td style="color:var(--dim)">4%</td></tr>
+        <tr class="outs-key-row"><td><strong>2</strong></td><td>Set Draw (Pocket Pair)</td><td>4.3%</td><td>4.3%</td><td style="color:var(--red)">8.4%</td><td style="color:var(--dim)">4%</td><td style="color:var(--dim)">8%</td></tr>
+        <tr><td>3</td><td style="color:var(--muted)">Overcard (1)</td><td>6.4%</td><td>6.5%</td><td style="color:var(--red)">12.5%</td><td style="color:var(--dim)">6%</td><td style="color:var(--dim)">12%</td></tr>
+        <tr class="outs-key-row"><td><strong>4</strong></td><td>Gutshot</td><td>8.5%</td><td>8.7%</td><td style="color:var(--amber)">16.5%</td><td>8%</td><td>16%</td></tr>
+        <tr><td>5</td><td style="color:var(--muted)">Gutshot + Overcard</td><td>10.6%</td><td>10.9%</td><td style="color:var(--amber)">20.4%</td><td>10%</td><td>20%</td></tr>
+        <tr><td>6</td><td style="color:var(--muted)">Zwei Overcards / Paar-Draw</td><td>12.8%</td><td>13.0%</td><td style="color:var(--amber)">24.1%</td><td>12%</td><td>24%</td></tr>
+        <tr><td>7</td><td style="color:var(--muted)">Paar + Gutshot</td><td>14.9%</td><td>15.2%</td><td style="color:var(--amber)">27.8%</td><td>14%</td><td>28%</td></tr>
+        <tr class="outs-key-row"><td><strong>8</strong></td><td>OESD (beidseitig offen)</td><td>17.0%</td><td>17.4%</td><td style="color:var(--amber)">31.5%</td><td>16%</td><td>32%</td></tr>
+        <tr class="outs-key-row"><td><strong>9</strong></td><td>Flush Draw</td><td>19.1%</td><td>19.6%</td><td style="color:var(--blue)">35.0%</td><td>18%</td><td style="color:var(--amber)">36%</td></tr>
+        <tr><td>10</td><td style="color:var(--muted)">Flush Draw + Overcard</td><td>21.3%</td><td>21.7%</td><td style="color:var(--blue)">38.4%</td><td>20%</td><td style="color:var(--amber)">40%</td></tr>
+        <tr><td>11</td><td style="color:var(--muted)">Flush Draw + Paar-Draw</td><td>23.4%</td><td>23.9%</td><td style="color:var(--blue)">41.7%</td><td>22%</td><td style="color:var(--amber)">44%</td></tr>
+        <tr class="outs-key-row"><td><strong>12</strong></td><td>Flush Draw + Gutshot</td><td>25.5%</td><td>26.1%</td><td style="color:var(--blue)">44.9%</td><td>24%</td><td style="color:var(--amber)">48%</td></tr>
+        <tr><td>13</td><td style="color:var(--muted)">Flush Draw + Set Draw</td><td>27.7%</td><td>28.3%</td><td style="color:var(--blue)">48.1%</td><td>26%</td><td style="color:var(--amber)">52%</td></tr>
+        <tr><td>14</td><td style="color:var(--muted)">OESD + Paar-Draw</td><td>29.8%</td><td>30.4%</td><td style="color:var(--blue)">51.2%</td><td>28%</td><td style="color:var(--amber)">56%</td></tr>
+        <tr class="outs-key-row"><td><strong>15</strong></td><td>Flush Draw + OESD (Combo Draw)</td><td>31.9%</td><td>32.6%</td><td style="color:var(--green)">54.1%</td><td>30%</td><td style="color:var(--red)">60%</td></tr>
+        <tr><td>16</td><td style="color:var(--muted)">Combo Draw + Overcard</td><td>34.0%</td><td>34.8%</td><td style="color:var(--green)">57.0%</td><td>32%</td><td style="color:var(--red)">64%</td></tr>
+        <tr><td>17</td><td style="color:var(--muted)">Combo Draw + 2 Overcards</td><td>36.2%</td><td>37.0%</td><td style="color:var(--green)">59.8%</td><td>34%</td><td style="color:var(--red)">68%</td></tr>
+        <tr><td>18</td><td style="color:var(--muted)">—</td><td>38.3%</td><td>39.1%</td><td style="color:var(--green)">62.4%</td><td>36%</td><td style="color:var(--red)">72%</td></tr>
+        <tr><td>19</td><td style="color:var(--muted)">—</td><td>40.4%</td><td>41.3%</td><td style="color:var(--green)">65.0%</td><td>38%</td><td style="color:var(--red)">76%</td></tr>
+        <tr><td>20</td><td style="color:var(--muted)">—</td><td>42.6%</td><td>43.5%</td><td style="color:var(--green)">67.5%</td><td>40%</td><td style="color:var(--red)">80%</td></tr>
+        <tr><td>21</td><td style="color:var(--muted)">FD + OESD + Trips-Draw</td><td>44.7%</td><td>45.7%</td><td style="color:var(--green)">69.9%</td><td>42%</td><td style="color:var(--red)">84%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:11px;color:var(--dim);margin-top:8px;text-align:right;font-style:italic;">Turn = N÷47 · River = N÷46 · Flop→River = 1 − (47−N)/47 × (46−N)/46 · ×4 rot = ungenau (Überschätzung)</div>
 </div>
 
 <script>
@@ -887,110 +917,9 @@ function renderCur(){
 
 
 /* ═══════════════════════════════════════════════════════════════
-   VARIANCE CALCULATOR
-═══════════════════════════════════════════════════════════════ */
-let varianceData=null;
-
-function initVariance(){
-  const ua=document.getElementById('upload-area');if(!ua)return;
-  ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('drag-over');});
-  ua.addEventListener('dragleave',()=>ua.classList.remove('drag-over'));
-  ua.addEventListener('drop',e=>{e.preventDefault();ua.classList.remove('drag-over');const f=Array.from(e.dataTransfer.files);if(f.length)processFiles(f);});
-}
-function handleFileUpload(e){const f=Array.from(e.target.files);if(f.length)processFiles(f);}
-function processFiles(files){
-  let all=[],done=0;
-  files.forEach(file=>{
-    const r=new FileReader();
-    r.onload=e=>{all=all.concat(parseHH(e.target.result));done++;
-      if(done===files.length){if(!all.length){alert('Keine gültigen Hände gefunden');return;}
-        all.sort((a,b)=>parseInt(a.handNum.replace(/\D/g,''))-parseInt(b.handNum.replace(/\D/g,'')));
-        varianceData=all;renderVariance();}};
-    r.readAsText(file);
-  });
-}
-function parseHH(text){
-  const hands=[];
-  text.split(/(?=Poker Hand #)/).forEach(block=>{
-    if(!block.trim()||!block.includes('Hero'))return;
-    const hm=block.match(/Poker Hand #([^:]+)/);if(!hm)return;
-    const dm=block.match(/- (\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/);
-    const sm=block.match(/Seat \d+: Hero \(\$([0-9.]+) in chips\)/);if(!sm)return;
-    let inv=0;
-    const sbm=block.match(/Hero: posts small blind \$([0-9.]+)/);if(sbm)inv+=parseFloat(sbm[1]);
-    const bbm=block.match(/Hero: posts big blind \$([0-9.]+)/);if(bbm)inv+=parseFloat(bbm[1]);
-    for(const m of block.matchAll(/Hero: (?:calls|bets|raises[^$]*?) \$([0-9.]+)/g))inv+=parseFloat(m[1]);
-    let col=0;const cm=block.match(/Seat \d+: Hero[^(]*collected \(\$([0-9.]+)\)/);if(cm)col=parseFloat(cm[1]);
-    hands.push({handNum:hm[1],date:dm?dm[1]:'',win:col-inv,ev:col-inv,invested:inv,collected:col});
-  });
-  return hands;
-}
-function renderVariance(){
-  if(!varianceData)return;
-  let cw=0,ce=0;
-  varianceData.forEach(h=>{cw+=h.win;ce+=h.ev;h.cumWin=cw;h.cumEV=ce;});
-  const n=varianceData.length,tw=cw;
-  const ws=varianceData.map(h=>h.win),mean=ws.reduce((a,b)=>a+b)/n;
-  const sd=Math.sqrt(ws.reduce((s,v)=>s+Math.pow(v-mean,2),0)/n);
-  let mx=0,wd=0;varianceData.forEach(h=>{if(h.cumWin>mx)mx=h.cumWin;const d=mx-h.cumWin;if(d>wd)wd=d;});
-  const wc=tw>=0?'positive':'negative';
-  document.getElementById('stats-grid').innerHTML=`
-    <div class="stat-card"><div class="stat-label">Gespielte Hände</div><div class="stat-value">${n.toLocaleString()}</div><div class="stat-sub">Total</div></div>
-    <div class="stat-card"><div class="stat-label">Tatsächlicher Gewinn</div><div class="stat-value ${wc}">${tw>=0?'+':''}${tw.toFixed(2)}$</div><div class="stat-sub">${(tw/n).toFixed(3)}$ / Hand</div></div>
-    <div class="stat-card"><div class="stat-label">EV Gewinn</div><div class="stat-value">${cw>=0?'+':''}${ce.toFixed(2)}$</div><div class="stat-sub">${(ce/n).toFixed(3)}$ / Hand</div></div>
-    <div class="stat-card"><div class="stat-label">Standard-Abweichung</div><div class="stat-value">${sd.toFixed(2)}$</div><div class="stat-sub">Pro Hand</div></div>
-    <div class="stat-card"><div class="stat-label">Größter Downswing</div><div class="stat-value negative">-${wd.toFixed(2)}$</div><div class="stat-sub">Vom Peak</div></div>
-    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value ${wc}">${tw>=0?'+':''}${((tw/n)*100).toFixed(2)}</div><div class="stat-sub">bb/100 (ca.)</div></div>`;
-  renderMainChart();renderDownChart();renderTable();
-  document.getElementById('variance-results').style.display='block';
-}
-function renderMainChart(){
-  const cv=document.getElementById('variance-chart');const ctx=cv.getContext('2d');
-  cv.width=cv.parentElement.clientWidth-36;cv.height=340;
-  const w=cv.width,h=cv.height,p={t:20,r:40,b:38,l:68};
-  const pw=w-p.l-p.r,ph=h-p.t-p.b,N=varianceData.length;
-  const av=varianceData.flatMap(h=>[h.cumWin,h.cumEV]);
-  const minY=Math.min(...av,0),maxY=Math.max(...av,0),ry=maxY-minY||1;
-  ctx.fillStyle='#14141a';ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='#2a2a38';ctx.lineWidth=1;
-  for(let i=0;i<=5;i++){const y=p.t+(ph/5)*i;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(p.l+pw,y);ctx.stroke();const v=maxY-(ry/5)*i;ctx.fillStyle='#44445a';ctx.font='10px Share Tech Mono,monospace';ctx.textAlign='right';ctx.fillText((v>=0?'+':'')+v.toFixed(0)+'$',p.l-7,y+4);}
-  for(let i=0;i<=5;i++){const x=p.l+(pw/5)*i;ctx.fillStyle='#44445a';ctx.textAlign='center';ctx.fillText(Math.floor((N/5)*i).toString(),x,h-14);}
-  if(minY<0&&maxY>0){const zy=p.t+ph*(1-(0-minY)/ry);ctx.strokeStyle='#38384a';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(p.l,zy);ctx.lineTo(p.l+pw,zy);ctx.stroke();ctx.setLineDash([]);}
-  ctx.strokeStyle='#f59e0b';ctx.lineWidth=1.5;ctx.beginPath();varianceData.forEach((h,i)=>{const x=p.l+(pw*i/(N-1)),y=p.t+ph*(1-(h.cumEV-minY)/ry);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
-  ctx.strokeStyle='#60a5fa';ctx.lineWidth=2.5;ctx.beginPath();varianceData.forEach((h,i)=>{const x=p.l+(pw*i/(N-1)),y=p.t+ph*(1-(h.cumWin-minY)/ry);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
-  ctx.fillStyle='#60a5fa';ctx.fillRect(p.l+10,8,20,3);ctx.fillStyle='#e8e8f0';ctx.font='bold 11px Barlow,sans-serif';ctx.textAlign='left';ctx.fillText('Tatsächlich',p.l+35,13);
-  ctx.fillStyle='#f59e0b';ctx.fillRect(p.l+130,8,20,3);ctx.fillStyle='#e8e8f0';ctx.fillText('EV',p.l+155,13);
-}
-function renderDownChart(){
-  const cv=document.getElementById('downswing-chart');const ctx=cv.getContext('2d');
-  cv.width=cv.parentElement.clientWidth-36;cv.height=220;
-  const w=cv.width,h=cv.height,p={t:20,r:40,b:38,l:68};
-  const pw=w-p.l-p.r,ph=h-p.t-p.b;
-  let mx=0;const dd=varianceData.map(h=>{if(h.cumWin>mx)mx=h.cumWin;return mx-h.cumWin;});
-  const mdd=Math.max(...dd,.01);
-  ctx.fillStyle='#14141a';ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='#2a2a38';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){const y=p.t+(ph/4)*i;ctx.beginPath();ctx.moveTo(p.l,y);ctx.lineTo(p.l+pw,y);ctx.stroke();const v=mdd-(mdd/4)*i;ctx.fillStyle='#44445a';ctx.font='10px Share Tech Mono,monospace';ctx.textAlign='right';ctx.fillText('-'+v.toFixed(0)+'$',p.l-7,y+4);}
-  ctx.fillStyle='rgba(239,68,68,.15)';ctx.beginPath();ctx.moveTo(p.l,p.t+ph);
-  dd.forEach((d,i)=>{ctx.lineTo(p.l+(pw*i/(dd.length-1)),p.t+ph*(1-d/mdd));});
-  ctx.lineTo(p.l+pw,p.t+ph);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#ef4444';ctx.lineWidth=2;ctx.beginPath();dd.forEach((d,i)=>{const x=p.l+(pw*i/(dd.length-1)),y=p.t+ph*(1-d/mdd);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
-}
-function renderTable(){
-  const d=varianceData.slice(0,100);
-  let html=`<table><thead><tr><th>Hand #</th><th>Datum</th><th>Gewinn</th><th>Kum. Gewinn</th><th>Invested</th></tr></thead><tbody>`;
-  d.forEach(h=>{const wc=h.win>=0?'positive':'negative';html+=`<tr><td>${h.handNum}</td><td>${h.date}</td><td class="${wc}">${h.win>=0?'+':''}${h.win.toFixed(2)}$</td><td class="${h.cumWin>=0?'positive':'negative'}">${h.cumWin>=0?'+':''}${h.cumWin.toFixed(2)}$</td><td>${h.invested.toFixed(2)}$</td></tr>`;});
-  if(varianceData.length>100)html+=`<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:10px;">... und ${varianceData.length-100} weitere Hände</td></tr>`;
-  html+='</tbody></table>';
-  document.getElementById('data-table-container').innerHTML=html;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════════ */
 renderPreflop(true);
-initVariance();
 </script>
 </body>
 </html>
