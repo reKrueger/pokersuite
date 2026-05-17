@@ -25,10 +25,6 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
 
 /* NAV */
 .topnav { background: var(--bg2); border-bottom: 2px solid var(--border); display: flex; align-items: stretch; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-.nav-logo { display: flex; align-items: center; gap: 8px; padding: 0 16px; border-right: 1px solid var(--border); flex-shrink: 0; }
-.nav-logo-icon { font-size: 18px; }
-.nav-logo-text { font-size: 15px; font-weight: bold; color: var(--gold); }
-.nav-logo-sub { font-size: 10px; color: var(--muted); display: block; }
 .nav-tab { padding: 0 18px; font-size: 14px; font-weight: bold; font-family: Arial, sans-serif; cursor: pointer; color: var(--muted); border: none; background: none; border-bottom: 3px solid transparent; height: 50px; white-space: nowrap; transition: color .15s, border-color .15s; }
 .nav-tab:hover { color: var(--text); }
 .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
@@ -176,6 +172,7 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
 .data-table th { background: var(--bg3); color: var(--muted); padding: 10px 12px; text-align: left; font-weight: bold; font-size: 12px; position: sticky; top: 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
 .data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'Courier New', monospace; font-size: 13px; }
 .data-table tr:hover { background: var(--bg3); }
+#page-outs .data-table td:nth-child(2) { font-family: Arial, sans-serif; }
 .box { background: var(--bg2); border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; }
 .box-label { font-size: 12px; font-weight: bold; color: var(--muted); margin-bottom: 10px; }
 .positive { color: var(--green); }
@@ -199,6 +196,7 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
   .street-indicator { width: 100%; margin-left: 0; text-align: center; }
   .pb-pos { font-size: 28px; }
   .pb-pct { font-size: 22px; }
+  .pb-divider { display: none; }
   .outs-rule-grid { grid-template-columns: 1fr 1fr; }
   .data-table th, .data-table td { padding: 8px 10px; font-size: 12px; }
 }
@@ -212,13 +210,6 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
 <body>
 
 <nav class="topnav">
-  <div class="nav-logo">
-    <span class="nav-logo-icon">♠</span>
-    <div>
-      <div class="nav-logo-text">POKER SUITE</div>
-      <span class="nav-logo-sub">6-max NL Cash · GTO</span>
-    </div>
-  </div>
   <button class="nav-tab active" onclick="goPage('preflop',this)">Preflop Ranges</button>
   <button class="nav-tab"        onclick="goPage('trainer',this)">Postflop Trainer</button>
   <button class="nav-tab"        onclick="goPage('outs',this)">Outs &amp; Equity</button>
@@ -300,27 +291,27 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
         </tr>
       </thead>
       <tbody>
-        <tr><td>1</td><td style="color:var(--muted)">Backdoor (1 Karte)</td><td>2.1%</td><td>2.2%</td><td style="color:var(--red)">4.3%</td><td style="color:var(--dim)">2%</td><td style="color:var(--dim)">4%</td></tr>
+        <tr><td>1</td><td>Backdoor (1 Karte)</td><td>2.1%</td><td>2.2%</td><td style="color:var(--red)">4.3%</td><td style="color:var(--dim)">2%</td><td style="color:var(--dim)">4%</td></tr>
         <tr class="outs-key-row"><td><strong>2</strong></td><td>Set Draw (Pocket Pair)</td><td>4.3%</td><td>4.3%</td><td style="color:var(--red)">8.4%</td><td style="color:var(--dim)">4%</td><td style="color:var(--dim)">8%</td></tr>
-        <tr><td>3</td><td style="color:var(--muted)">Overcard (1)</td><td>6.4%</td><td>6.5%</td><td style="color:var(--red)">12.5%</td><td style="color:var(--dim)">6%</td><td style="color:var(--dim)">12%</td></tr>
+        <tr><td>3</td><td>Overcard (1)</td><td>6.4%</td><td>6.5%</td><td style="color:var(--red)">12.5%</td><td style="color:var(--dim)">6%</td><td style="color:var(--dim)">12%</td></tr>
         <tr class="outs-key-row"><td><strong>4</strong></td><td>Gutshot</td><td>8.5%</td><td>8.7%</td><td style="color:var(--amber)">16.5%</td><td>8%</td><td>16%</td></tr>
-        <tr><td>5</td><td style="color:var(--muted)">Gutshot + Overcard</td><td>10.6%</td><td>10.9%</td><td style="color:var(--amber)">20.4%</td><td>10%</td><td>20%</td></tr>
-        <tr><td>6</td><td style="color:var(--muted)">Zwei Overcards / Paar-Draw</td><td>12.8%</td><td>13.0%</td><td style="color:var(--amber)">24.1%</td><td>12%</td><td>24%</td></tr>
-        <tr><td>7</td><td style="color:var(--muted)">Paar + Gutshot</td><td>14.9%</td><td>15.2%</td><td style="color:var(--amber)">27.8%</td><td>14%</td><td>28%</td></tr>
+        <tr><td>5</td><td>Gutshot + Overcard</td><td>10.6%</td><td>10.9%</td><td style="color:var(--amber)">20.4%</td><td>10%</td><td>20%</td></tr>
+        <tr><td>6</td><td>Zwei Overcards / Paar-Draw</td><td>12.8%</td><td>13.0%</td><td style="color:var(--amber)">24.1%</td><td>12%</td><td>24%</td></tr>
+        <tr><td>7</td><td>Paar + Gutshot</td><td>14.9%</td><td>15.2%</td><td style="color:var(--amber)">27.8%</td><td>14%</td><td>28%</td></tr>
         <tr class="outs-key-row"><td><strong>8</strong></td><td>OESD (beidseitig offen)</td><td>17.0%</td><td>17.4%</td><td style="color:var(--amber)">31.5%</td><td>16%</td><td>32%</td></tr>
         <tr class="outs-key-row"><td><strong>9</strong></td><td>Flush Draw</td><td>19.1%</td><td>19.6%</td><td style="color:var(--blue)">35.0%</td><td>18%</td><td style="color:var(--amber)">36%</td></tr>
-        <tr><td>10</td><td style="color:var(--muted)">Flush Draw + Overcard</td><td>21.3%</td><td>21.7%</td><td style="color:var(--blue)">38.4%</td><td>20%</td><td style="color:var(--amber)">40%</td></tr>
-        <tr><td>11</td><td style="color:var(--muted)">Flush Draw + Paar-Draw</td><td>23.4%</td><td>23.9%</td><td style="color:var(--blue)">41.7%</td><td>22%</td><td style="color:var(--amber)">44%</td></tr>
+        <tr><td>10</td><td>Flush Draw + Overcard</td><td>21.3%</td><td>21.7%</td><td style="color:var(--blue)">38.4%</td><td>20%</td><td style="color:var(--amber)">40%</td></tr>
+        <tr><td>11</td><td>Flush Draw + Paar-Draw</td><td>23.4%</td><td>23.9%</td><td style="color:var(--blue)">41.7%</td><td>22%</td><td style="color:var(--amber)">44%</td></tr>
         <tr class="outs-key-row"><td><strong>12</strong></td><td>Flush Draw + Gutshot</td><td>25.5%</td><td>26.1%</td><td style="color:var(--blue)">44.9%</td><td>24%</td><td style="color:var(--amber)">48%</td></tr>
-        <tr><td>13</td><td style="color:var(--muted)">Flush Draw + Set Draw</td><td>27.7%</td><td>28.3%</td><td style="color:var(--blue)">48.1%</td><td>26%</td><td style="color:var(--amber)">52%</td></tr>
-        <tr><td>14</td><td style="color:var(--muted)">OESD + Paar-Draw</td><td>29.8%</td><td>30.4%</td><td style="color:var(--blue)">51.2%</td><td>28%</td><td style="color:var(--amber)">56%</td></tr>
+        <tr><td>13</td><td>Flush Draw + Set Draw</td><td>27.7%</td><td>28.3%</td><td style="color:var(--blue)">48.1%</td><td>26%</td><td style="color:var(--amber)">52%</td></tr>
+        <tr><td>14</td><td>OESD + Paar-Draw</td><td>29.8%</td><td>30.4%</td><td style="color:var(--blue)">51.2%</td><td>28%</td><td style="color:var(--amber)">56%</td></tr>
         <tr class="outs-key-row"><td><strong>15</strong></td><td>Flush Draw + OESD (Combo Draw)</td><td>31.9%</td><td>32.6%</td><td style="color:var(--green)">54.1%</td><td>30%</td><td style="color:var(--red)">60%</td></tr>
-        <tr><td>16</td><td style="color:var(--muted)">Combo Draw + Overcard</td><td>34.0%</td><td>34.8%</td><td style="color:var(--green)">57.0%</td><td>32%</td><td style="color:var(--red)">64%</td></tr>
-        <tr><td>17</td><td style="color:var(--muted)">Combo Draw + 2 Overcards</td><td>36.2%</td><td>37.0%</td><td style="color:var(--green)">59.8%</td><td>34%</td><td style="color:var(--red)">68%</td></tr>
-        <tr><td>18</td><td style="color:var(--muted)">—</td><td>38.3%</td><td>39.1%</td><td style="color:var(--green)">62.4%</td><td>36%</td><td style="color:var(--red)">72%</td></tr>
-        <tr><td>19</td><td style="color:var(--muted)">—</td><td>40.4%</td><td>41.3%</td><td style="color:var(--green)">65.0%</td><td>38%</td><td style="color:var(--red)">76%</td></tr>
-        <tr><td>20</td><td style="color:var(--muted)">—</td><td>42.6%</td><td>43.5%</td><td style="color:var(--green)">67.5%</td><td>40%</td><td style="color:var(--red)">80%</td></tr>
-        <tr><td>21</td><td style="color:var(--muted)">FD + OESD + Trips-Draw</td><td>44.7%</td><td>45.7%</td><td style="color:var(--green)">69.9%</td><td>42%</td><td style="color:var(--red)">84%</td></tr>
+        <tr><td>16</td><td>Combo Draw + Overcard</td><td>34.0%</td><td>34.8%</td><td style="color:var(--green)">57.0%</td><td>32%</td><td style="color:var(--red)">64%</td></tr>
+        <tr><td>17</td><td>Combo Draw + 2 Overcards</td><td>36.2%</td><td>37.0%</td><td style="color:var(--green)">59.8%</td><td>34%</td><td style="color:var(--red)">68%</td></tr>
+        <tr><td>18</td><td>—</td><td>38.3%</td><td>39.1%</td><td style="color:var(--green)">62.4%</td><td>36%</td><td style="color:var(--red)">72%</td></tr>
+        <tr><td>19</td><td>—</td><td>40.4%</td><td>41.3%</td><td style="color:var(--green)">65.0%</td><td>38%</td><td style="color:var(--red)">76%</td></tr>
+        <tr><td>20</td><td>—</td><td>42.6%</td><td>43.5%</td><td style="color:var(--green)">67.5%</td><td>40%</td><td style="color:var(--red)">80%</td></tr>
+        <tr><td>21</td><td>FD + OESD + Trips-Draw</td><td>44.7%</td><td>45.7%</td><td style="color:var(--green)">69.9%</td><td>42%</td><td style="color:var(--red)">84%</td></tr>
       </tbody>
     </table>
   </div>
@@ -533,14 +524,14 @@ function buildLegend(rfiMode){
       <div class="leg"><div class="leg-sq" style="background:#312e81"></div>4-Bet / Value — immer weiter vs 3-Bet</div>
       <div class="leg"><div class="leg-sq" style="background:#14532d"></div>Raise + 3-Bet callen</div>
       <div class="leg"><div class="leg-sq" style="background:#7c2d12"></div>Raise First In + Fold vs 3-Bet</div>
-      <div class="leg"><div class="leg-sq" style="background:var(--bg);border:1px solid #2a2a38"></div>Fold</div>
+      <div class="leg"><div class="leg-sq" style="background:var(--bg);border:1px solid var(--border)"></div>Fold</div>
       <div class="legend-hint">Oben rechts = suited &nbsp;·&nbsp; Unten links = offsuit</div>`;
   } else {
     leg.innerHTML=`
       <div class="leg"><div class="leg-sq" style="background:#312e81"></div>3-Bet Value (TT+, AJs+, AQo+)</div>
       <div class="leg"><div class="leg-sq" style="background:#14532d"></div>Call</div>
       <div class="leg"><div class="leg-sq" style="background:#7c2d12"></div>3-Bet Bluff (A5s-A2s + Blockers)</div>
-      <div class="leg"><div class="leg-sq" style="background:var(--bg);border:1px solid #2a2a38"></div>Fold</div>
+      <div class="leg"><div class="leg-sq" style="background:var(--bg);border:1px solid var(--border)"></div>Fold</div>
       <div class="legend-hint">BB Defense vs BTN · Oben rechts = suited &nbsp;·&nbsp; Unten links = offsuit</div>`;
   }
 }
@@ -623,8 +614,8 @@ function renderPreflop(buildTabs){
 function showTip(hand,cat){
   const el=document.getElementById('hand-tip');
   el.style.display='flex';
-  const cols={'4-Bet / Value':'#818cf8','Raise + 3-Bet callen':'#4ade80','Raise + Fold vs 3-Bet':'#fb923c',
-              '3-Bet Value':'#818cf8','Call':'#4ade80','3-Bet Bluff':'#fb923c','Fold':'var(--dim)'};
+  const cols={'4-Bet / Value':'var(--purple)','Raise + 3-Bet callen':'var(--green)','Raise + Fold vs 3-Bet':'var(--amber)',
+              '3-Bet Value':'var(--purple)','Call':'var(--green)','3-Bet Bluff':'var(--amber)','Fold':'var(--dim)'};
   const combos=hand.length===2?'6':hand.endsWith('s')?'4':'12';
   el.innerHTML=`<div class="ht-name">${hand}</div>
     <div style="color:var(--dim)">—</div>
@@ -877,7 +868,7 @@ function renderCur(){
     const sl=dealState==='flop'?'FLOP':dealState==='turn'?'TURN':'RIVER';
     let content;
     if(dealState==='river'){
-      const mc=hs.ms>=3?'var(--green)':hs.ms>=2?'var(--amber)':hs.ms>=1?'#fbbf24':'var(--dim)';
+      const mc=hs.ms>=3?'var(--green)':hs.ms>=2?'var(--amber)':hs.ms>=1?'var(--gold)':'var(--dim)';
       const mRow=`<div class="eq-table"><div class="eq-row"><span class="eq-type">${hs.ml}</span><span class="eq-val" style="color:${mc}">${madeEqStr(hs.ms)} vs. Random</span></div></div>`;
       const stL=['Schwach','Mittel','Stark','Sehr stark','Monster','Nuts'][Math.min(hs.ms,5)];
       content=`<div class="outs-bar">
@@ -887,12 +878,12 @@ function renderCur(){
     } else {
       const rD=hs.draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
       const outs=totalOuts(rD),eq=estEq(hs,dealState);
-      const mc=hs.ms>=3?'var(--green)':hs.ms>=2?'var(--amber)':hs.ms>=1?'#fbbf24':'var(--dim)';
-      const ec=eq>=60?'var(--green)':eq>=40?'var(--amber)':eq>=25?'#fbbf24':'var(--red)';
-      const oc=outs>=12?'#f97316':outs>=8?'var(--blue)':outs>=4?'#93c5fd':outs>0?'var(--purple)':'var(--dim)';
+      const mc=hs.ms>=3?'var(--green)':hs.ms>=2?'var(--amber)':hs.ms>=1?'var(--gold)':'var(--dim)';
+      const ec=eq>=60?'var(--green)':eq>=40?'var(--amber)':eq>=25?'var(--gold)':'var(--red)';
+      const oc=outs>=12?'var(--amber)':outs>=8?'var(--blue)':outs>=4?'var(--blue)':outs>0?'var(--purple)':'var(--dim)';
       const rm=dealState==='turn'?2:4;
       let rows=`<div class="eq-row"><span class="eq-type">${hs.ml}</span><span class="eq-val" style="color:${mc}">${madeEqStr(hs.ms)} Equity</span></div>`;
-      rD.forEach(d=>{const de=DRAW_EQ[d.type];if(!de)return;const dc=d.strength>=4?'#f97316':d.strength>=3?'var(--blue)':d.strength===2?'#93c5fd':'var(--purple)';const es=dealState==='turn'?`${de.outs} Outs · River: ${de.river}`:`${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;rows+=`<div class="eq-row"><span class="eq-type" style="color:${dc}">${d.label}</span><span class="eq-val">${es}</span></div>`;});
+      rD.forEach(d=>{const de=DRAW_EQ[d.type];if(!de)return;const dc=d.strength>=4?'var(--amber)':d.strength>=3?'var(--blue)':d.strength===2?'var(--muted)':'var(--purple)';const es=dealState==='turn'?`${de.outs} Outs · River: ${de.river}`:`${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;rows+=`<div class="eq-row"><span class="eq-type" style="color:${dc}">${d.label}</span><span class="eq-val">${es}</span></div>`;});
       const bdoor=hs.draws.filter(d=>['bdoor_fd','bdoor_str'].includes(d.type));
       if(bdoor.length&&dealState==='flop'){const bl=bdoor.some(d=>d.type==='bdoor_fd')&&bdoor.some(d=>d.type==='bdoor_str')?'Backdoor FD + Straight':bdoor.some(d=>d.type==='bdoor_fd')?'Backdoor Flush Draw':'Backdoor Straight Draw';rows+=`<div class="eq-row"><span class="eq-type" style="color:var(--purple)">${bl}</span><span class="eq-val">~4–8% — braucht 2 Karten</span></div>`;}
       const sD=rD.find(d=>d.strength>=3);
