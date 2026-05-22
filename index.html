@@ -5,90 +5,212 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Poker Range Suite — 6-max NL Cash</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — alle Farben & Schrift zentral hier anpassen
+══════════════════════════════════════════════════════════════ */
 :root {
-  --bg: #111;
-  --bg2: #1c1c1c;
-  --bg3: #262626;
-  --border: #333;
-  --text: #f0f0f0;
-  --muted: #888;
-  --dim: #555;
-  --gold: #d4a017;
-  --green: #27ae60;
-  --amber: #e67e22;
-  --red: #e74c3c;
-  --blue: #3498db;
+  /* Hintergründe */
+  --bg:     #111111;
+  --bg2:    #1c1c1c;
+  --bg3:    #262626;
+  --border: #333333;
+
+  /* Text */
+  --text:   #ffffff;
+  --dim:    #666666;
+
+  /* Signalfarbe — hier ändern für komplett anderen Akzent */
+  --accent: #00bfbf;
+
+  /* Semantische Farben */
+  --green:  #27ae60;
+  --amber:  #e67e22;
+  --red:    #e74c3c;
+  --blue:   #3498db;
   --purple: #9b59b6;
+
+  /* Typografie */
+  --font:   Arial, sans-serif;
+  --mono:   'Courier New', monospace;
 }
-body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; font-size: 15px; line-height: 1.5; min-height: 100vh; }
 
-/* NAV */
-.topnav { background: var(--bg2); border-bottom: 2px solid var(--border); display: flex; align-items: stretch; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-.nav-tab { padding: 0 18px; font-size: 14px; font-weight: bold; font-family: Arial, sans-serif; cursor: pointer; color: var(--muted); border: none; background: none; border-bottom: 3px solid transparent; height: 50px; white-space: nowrap; transition: color .15s, border-color .15s; }
-.nav-tab:hover { color: var(--text); }
-.nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+/* ══════════════════════════════════════════════════════════════
+   BASE RESET
+══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* PAGE */
-.page { display: none; padding: 20px 16px 60px; max-width: 960px; margin: 0 auto; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════════ */
+.topnav {
+  background: var(--bg2);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow-x: auto;
+}
+.nav-tab {
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: var(--font);
+  cursor: pointer;
+  color: var(--dim);
+  border: none;
+  background: none;
+  border-bottom: 3px solid transparent;
+  height: 50px;
+  white-space: nowrap;
+  transition: color .15s, border-color .15s;
+}
+.nav-tab:hover         { color: var(--text); }
+.nav-tab.active        { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════════
+   PAGES / SECTIONS
+══════════════════════════════════════════════════════════════ */
+.page        { display: none; padding: 20px 16px 60px; max-width: 960px; margin: 0 auto; }
 .page.active { display: block; }
-.sec-title { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
-.sec-title span { color: var(--gold); }
-.sec-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
 
-/* POSITION RAIL */
+.sec-title      { font-size: 22px; font-weight: bold; margin-bottom: 14px; font-family: var(--font); }
+.sec-title span { color: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════════
+   POSITION RAIL (Tab-Buttons)
+══════════════════════════════════════════════════════════════ */
 .pos-rail { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-.pos-btn { padding: 9px 18px; font-size: 14px; font-weight: bold; font-family: Arial, sans-serif; cursor: pointer; border: 1px solid var(--border); background: var(--bg2); color: var(--muted); min-height: 44px; transition: all .15s; }
-.pos-btn:hover { border-color: var(--gold); color: var(--text); }
-.pos-btn.active { border-color: var(--gold); background: rgba(212,160,23,.15); color: var(--gold); }
+.pos-btn {
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: var(--font);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--dim);
+  min-height: 44px;
+  transition: all .15s;
+}
+.pos-btn:hover  { border-color: var(--accent); color: var(--text); }
+.pos-btn.active { border-color: var(--accent); background: rgba(0,191,191,.12); color: var(--accent); }
 
-/* BANNER */
-.pos-banner { background: var(--bg2); border: 1px solid var(--border); padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.pb-pos { font-size: 36px; font-weight: bold; color: var(--gold); min-width: 60px; line-height: 1; }
-.pb-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
-.pb-info { flex: 1; min-width: 0; }
-.pb-note { font-size: 13px; color: var(--text); font-weight: bold; margin-bottom: 4px; }
-.pb-combos { display: flex; gap: 12px; flex-wrap: wrap; }
-.pb-ci { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
-.pb-dot { width: 8px; height: 8px; flex-shrink: 0; }
-.pb-right { margin-left: auto; text-align: right; }
-.pb-pct { font-family: 'Courier New', monospace; font-size: 28px; font-weight: bold; color: var(--text); line-height: 1; }
-.pb-total { font-size: 11px; color: var(--dim); margin-top: 2px; font-family: 'Courier New', monospace; }
+/* ══════════════════════════════════════════════════════════════
+   LEGEND
+══════════════════════════════════════════════════════════════ */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 9px 13px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  align-items: center;
+}
+.leg         { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); font-family: var(--font); }
+.leg-sq      { width: 12px; height: 12px; flex-shrink: 0; }
+.legend-hint { margin-left: auto; font-size: 12px; color: var(--text); font-family: var(--font); }
 
-/* LEGEND */
-.legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; padding: 9px 13px; background: var(--bg2); border: 1px solid var(--border); align-items: center; }
-.leg { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
-.leg-sq { width: 12px; height: 12px; flex-shrink: 0; }
-.legend-hint { margin-left: auto; font-size: 12px; color: var(--dim); }
-
-/* RANGE GRID */
+/* ══════════════════════════════════════════════════════════════
+   RANGE GRID
+══════════════════════════════════════════════════════════════ */
 .range-wrap { overflow-x: auto; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
 .rg { border-collapse: collapse; table-layout: fixed; }
-.rg td { width: 54px; height: 38px; text-align: center; vertical-align: middle; font-size: 11px; font-weight: bold; font-family: 'Courier New', monospace; border: 1px solid rgba(0,0,0,.5); cursor: pointer; color: #fff; }
+.rg td {
+  width: 54px; height: 38px;
+  text-align: center; vertical-align: middle;
+  font-size: 11px; font-weight: bold;
+  font-family: var(--mono);
+  border: 1px solid rgba(0,0,0,.5);
+  cursor: pointer;
+  color: #fff;
+}
 .rg td:hover { outline: 2px solid rgba(255,255,255,.8); z-index: 2; position: relative; }
-.rg th.rl { font-size: 10px; font-family: 'Courier New', monospace; color: var(--dim); width: 14px; min-width: 14px; text-align: center; border: none; padding: 0; }
-.rg th.ct { font-size: 10px; font-family: 'Courier New', monospace; color: var(--dim); text-align: center; border: none; padding: 3px 0; }
+.rg th.rl   { font-size: 10px; font-family: var(--mono); color: var(--dim); width: 14px; min-width: 14px; text-align: center; border: none; padding: 0; }
+.rg th.ct   { font-size: 10px; font-family: var(--mono); color: var(--dim); text-align: center; border: none; padding: 3px 0; }
+
+/* Range cell colors — bleiben wie sie sind (Range-Logik) */
 .h4 { background: #312e81; }
 .hc { background: #14532d; }
 .hr { background: #7c2d12; }
 .hf { background: var(--bg); color: #1e1e2e; font-weight: normal; }
 
-/* HAND TIP */
-.hand-tip { display: flex; align-items: center; gap: 12px; background: var(--bg3); border: 1px solid var(--gold); padding: 10px 14px; font-size: 14px; margin-top: 8px; flex-wrap: wrap; }
-.ht-name { font-family: 'Courier New', monospace; font-size: 16px; color: var(--gold); font-weight: bold; }
-.ht-combos { margin-left: auto; font-size: 12px; color: var(--dim); }
+/* ══════════════════════════════════════════════════════════════
+   HAND TIP (Klick auf Zelle)
+══════════════════════════════════════════════════════════════ */
+.hand-tip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--accent);
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.ht-name   { font-family: var(--mono); font-size: 16px; color: var(--accent); font-weight: bold; }
+.ht-combos { margin-left: auto; font-size: 12px; color: var(--text); font-family: var(--font); }
 
-/* POS OVERVIEW */
+/* ══════════════════════════════════════════════════════════════
+   POSITION OVERVIEW CARDS (Schnell-Navigation)
+══════════════════════════════════════════════════════════════ */
 .pos-overview { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 18px; }
-.pov-card { background: var(--bg2); border: 1px solid var(--border); padding: 12px 4px; text-align: center; cursor: pointer; transition: all .15s; }
-.pov-card:hover { background: var(--bg3); }
-.pov-card.active { border-color: var(--gold); background: rgba(212,160,23,.1); }
-.pov-pos { font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 4px; }
-.pov-pct { font-family: 'Courier New', monospace; font-size: 17px; font-weight: bold; }
+.pov-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 12px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.pov-card:hover  { background: var(--bg3); }
+.pov-card.active { border-color: var(--accent); background: rgba(0,191,191,.08); }
+.pov-pos { font-size: 11px; font-weight: bold; color: var(--text); margin-bottom: 4px; font-family: var(--font); }
+.pov-pct { font-family: var(--mono); font-size: 17px; font-weight: bold; }
 
-/* TRAINER */
-.trainer-topbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-.street-btn { padding: 10px 16px; font-size: 14px; font-weight: bold; font-family: Arial, sans-serif; border: 1px solid; cursor: pointer; transition: all .15s; min-height: 44px; }
+/* ══════════════════════════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════════════════════════ */
+.box       { background: var(--bg2); border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; }
+.box-label { font-size: 12px; font-weight: bold; color: var(--text); margin-bottom: 10px; font-family: var(--font); }
+.positive  { color: var(--green); }
+.negative  { color: var(--red); }
+
+/* ══════════════════════════════════════════════════════════════
+   POSTFLOP TRAINER — Top-Bar
+══════════════════════════════════════════════════════════════ */
+.trainer-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.street-btn {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: var(--font);
+  border: 1px solid;
+  cursor: pointer;
+  transition: all .15s;
+  min-height: 44px;
+}
 .street-btn:disabled { opacity: .3; cursor: default; }
 .btn-new   { border-color: var(--green);  background: rgba(39,174,96,.12);  color: var(--green); }
 .btn-new:not(:disabled):hover   { background: rgba(39,174,96,.22); }
@@ -98,25 +220,47 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
 .btn-turn:not(:disabled):hover  { background: rgba(230,126,34,.22); }
 .btn-river { border-color: var(--purple); background: rgba(155,89,182,.1);  color: var(--purple); }
 .btn-river:not(:disabled):hover { background: rgba(155,89,182,.22); }
-.street-indicator { margin-left: auto; font-size: 13px; font-weight: bold; color: var(--muted); }
+.street-indicator { margin-left: auto; font-size: 13px; font-weight: bold; color: var(--text); font-family: var(--font); }
 .street-indicator span { font-size: 15px; }
 
-.situation { background: var(--bg2); border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; }
+/* ══════════════════════════════════════════════════════════════
+   SITUATION CARD
+══════════════════════════════════════════════════════════════ */
+.situation {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 12px;
+}
 .sit-header { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-.sit-badge { font-size: 12px; font-weight: bold; padding: 4px 10px; border: 1px solid; }
+.sit-badge  { font-size: 12px; font-weight: bold; font-family: var(--font); padding: 4px 10px; border: 1px solid; }
 .sit-badge.pfr    { border-color: var(--green);  color: var(--green); }
 .sit-badge.caller { border-color: var(--amber);  color: var(--amber); }
 .sit-badge.ip     { border-color: var(--blue);   color: var(--blue); }
-.sit-badge.oop    { border-color: var(--muted);  color: var(--muted); }
-.sit-badge.pos    { border-color: var(--gold);   color: var(--gold); }
+.sit-badge.oop    { border-color: var(--dim);    color: var(--text); }
+.sit-badge.pos    { border-color: var(--accent); color: var(--accent); }
 .sit-badge.opp    { border-color: var(--purple); color: var(--purple); }
 
-.cards-row { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
-.card-group-label { font-size: 11px; font-weight: bold; color: var(--dim); margin-bottom: 5px; }
-.cards-display { display: flex; gap: 4px; flex-wrap: wrap; }
-.card { width: 46px; height: 66px; background: #f5f0e8; border: 2px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Courier New', monospace; color: #111; user-select: none; }
+/* ══════════════════════════════════════════════════════════════
+   CARDS DISPLAY
+══════════════════════════════════════════════════════════════ */
+.cards-row        { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.card-group-label { font-size: 11px; font-weight: bold; color: var(--text); margin-bottom: 5px; font-family: var(--font); }
+.cards-display    { display: flex; gap: 4px; flex-wrap: wrap; }
+.card {
+  width: 46px; height: 66px;
+  background: #f5f0e8;
+  border: 2px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  color: #111;
+  user-select: none;
+}
 .card.red-card { color: #cc0000; }
-.card.hidden { background: linear-gradient(135deg, #1a1a2e, #16213e); border-color: #2a3a5a; }
+.card.hidden   { background: linear-gradient(135deg, #1a1a2e, #16213e); border-color: #2a3a5a; }
 .card.hidden::after { content: '♦'; color: #1e3460; font-size: 22px; }
 .card-rank { font-size: 16px; line-height: 1; }
 .card-suit { font-size: 12px; line-height: 1; }
@@ -124,104 +268,149 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
 .card.turn-card  { border-color: var(--amber);  box-shadow: 0 0 6px rgba(230,126,34,.4); }
 .card.river-card { border-color: var(--purple); box-shadow: 0 0 6px rgba(155,89,182,.4); }
 
+/* ══════════════════════════════════════════════════════════════
+   BOARD TAGS
+══════════════════════════════════════════════════════════════ */
 .board-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
-.btag { font-size: 11px; font-weight: bold; padding: 3px 8px; border: 1px solid; }
-.btag-dry  { border-color: var(--dim);    color: var(--muted); }
-.btag-wet  { border-color: var(--red);    color: var(--red); }
-.btag-mid  { border-color: var(--amber);  color: var(--amber); }
-.btag-pair { border-color: var(--purple); color: var(--purple); }
-.btag-fd   { border-color: var(--blue);   color: var(--blue); }
+.btag       { font-size: 11px; font-weight: bold; font-family: var(--font); padding: 3px 8px; border: 1px solid; }
+.btag-dry   { border-color: var(--dim);    color: var(--text); }
+.btag-wet   { border-color: var(--red);    color: var(--red); }
+.btag-mid   { border-color: var(--amber);  color: var(--amber); }
+.btag-pair  { border-color: var(--purple); color: var(--purple); }
+.btag-fd    { border-color: var(--blue);   color: var(--blue); }
 
-.outs-bar { display: flex; border: 1px solid var(--border); overflow: hidden; flex-wrap: wrap; }
-.outs-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 14px; flex: 1; min-width: 80px; border-right: 1px solid var(--border); background: var(--bg3); }
+/* ══════════════════════════════════════════════════════════════
+   OUTS BAR (Postflop Trainer)
+══════════════════════════════════════════════════════════════ */
+.outs-bar {
+  display: flex;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+.outs-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+  flex: 1;
+  min-width: 80px;
+  border-right: 1px solid var(--border);
+  background: var(--bg3);
+}
 .outs-cell:last-child { border-right: none; }
-.outs-cell-lbl { font-size: 10px; font-weight: bold; color: var(--dim); margin-bottom: 4px; }
-.outs-cell-val { font-family: 'Courier New', monospace; font-size: 20px; font-weight: bold; line-height: 1; }
-.outs-cell-sub { font-size: 10px; color: var(--dim); margin-top: 3px; }
-.equity-note { font-size: 12px; color: var(--dim); padding: 5px 12px; border-top: 1px solid var(--border); background: var(--bg2); text-align: right; font-style: italic; }
+.outs-cell-lbl { font-size: 10px; font-weight: bold; color: var(--text); margin-bottom: 4px; font-family: var(--font); }
+.outs-cell-val { font-family: var(--mono); font-size: 20px; font-weight: bold; line-height: 1; }
+.outs-cell-sub { font-size: 10px; color: var(--text); margin-top: 3px; font-family: var(--font); }
+.equity-note   { font-size: 12px; color: var(--text); padding: 5px 12px; border-top: 1px solid var(--border); background: var(--bg2); text-align: right; font-style: italic; font-family: var(--font); }
 
+/* ══════════════════════════════════════════════════════════════
+   HAND ANALYSIS (Postflop Trainer)
+══════════════════════════════════════════════════════════════ */
 .hand-analysis { background: var(--bg2); border: 1px solid var(--border); padding: 12px 14px; }
-.ha-title { font-size: 12px; font-weight: bold; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.street-label-strip { display: inline-flex; align-items: center; font-size: 11px; font-weight: bold; padding: 3px 9px; border: 1px solid; }
+.ha-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font);
+}
+.street-label-strip { display: inline-flex; align-items: center; font-size: 11px; font-weight: bold; font-family: var(--font); padding: 3px 9px; border: 1px solid; }
 .strip-flop  { border-color: var(--blue);   color: var(--blue); }
 .strip-turn  { border-color: var(--amber);  color: var(--amber); }
 .strip-river { border-color: var(--purple); color: var(--purple); }
 
 .eq-table { display: flex; flex-direction: column; gap: 7px; margin-bottom: 4px; }
-.eq-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+.eq-row   { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
 .eq-row.eq-combined { border-top: 1px solid var(--border); padding-top: 6px; margin-top: 2px; }
-.eq-type { font-size: 13px; font-weight: bold; }
-.eq-val { font-family: 'Courier New', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.eq-type  { font-size: 13px; font-weight: bold; font-family: var(--font); color: var(--text); }
+.eq-val   { font-family: var(--mono); font-size: 12px; color: var(--text); white-space: nowrap; }
 
-.empty-state { text-align: center; padding: 60px 20px; color: var(--dim); }
+/* ══════════════════════════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════════════════════════ */
+.empty-state        { text-align: center; padding: 60px 20px; color: var(--dim); }
 .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
-.empty-state .es-text { font-size: 15px; font-weight: bold; }
+.empty-state .es-text { font-size: 15px; font-weight: bold; font-family: var(--font); }
 
-/* OUTS & EQUITY */
-.outs-rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 18px; }
-.outs-rule-card { background: var(--bg2); border: 1px solid var(--border); padding: 14px 16px; }
-.orc-icon { font-size: 28px; font-weight: bold; color: var(--gold); line-height: 1; margin-bottom: 4px; }
-.orc-label { font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 6px; }
-.orc-desc { font-size: 13px; color: var(--text); }
-.orc-warn .orc-icon { color: var(--amber); }
-.outs-key-row { background: rgba(212,160,23,.06) !important; }
-.outs-key-row td:first-child { border-left: 3px solid var(--gold); }
+/* ══════════════════════════════════════════════════════════════
+   DATA TABLE (Outs & Equity)
+══════════════════════════════════════════════════════════════ */
+.outs-key-row               { background: rgba(0,191,191,.06) !important; }
+.outs-key-row td:first-child { border-left: 3px solid var(--accent); }
 
-.data-table { background: var(--bg2); border: 1px solid var(--border); overflow-x: auto; max-height: 380px; overflow-y: auto; }
+.data-table { background: var(--bg2); border: 1px solid var(--border); overflow-x: auto; }
 .data-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.data-table th { background: var(--bg3); color: var(--muted); padding: 10px 12px; text-align: left; font-weight: bold; font-size: 12px; position: sticky; top: 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); font-family: 'Courier New', monospace; font-size: 13px; }
+.data-table th {
+  background: var(--bg3);
+  color: var(--text);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 12px;
+  font-family: var(--font);
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+}
 .data-table tr:hover { background: var(--bg3); }
-#page-outs .data-table td:nth-child(2) { font-family: Arial, sans-serif; }
-.box { background: var(--bg2); border: 1px solid var(--border); padding: 14px; margin-bottom: 12px; }
-.box-label { font-size: 12px; font-weight: bold; color: var(--muted); margin-bottom: 10px; }
-.positive { color: var(--green); }
-.negative { color: var(--red); }
 
-/* RESPONSIVE — mobile first */
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-  .nav-tab { padding: 0 14px; font-size: 13px; }
-  .page { padding: 14px 12px 50px; }
-  .rg td { width: 32px; height: 25px; font-size: 8px; }
+  .nav-tab    { padding: 0 14px; font-size: 13px; }
+  .page       { padding: 14px 12px 50px; }
+  .rg td      { width: 32px; height: 25px; font-size: 8px; }
   .rg th.rl, .rg th.ct { font-size: 8px; width: 12px; min-width: 12px; }
   .pos-overview { grid-template-columns: repeat(3, 1fr); }
-  .card { width: 42px; height: 58px; }
-  .card-rank { font-size: 14px; }
-  .card-suit { font-size: 11px; }
-  .cards-row { gap: 10px; }
-  .outs-cell { padding: 9px 8px; min-width: 72px; }
+  .card       { width: 42px; height: 58px; }
+  .card-rank  { font-size: 14px; }
+  .card-suit  { font-size: 11px; }
+  .cards-row  { gap: 10px; }
+  .outs-cell  { padding: 9px 8px; min-width: 72px; }
   .outs-cell-val { font-size: 17px; }
   .trainer-topbar { gap: 6px; }
   .street-btn { flex: 1; min-width: 60px; padding: 10px 6px; font-size: 13px; }
   .street-indicator { width: 100%; margin-left: 0; text-align: center; }
-  .pb-pos { font-size: 28px; }
-  .pb-pct { font-size: 22px; }
-  .pb-divider { display: none; }
-  .outs-rule-grid { grid-template-columns: 1fr 1fr; }
   .data-table th, .data-table td { padding: 8px 10px; font-size: 12px; }
 }
 @media (max-width: 400px) {
   .rg td { width: 27px; height: 21px; font-size: 7px; }
-  .outs-rule-grid { grid-template-columns: 1fr; }
   .nav-tab { padding: 0 11px; font-size: 12px; }
 }
 </style>
 </head>
 <body>
 
+<!-- ══════════════════════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════════════════════ -->
 <nav class="topnav">
   <button class="nav-tab active" onclick="goPage('preflop',this)">Preflop Ranges</button>
   <button class="nav-tab"        onclick="goPage('trainer',this)">Postflop Trainer</button>
   <button class="nav-tab"        onclick="goPage('outs',this)">Outs &amp; Equity</button>
 </nav>
 
-<!-- ══ PREFLOP RANGES ══ -->
+<!-- ══════════════════════════════════════════════════════════
+     PREFLOP RANGES
+══════════════════════════════════════════════════════════ -->
 <div class="page active" id="page-preflop">
   <div class="sec-title">Preflop <span>Ranges</span></div>
-  <div class="sec-sub" id="preflop-sub">GTO-Ranges für 6-max NL Cash · 100bb · Quelle: PokerCoaching / GTO Wizard · Klick auf Hand für Details</div>
 
   <div class="pos-rail" id="pos-tabs"></div>
-  <div class="pos-banner" id="pos-banner"></div>
   <div class="legend" id="main-legend"></div>
 
   <div class="range-wrap">
@@ -235,10 +424,11 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
   </div>
 </div>
 
-<!-- ══ POSTFLOP TRAINER ══ -->
+<!-- ══════════════════════════════════════════════════════════
+     POSTFLOP TRAINER
+══════════════════════════════════════════════════════════ -->
 <div class="page" id="page-trainer">
   <div class="sec-title">Postflop <span>Trainer</span></div>
-  <div class="sec-sub">Rolle & Position zufällig · Decke Street für Street auf</div>
   <div class="trainer-topbar">
     <button class="street-btn btn-new"   onclick="dealNew()">↺ Neue Hand</button>
     <button class="street-btn btn-flop"  id="btn-flop"  onclick="revealFlop()"  disabled>Flop</button>
@@ -254,30 +444,13 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
   </div>
 </div>
 
-<!-- ══ OUTS & EQUITY ══ -->
+<!-- ══════════════════════════════════════════════════════════
+     OUTS & EQUITY
+══════════════════════════════════════════════════════════ -->
 <div class="page" id="page-outs">
   <div class="sec-title">Outs &amp; <span>Equity</span></div>
-  <div class="sec-sub">Exakte Wahrscheinlichkeiten &amp; Faustregeln · Flop (47 Karten offen) · Turn (46 Karten offen)</div>
 
-  <div class="outs-rule-grid">
-    <div class="outs-rule-card">
-      <div class="orc-icon">×2</div>
-      <div class="orc-label">Regel ×2</div>
-      <div class="orc-desc">Outs × 2 ≈ % für <strong>eine</strong> Karte (Turn oder River einzeln)</div>
-    </div>
-    <div class="outs-rule-card">
-      <div class="orc-icon">×4</div>
-      <div class="orc-label">Regel ×4</div>
-      <div class="orc-desc">Outs × 4 ≈ % für <strong>zwei</strong> Karten (Flop → River gesamt)</div>
-    </div>
-    <div class="outs-rule-card orc-warn">
-      <div class="orc-icon">!</div>
-      <div class="orc-label">Achtung ×4</div>
-      <div class="orc-desc">Bei 9+ Outs überschätzt ×4 die Equity — exakte Werte bevorzugen</div>
-    </div>
-  </div>
-
-  <div class="data-table" style="max-height:none;">
+  <div class="data-table">
     <table>
       <thead>
         <tr>
@@ -291,61 +464,57 @@ body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif
         </tr>
       </thead>
       <tbody>
-        <tr><td>1</td><td>Backdoor (1 Karte)</td><td>2.1%</td><td>2.2%</td><td style="color:var(--red)">4.3%</td><td style="color:var(--dim)">2%</td><td style="color:var(--dim)">4%</td></tr>
-        <tr class="outs-key-row"><td><strong>2</strong></td><td>Set Draw (Pocket Pair)</td><td>4.3%</td><td>4.3%</td><td style="color:var(--red)">8.4%</td><td style="color:var(--dim)">4%</td><td style="color:var(--dim)">8%</td></tr>
-        <tr><td>3</td><td>Overcard (1)</td><td>6.4%</td><td>6.5%</td><td style="color:var(--red)">12.5%</td><td style="color:var(--dim)">6%</td><td style="color:var(--dim)">12%</td></tr>
+        <tr><td>1</td><td>Backdoor (1 Karte)</td><td>2.1%</td><td>2.2%</td><td style="color:var(--red)">4.3%</td><td>2%</td><td>4%</td></tr>
+        <tr class="outs-key-row"><td><strong>2</strong></td><td>Set Draw (Pocket Pair)</td><td>4.3%</td><td>4.3%</td><td style="color:var(--red)">8.4%</td><td>4%</td><td>8%</td></tr>
+        <tr><td>3</td><td>Overcard (1)</td><td>6.4%</td><td>6.5%</td><td style="color:var(--red)">12.5%</td><td>6%</td><td>12%</td></tr>
         <tr class="outs-key-row"><td><strong>4</strong></td><td>Gutshot</td><td>8.5%</td><td>8.7%</td><td style="color:var(--amber)">16.5%</td><td>8%</td><td>16%</td></tr>
         <tr><td>5</td><td>Gutshot + Overcard</td><td>10.6%</td><td>10.9%</td><td style="color:var(--amber)">20.4%</td><td>10%</td><td>20%</td></tr>
         <tr><td>6</td><td>Zwei Overcards / Paar-Draw</td><td>12.8%</td><td>13.0%</td><td style="color:var(--amber)">24.1%</td><td>12%</td><td>24%</td></tr>
         <tr><td>7</td><td>Paar + Gutshot</td><td>14.9%</td><td>15.2%</td><td style="color:var(--amber)">27.8%</td><td>14%</td><td>28%</td></tr>
         <tr class="outs-key-row"><td><strong>8</strong></td><td>OESD (beidseitig offen)</td><td>17.0%</td><td>17.4%</td><td style="color:var(--amber)">31.5%</td><td>16%</td><td>32%</td></tr>
-        <tr class="outs-key-row"><td><strong>9</strong></td><td>Flush Draw</td><td>19.1%</td><td>19.6%</td><td style="color:var(--blue)">35.0%</td><td>18%</td><td style="color:var(--amber)">36%</td></tr>
-        <tr><td>10</td><td>Flush Draw + Overcard</td><td>21.3%</td><td>21.7%</td><td style="color:var(--blue)">38.4%</td><td>20%</td><td style="color:var(--amber)">40%</td></tr>
-        <tr><td>11</td><td>Flush Draw + Paar-Draw</td><td>23.4%</td><td>23.9%</td><td style="color:var(--blue)">41.7%</td><td>22%</td><td style="color:var(--amber)">44%</td></tr>
-        <tr class="outs-key-row"><td><strong>12</strong></td><td>Flush Draw + Gutshot</td><td>25.5%</td><td>26.1%</td><td style="color:var(--blue)">44.9%</td><td>24%</td><td style="color:var(--amber)">48%</td></tr>
-        <tr><td>13</td><td>Flush Draw + Set Draw</td><td>27.7%</td><td>28.3%</td><td style="color:var(--blue)">48.1%</td><td>26%</td><td style="color:var(--amber)">52%</td></tr>
-        <tr><td>14</td><td>OESD + Paar-Draw</td><td>29.8%</td><td>30.4%</td><td style="color:var(--blue)">51.2%</td><td>28%</td><td style="color:var(--amber)">56%</td></tr>
-        <tr class="outs-key-row"><td><strong>15</strong></td><td>Flush Draw + OESD (Combo Draw)</td><td>31.9%</td><td>32.6%</td><td style="color:var(--green)">54.1%</td><td>30%</td><td style="color:var(--red)">60%</td></tr>
-        <tr><td>16</td><td>Combo Draw + Overcard</td><td>34.0%</td><td>34.8%</td><td style="color:var(--green)">57.0%</td><td>32%</td><td style="color:var(--red)">64%</td></tr>
-        <tr><td>17</td><td>Combo Draw + 2 Overcards</td><td>36.2%</td><td>37.0%</td><td style="color:var(--green)">59.8%</td><td>34%</td><td style="color:var(--red)">68%</td></tr>
-        <tr><td>18</td><td>—</td><td>38.3%</td><td>39.1%</td><td style="color:var(--green)">62.4%</td><td>36%</td><td style="color:var(--red)">72%</td></tr>
-        <tr><td>19</td><td>—</td><td>40.4%</td><td>41.3%</td><td style="color:var(--green)">65.0%</td><td>38%</td><td style="color:var(--red)">76%</td></tr>
-        <tr><td>20</td><td>—</td><td>42.6%</td><td>43.5%</td><td style="color:var(--green)">67.5%</td><td>40%</td><td style="color:var(--red)">80%</td></tr>
-        <tr><td>21</td><td>FD + OESD + Trips-Draw</td><td>44.7%</td><td>45.7%</td><td style="color:var(--green)">69.9%</td><td>42%</td><td style="color:var(--red)">84%</td></tr>
+        <tr class="outs-key-row"><td><strong>9</strong></td><td>Flush Draw</td><td>19.1%</td><td>19.6%</td><td style="color:var(--blue)">35.0%</td><td>18%</td><td>36%</td></tr>
+        <tr><td>10</td><td>Flush Draw + Overcard</td><td>21.3%</td><td>21.7%</td><td style="color:var(--blue)">38.4%</td><td>20%</td><td>40%</td></tr>
+        <tr><td>11</td><td>Flush Draw + Paar-Draw</td><td>23.4%</td><td>23.9%</td><td style="color:var(--blue)">41.7%</td><td>22%</td><td>44%</td></tr>
+        <tr class="outs-key-row"><td><strong>12</strong></td><td>Flush Draw + Gutshot</td><td>25.5%</td><td>26.1%</td><td style="color:var(--blue)">44.9%</td><td>24%</td><td>48%</td></tr>
+        <tr><td>13</td><td>Flush Draw + Set Draw</td><td>27.7%</td><td>28.3%</td><td style="color:var(--blue)">48.1%</td><td>26%</td><td>52%</td></tr>
+        <tr><td>14</td><td>OESD + Paar-Draw</td><td>29.8%</td><td>30.4%</td><td style="color:var(--blue)">51.2%</td><td>28%</td><td>56%</td></tr>
+        <tr class="outs-key-row"><td><strong>15</strong></td><td>Flush Draw + OESD (Combo Draw)</td><td>31.9%</td><td>32.6%</td><td style="color:var(--green)">54.1%</td><td>30%</td><td>60%</td></tr>
+        <tr><td>16</td><td>Combo Draw + Overcard</td><td>34.0%</td><td>34.8%</td><td style="color:var(--green)">57.0%</td><td>32%</td><td>64%</td></tr>
+        <tr><td>17</td><td>Combo Draw + 2 Overcards</td><td>36.2%</td><td>37.0%</td><td style="color:var(--green)">59.8%</td><td>34%</td><td>68%</td></tr>
+        <tr><td>18</td><td>—</td><td>38.3%</td><td>39.1%</td><td style="color:var(--green)">62.4%</td><td>36%</td><td>72%</td></tr>
+        <tr><td>19</td><td>—</td><td>40.4%</td><td>41.3%</td><td style="color:var(--green)">65.0%</td><td>38%</td><td>76%</td></tr>
+        <tr><td>20</td><td>—</td><td>42.6%</td><td>43.5%</td><td style="color:var(--green)">67.5%</td><td>40%</td><td>80%</td></tr>
+        <tr><td>21</td><td>FD + OESD + Trips-Draw</td><td>44.7%</td><td>45.7%</td><td style="color:var(--green)">69.9%</td><td>42%</td><td>84%</td></tr>
       </tbody>
     </table>
   </div>
-  <div style="font-size:11px;color:var(--dim);margin-top:8px;text-align:right;font-style:italic;">Turn = N÷47 · River = N÷46 · Flop→River = 1 − (47−N)/47 × (46−N)/46 · ×4 rot = ungenau (Überschätzung)</div>
+  <div style="font-size:11px;color:var(--text);margin-top:8px;text-align:right;font-style:italic;font-family:var(--font);">Turn = N÷47 · River = N÷46 · Flop→River = 1 − (47−N)/47 × (46−N)/46 · ×4 orange/rot = Überschätzung</div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    NAV
-═══════════════════════════════════════════════════════════════ */
-function goPage(id,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+══════════════════════════════════════════════════════════════ */
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
   el.classList.add('active');
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    GTO PREFLOP RANGES — 6-max NL Cash 100bb
-   Quelle: PokerCoaching (implementable GTO), GTO Wizard
-   ─────────────────────────────────────────────────────────────
-   Kategorien für RFI-Positionen (UTG/MP/CO/BTN/SB):
+   Kategorien RFI (UTG/MP/CO/BTN/SB):
      b = 4-Bet / immer weiter vs 3-Bet (Premium)
      c = Raise + 3-Bet callen
      r = Raise First In + Fold vs 3-Bet
-   Kategorie für BB (Defense):
+   Kategorien BB (Defense vs BTN):
      b = 3-Bet Value
      c = Call
-     r = 3-Bet Bluff (A5s-A2s + einige weitere)
-═══════════════════════════════════════════════════════════════ */
+     r = 3-Bet Bluff
+══════════════════════════════════════════════════════════════ */
 const RANGES = {
 
-  /* ─── UTG: 17.6% ─── source: PokerCoaching 6-max implementable GTO
-     66+, A3s+, K8s+, Q9s+, J9s+, T9s, ATo+, KJo+, QJo             */
   UTG: {
     pct: '17.6', note: 'Raise First In · 3bb · Engste Position — nur starke Hands',
     rfiMode: true,
@@ -359,9 +528,6 @@ const RANGES = {
         'AJo','ATo','KJo','QJo']
   },
 
-  /* ─── MP: 21.4% ─── source: PokerCoaching 6-max implementable GTO
-     55+, A2s+, K6s+, Q9s+, J9s+, T9s, 98s, 87s, 76s,
-     ATo+, KTo+, QTo+                                                 */
   MP: {
     pct: '21.4', note: 'Raise First In · 3bb · Ein früher Platz weiter',
     rfiMode: true,
@@ -375,9 +541,6 @@ const RANGES = {
         'ATo','AJo','KTo','KJo','QTo','QJo']
   },
 
-  /* ─── CO: 27.8% ─── source: PokerCoaching 6-max implementable GTO
-     33+, A2s+, K3s+, Q6s+, J8s+, T7s+, 97s+, 87s, 76s,
-     A8o+, KTo+, QTo+, JTo                                           */
   CO: {
     pct: '27.8', note: 'Raise First In · 3bb · Cut-Off',
     rfiMode: true,
@@ -394,9 +557,6 @@ const RANGES = {
         'KTo','KJo','QTo']
   },
 
-  /* ─── BTN: 43.5% ─── source: PokerCoaching 6-max implementable GTO
-     33+, A2s+, K2s+, Q3s+, J4s+, T6s+, 96s+, 85s+, 75s+, 64s+, 53s+,
-     A4o+, K8o+, Q9o+, J9o+, T8o+, 98o                              */
   BTN: {
     pct: '43.5', note: 'Raise First In · 2.5bb · Beste Position postflop',
     rfiMode: true,
@@ -424,8 +584,6 @@ const RANGES = {
         '98o']
   },
 
-  /* ─── SB: ~37% ─── pure Raise-Range vs BB (kein Limp)
-     Basiert auf PokerCoaching SB-Range, aufgeteilt nach Stärke         */
   SB: {
     pct: '37', note: 'Raise vs BB · 2.5bb · Kein Limp — nur raise/fold',
     rfiMode: true,
@@ -445,14 +603,9 @@ const RANGES = {
         '98o','87o','76o']
   },
 
-  /* ─── BB: ~55% Defense vs BTN ───
-     Quelle: GTO Wizard (TT+, AJs+, AQo+ = pure 3-bet Value)
-     b = 3-Bet Value:  TT+, AKs, AQs, AJs, AKo, AQo
-     c = Call:         wide calling range ~42%
-     r = 3-Bet Bluff:  A5s-A2s (Nut-Blocker), KQo, einige Connectors  */
   BB: {
     pct: '55', note: 'Defense vs BTN · 3-bet (blau/orange) oder Call (grün)',
-    rfiMode: false,  /* BB is defense, not RFI */
+    rfiMode: false,
     b: ['AA','KK','QQ','JJ','TT','AKs','AKo','AQs','AJs','AQo'],
     c: ['99','88','77','66','55','44','33','22',
         'ATs','A9s','A8s','A7s','A6s',
@@ -467,67 +620,67 @@ const RANGES = {
         'JTo','J9o',
         'T9o','T8o',
         '98o','87o','76o','65o'],
-    r: ['A5s','A4s','A3s','A2s',   /* nut-blocker 3-bet bluffs */
-        'J5s','J4s','J3s',         /* blocker + playability */
-        '65s']                     /* connected 3-bet bluff */
+    r: ['A5s','A4s','A3s','A2s',
+        'J5s','J4s','J3s',
+        '65s']
   }
 };
 
-/* ─────────────────────────────────────────────────────────────
-   POSITION OVERVIEW CARDS (pct + color)
-──────────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   POSITION OVERVIEW DATA
+══════════════════════════════════════════════════════════════ */
 const POS_OVERVIEW = [
-  {pos:'UTG', pct:'17.6%', col:'var(--red)'},
-  {pos:'MP',  pct:'21.4%', col:'var(--amber)'},
-  {pos:'CO',  pct:'27.8%', col:'var(--amber)'},
-  {pos:'BTN', pct:'43.5%', col:'var(--green)'},
-  {pos:'SB',  pct:'~37%',  col:'var(--blue)'},
-  {pos:'BB',  pct:'~55%',  col:'var(--blue)'}
+  { pos: 'UTG', pct: '17.6%', col: 'var(--red)'    },
+  { pos: 'MP',  pct: '21.4%', col: 'var(--amber)'  },
+  { pos: 'CO',  pct: '27.8%', col: 'var(--amber)'  },
+  { pos: 'BTN', pct: '43.5%', col: 'var(--green)'  },
+  { pos: 'SB',  pct: '~37%',  col: 'var(--blue)'   },
+  { pos: 'BB',  pct: '~55%',  col: 'var(--blue)'   }
 ];
 
-/* ─────────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════════
    COMBO COUNTER
-──────────────────────────────────────────────────────────────── */
+══════════════════════════════════════════════════════════════ */
 const PF_RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
 
-function handName(r,c){
-  if(r===c) return PF_RANKS[r]+PF_RANKS[r];
-  if(r<c)   return PF_RANKS[r]+PF_RANKS[c]+'s';
-  return PF_RANKS[c]+PF_RANKS[r]+'o';
+function handName(r, c) {
+  if (r === c) return PF_RANKS[r] + PF_RANKS[r];
+  if (r < c)   return PF_RANKS[r] + PF_RANKS[c] + 's';
+  return PF_RANKS[c] + PF_RANKS[r] + 'o';
 }
-function handCombos(h){
-  if(h.length===2) return 6;
-  if(h.endsWith('s')) return 4;
+function handCombos(h) {
+  if (h.length === 2)  return 6;
+  if (h.endsWith('s')) return 4;
   return 12;
 }
-function countSet(s){ let n=0; s.forEach(h=>n+=handCombos(h)); return n; }
+function countSet(s) { let n = 0; s.forEach(h => n += handCombos(h)); return n; }
 
-/* ─────────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════════
    RENDER PREFLOP
-──────────────────────────────────────────────────────────────── */
-const POS_LIST = ['UTG','MP','CO','BTN','SB','BB'];
+══════════════════════════════════════════════════════════════ */
+const POS_LIST = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
 let curPos = 'UTG';
 
-function switchPos(pos){
-  curPos=pos;
-  document.querySelectorAll('[id^="pov-"]').forEach(e=>e.classList.remove('active'));
-  const el=document.getElementById('pov-'+pos.toLowerCase());
-  if(el) el.classList.add('active');
-  document.querySelectorAll('.pos-btn').forEach(b=>b.classList.toggle('active',b.textContent===pos));
+function switchPos(pos) {
+  curPos = pos;
+  document.querySelectorAll('[id^="pov-"]').forEach(e => e.classList.remove('active'));
+  const el = document.getElementById('pov-' + pos.toLowerCase());
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.toggle('active', b.textContent === pos));
   renderPreflop(false);
 }
 
-function buildLegend(rfiMode){
+function buildLegend(rfiMode) {
   const leg = document.getElementById('main-legend');
-  if(rfiMode){
-    leg.innerHTML=`
+  if (rfiMode) {
+    leg.innerHTML = `
       <div class="leg"><div class="leg-sq" style="background:#312e81"></div>4-Bet / Value — immer weiter vs 3-Bet</div>
       <div class="leg"><div class="leg-sq" style="background:#14532d"></div>Raise + 3-Bet callen</div>
       <div class="leg"><div class="leg-sq" style="background:#7c2d12"></div>Raise First In + Fold vs 3-Bet</div>
       <div class="leg"><div class="leg-sq" style="background:var(--bg);border:1px solid var(--border)"></div>Fold</div>
       <div class="legend-hint">Oben rechts = suited &nbsp;·&nbsp; Unten links = offsuit</div>`;
   } else {
-    leg.innerHTML=`
+    leg.innerHTML = `
       <div class="leg"><div class="leg-sq" style="background:#312e81"></div>3-Bet Value (TT+, AJs+, AQo+)</div>
       <div class="leg"><div class="leg-sq" style="background:#14532d"></div>Call</div>
       <div class="leg"><div class="leg-sq" style="background:#7c2d12"></div>3-Bet Bluff (A5s-A2s + Blockers)</div>
@@ -536,374 +689,439 @@ function buildLegend(rfiMode){
   }
 }
 
-function renderPreflop(buildTabs){
-  if(buildTabs){
-    // Build position tabs
-    const tabs=document.getElementById('pos-tabs');
-    tabs.innerHTML='';
-    POS_LIST.forEach(p=>{
-      const btn=document.createElement('button');
-      btn.className='pos-btn'+(p===curPos?' active':'');
-      btn.textContent=p;
-      btn.onclick=()=>switchPos(p);
+function renderPreflop(buildTabs) {
+  if (buildTabs) {
+    /* Position Tabs */
+    const tabs = document.getElementById('pos-tabs');
+    tabs.innerHTML = '';
+    POS_LIST.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'pos-btn' + (p === curPos ? ' active' : '');
+      btn.textContent = p;
+      btn.onclick = () => switchPos(p);
       tabs.appendChild(btn);
     });
-    // Build overview cards
-    const ov=document.getElementById('pos-overview');
-    ov.innerHTML='';
-    POS_OVERVIEW.forEach(({pos,pct,col})=>{
-      const d=document.createElement('div');
-      d.className='pov-card'+(pos===curPos?' active':'');
-      d.id='pov-'+pos.toLowerCase();
-      d.onclick=()=>switchPos(pos);
-      d.innerHTML=`<div class="pov-pos">${pos}</div><div class="pov-pct" style="color:${col}">${pct}</div>`;
+    /* Overview Cards */
+    const ov = document.getElementById('pos-overview');
+    ov.innerHTML = '';
+    POS_OVERVIEW.forEach(({ pos, pct, col }) => {
+      const d = document.createElement('div');
+      d.className = 'pov-card' + (pos === curPos ? ' active' : '');
+      d.id = 'pov-' + pos.toLowerCase();
+      d.onclick = () => switchPos(pos);
+      d.innerHTML = `<div class="pov-pos">${pos}</div><div class="pov-pct" style="color:${col}">${pct}</div>`;
       ov.appendChild(d);
     });
   }
 
-  const {b,c,r,note,rfiMode,pct}=RANGES[curPos];
-  const bSet=new Set(b), cSet=new Set(c), rSet=new Set(r);
-  const bc=countSet(bSet), cc=countSet(cSet), rc=countSet(rSet);
-  const total=bc+cc+rc;
-  const actualPct=((total/1326)*100).toFixed(1);
+  const { b, c, r, rfiMode } = RANGES[curPos];
+  const bSet = new Set(b), cSet = new Set(c), rSet = new Set(r);
 
   buildLegend(rfiMode);
 
-  // Labels change for BB
-  const lbl1=rfiMode?'4-Bet combos':'3-Bet Value';
-  const lbl2=rfiMode?'Call-3Bet combos':'Call combos';
-  const lbl3=rfiMode?'RFI/Fold combos':'3-Bet Bluff';
-
-  document.getElementById('pos-banner').innerHTML=`
-    <div class="pb-pos">${curPos}</div>
-    <div class="pb-divider"></div>
-    <div class="pb-info">
-      <div class="pb-note">${note}</div>
-      <div class="pb-combos">
-        <div class="pb-ci"><div class="pb-dot" style="background:#312e81"></div>${bc} ${lbl1}</div>
-        <div class="pb-ci"><div class="pb-dot" style="background:#14532d"></div>${cc} ${lbl2}</div>
-        <div class="pb-ci"><div class="pb-dot" style="background:#7c2d12"></div>${rc} ${lbl3}</div>
-      </div>
-    </div>
-    <div class="pb-right">
-      <div class="pb-pct">${actualPct}%</div>
-      <div class="pb-total">${total} / 1326 Combos</div>
-    </div>`;
-
-  // Build grid
-  let html='<thead><tr><th class="rl"></th>';
-  PF_RANKS.forEach(r=>{ html+=`<th class="ct">${r}</th>`; });
-  html+='</tr></thead><tbody>';
-  PF_RANKS.forEach((_,ri)=>{
-    html+=`<tr><th class="rl">${PF_RANKS[ri]}</th>`;
-    PF_RANKS.forEach((_,ci)=>{
-      const hand=handName(ri,ci);
-      let cls,cat;
-      if(bSet.has(hand)){    cls='h4'; cat=rfiMode?'4-Bet / Value':'3-Bet Value'; }
-      else if(cSet.has(hand)){cls='hc'; cat=rfiMode?'Raise + 3-Bet callen':'Call'; }
-      else if(rSet.has(hand)){cls='hr'; cat=rfiMode?'Raise + Fold vs 3-Bet':'3-Bet Bluff'; }
-      else {                  cls='hf'; cat='Fold'; }
-      html+=`<td class="${cls}" title="${hand} — ${cat}" onclick="showTip('${hand}','${cat}')">${hand}</td>`;
+  /* Build grid */
+  let html = '<thead><tr><th class="rl"></th>';
+  PF_RANKS.forEach(r => { html += `<th class="ct">${r}</th>`; });
+  html += '</tr></thead><tbody>';
+  PF_RANKS.forEach((_, ri) => {
+    html += `<tr><th class="rl">${PF_RANKS[ri]}</th>`;
+    PF_RANKS.forEach((_, ci) => {
+      const hand = handName(ri, ci);
+      let cls, cat;
+      if (bSet.has(hand))      { cls = 'h4'; cat = rfiMode ? '4-Bet / Value'         : '3-Bet Value'; }
+      else if (cSet.has(hand)) { cls = 'hc'; cat = rfiMode ? 'Raise + 3-Bet callen'  : 'Call'; }
+      else if (rSet.has(hand)) { cls = 'hr'; cat = rfiMode ? 'Raise + Fold vs 3-Bet' : '3-Bet Bluff'; }
+      else                     { cls = 'hf'; cat = 'Fold'; }
+      html += `<td class="${cls}" title="${hand} — ${cat}" onclick="showTip('${hand}','${cat}')">${hand}</td>`;
     });
-    html+='</tr>';
+    html += '</tr>';
   });
-  html+='</tbody>';
-  document.getElementById('range-grid').innerHTML=html;
+  html += '</tbody>';
+  document.getElementById('range-grid').innerHTML = html;
 }
 
-function showTip(hand,cat){
-  const el=document.getElementById('hand-tip');
-  el.style.display='flex';
-  const cols={'4-Bet / Value':'var(--purple)','Raise + 3-Bet callen':'var(--green)','Raise + Fold vs 3-Bet':'var(--amber)',
-              '3-Bet Value':'var(--purple)','Call':'var(--green)','3-Bet Bluff':'var(--amber)','Fold':'var(--dim)'};
-  const combos=hand.length===2?'6':hand.endsWith('s')?'4':'12';
-  el.innerHTML=`<div class="ht-name">${hand}</div>
+function showTip(hand, cat) {
+  const el = document.getElementById('hand-tip');
+  el.style.display = 'flex';
+  const cols = {
+    '4-Bet / Value':         'var(--purple)',
+    'Raise + 3-Bet callen':  'var(--green)',
+    'Raise + Fold vs 3-Bet': 'var(--amber)',
+    '3-Bet Value':           'var(--purple)',
+    'Call':                  'var(--green)',
+    '3-Bet Bluff':           'var(--amber)',
+    'Fold':                  'var(--dim)'
+  };
+  const combos = hand.length === 2 ? '6' : hand.endsWith('s') ? '4' : '12';
+  el.innerHTML = `
+    <div class="ht-name">${hand}</div>
     <div style="color:var(--dim)">—</div>
-    <div style="color:${cols[cat]||'var(--text)'};font-size:13px;">${cat}</div>
+    <div style="color:${cols[cat] || 'var(--text)'};font-size:13px;font-weight:bold">${cat}</div>
     <div class="ht-combos">${combos} Combos</div>`;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    CARD ENGINE
-═══════════════════════════════════════════════════════════════ */
-const RANKS=['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
-const SUITS=['c','d','h','s'];
-const RANK_VAL={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,J:11,Q:12,K:13,A:14};
-const SUIT_SYM={c:'♣',d:'♦',h:'♥',s:'♠'};
-const SUIT_RED={c:false,d:true,h:true,s:false};
-const cardRank=c=>c.slice(0,-1);
-const cardSuit=c=>c.slice(-1);
-const cardVal =c=>RANK_VAL[cardRank(c)];
+══════════════════════════════════════════════════════════════ */
+const RANKS    = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+const SUITS    = ['c','d','h','s'];
+const RANK_VAL = { 2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,J:11,Q:12,K:13,A:14 };
+const SUIT_SYM = { c:'♣', d:'♦', h:'♥', s:'♠' };
+const SUIT_RED = { c:false, d:true, h:true, s:false };
+const cardRank = c => c.slice(0, -1);
+const cardSuit = c => c.slice(-1);
+const cardVal  = c => RANK_VAL[cardRank(c)];
 
-function shuffleDeck(excl=[]){
-  let d=[];RANKS.forEach(r=>SUITS.forEach(s=>{const c=r+s;if(!excl.includes(c))d.push(c);}));
-  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
+function shuffleDeck(excl = []) {
+  let d = [];
+  RANKS.forEach(r => SUITS.forEach(s => { const c = r + s; if (!excl.includes(c)) d.push(c); }));
+  for (let i = d.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [d[i], d[j]] = [d[j], d[i]];
+  }
   return d;
 }
-function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function shuffleArr(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-function handToCards(notation,excl=[]){
-  const r1=notation[0],r2=notation[1],suited=notation.endsWith('s'),pair=r1===r2;
-  const deck=shuffleDeck(excl);
-  if(pair){const cards=deck.filter(c=>cardRank(c)===r1);return cards.length>=2?[cards[0],cards[1]]:null;}
-  if(suited){const suits=shuffleArr([...SUITS]);for(const s of suits){const c1=r1+s,c2=r2+s;if(!excl.includes(c1)&&!excl.includes(c2))return[c1,c2];}return null;}
-  for(const sa of SUITS)for(const sb of SUITS){if(sa===sb)continue;const a=r1+sa,b=r2+sb;if(!excl.includes(a)&&!excl.includes(b))return[a,b];}
+function handToCards(notation, excl = []) {
+  const r1 = notation[0], r2 = notation[1];
+  const suited = notation.endsWith('s'), pair = r1 === r2;
+  const deck = shuffleDeck(excl);
+  if (pair) {
+    const cards = deck.filter(c => cardRank(c) === r1);
+    return cards.length >= 2 ? [cards[0], cards[1]] : null;
+  }
+  if (suited) {
+    const suits = shuffleArr([...SUITS]);
+    for (const s of suits) {
+      const c1 = r1 + s, c2 = r2 + s;
+      if (!excl.includes(c1) && !excl.includes(c2)) return [c1, c2];
+    }
+    return null;
+  }
+  for (const sa of SUITS) for (const sb of SUITS) {
+    if (sa === sb) continue;
+    const a = r1 + sa, b = r2 + sb;
+    if (!excl.includes(a) && !excl.includes(b)) return [a, b];
+  }
   return null;
 }
 
-function renderCard(c,hidden=false,xc=''){
-  if(hidden)return`<div class="card hidden ${xc}"></div>`;
-  const r=cardRank(c),s=cardSuit(c),red=SUIT_RED[s]?'red-card':'';
-  return`<div class="card ${red} ${xc}"><div class="card-rank">${r}</div><div class="card-suit">${SUIT_SYM[s]}</div></div>`;
+function renderCard(c, hidden = false, xc = '') {
+  if (hidden) return `<div class="card hidden ${xc}"></div>`;
+  const r = cardRank(c), s = cardSuit(c), red = SUIT_RED[s] ? 'red-card' : '';
+  return `<div class="card ${red} ${xc}"><div class="card-rank">${r}</div><div class="card-suit">${SUIT_SYM[s]}</div></div>`;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    HAND EVALUATOR
-═══════════════════════════════════════════════════════════════ */
-const RANK_NAME={14:'Asse',13:'Könige',12:'Damen',11:'Buben',10:'Zehner',9:'Neuner',8:'Achter',7:'Siebener',6:'Sechser',5:'Fünfer',4:'Vierer',3:'Dreier',2:'Zweier'};
-const pairN=v=>RANK_NAME[v]||String(v);
+══════════════════════════════════════════════════════════════ */
+const RANK_NAME = { 14:'Asse',13:'Könige',12:'Damen',11:'Buben',10:'Zehner',9:'Neuner',8:'Achter',7:'Siebener',6:'Sechser',5:'Fünfer',4:'Vierer',3:'Dreier',2:'Zweier' };
+const pairN = v => RANK_NAME[v] || String(v);
 
-function evalMade(hole,board){
-  const all=[...hole,...board];
-  const rc={},sc={};
-  all.forEach(c=>{rc[cardVal(c)]=(rc[cardVal(c)]||0)+1;sc[cardSuit(c)]=(sc[cardSuit(c)]||0)+1;});
-  const quads=Object.keys(rc).filter(r=>rc[r]>=4).map(Number);
-  const trips=Object.keys(rc).filter(r=>rc[r]===3).map(Number);
-  const pairs=Object.keys(rc).filter(r=>rc[r]===2).map(Number);
-  const hasFlush=Object.values(sc).some(v=>v>=5);
-  const uv=[...new Set(all.map(cardVal))].sort((a,b)=>a-b);
-  let hasSt=false;
-  for(let i=0;i<=uv.length-5;i++)if(uv[i+4]-uv[i]===4&&new Set(uv.slice(i,i+5)).size===5){hasSt=true;break;}
-  if([14,2,3,4,5].every(v=>uv.includes(v)))hasSt=true;
-  if(quads.length)return{rank:7,name:'Vierling'};
-  if((trips.length>=1&&pairs.length>=1)||trips.length>=2)return{rank:6,name:'Full House'};
-  if(hasFlush)return{rank:5,name:'Flush'};
-  if(hasSt)return{rank:4,name:'Straight'};
-  if(trips.length)return{rank:3,name:'Drilling'};
-  if(pairs.length>=2)return{rank:2,name:'Zwei Paare'};
-  if(pairs.length===1)return{rank:1,name:'Ein Paar ('+pairN(pairs[0])+')'};
-  return{rank:0,name:'High Card'};
+function evalMade(hole, board) {
+  const all = [...hole, ...board];
+  const rc = {}, sc = {};
+  all.forEach(c => { rc[cardVal(c)] = (rc[cardVal(c)] || 0) + 1; sc[cardSuit(c)] = (sc[cardSuit(c)] || 0) + 1; });
+  const quads = Object.keys(rc).filter(r => rc[r] >= 4).map(Number);
+  const trips = Object.keys(rc).filter(r => rc[r] === 3).map(Number);
+  const pairs = Object.keys(rc).filter(r => rc[r] === 2).map(Number);
+  const hasFlush = Object.values(sc).some(v => v >= 5);
+  const uv = [...new Set(all.map(cardVal))].sort((a, b) => a - b);
+  let hasSt = false;
+  for (let i = 0; i <= uv.length - 5; i++)
+    if (uv[i+4] - uv[i] === 4 && new Set(uv.slice(i, i+5)).size === 5) { hasSt = true; break; }
+  if ([14,2,3,4,5].every(v => uv.includes(v))) hasSt = true;
+  if (quads.length)                                                      return { rank: 7, name: 'Vierling' };
+  if ((trips.length >= 1 && pairs.length >= 1) || trips.length >= 2)    return { rank: 6, name: 'Full House' };
+  if (hasFlush)                                                          return { rank: 5, name: 'Flush' };
+  if (hasSt)                                                             return { rank: 4, name: 'Straight' };
+  if (trips.length)                                                      return { rank: 3, name: 'Drilling' };
+  if (pairs.length >= 2)                                                 return { rank: 2, name: 'Zwei Paare' };
+  if (pairs.length === 1)                                                return { rank: 1, name: 'Ein Paar (' + pairN(pairs[0]) + ')' };
+  return { rank: 0, name: 'High Card' };
 }
 
-function analyzeHole(hole,board){
-  const h1=cardVal(hole[0]),h2=cardVal(hole[1]),hS1=cardSuit(hole[0]),hS2=cardSuit(hole[1]);
-  const bv=board.map(cardVal),bs=board.map(cardSuit);
-  const brc={};board.forEach(c=>{const r=cardVal(c);brc[r]=(brc[r]||0)+1;});
-  const made=evalMade(hole,board),top=Math.max(...bv);
-  let ms=0,ml='';
-  if(made.rank>=5){ms=5;ml=made.name;}
-  else if(made.rank===4){ms=4;ml=made.name;}
-  else if(made.rank===3){ms=3;ml=made.name;}
-  else if(made.rank===2){if(brc[h1]>=1&&brc[h2]>=1){ms=3;ml='Zwei Paare (beide Hole Cards)';}else{ms=2;ml='Zwei Paare';}}
-  else if(made.rank===1){
-    if(h1===h2&&h1>top){ms=3;ml='Überpaar ('+pairN(h1)+')';}
-    else if(h1===h2){ms=1;ml='Taschenpaar ('+pairN(h1)+')';}
-    else if(bv.includes(h1)&&h1===top){ms=2;ml='Top Pair ('+pairN(h1)+')';}
-    else if(bv.includes(h2)&&h2===top){ms=2;ml='Top Pair ('+pairN(h2)+')';}
-    else{ms=1;ml='Mittleres / unteres Paar';}
-  }else{ms=0;ml='High Card / Nichts';}
+function analyzeHole(hole, board) {
+  const h1 = cardVal(hole[0]), h2 = cardVal(hole[1]);
+  const hS1 = cardSuit(hole[0]), hS2 = cardSuit(hole[1]);
+  const bv = board.map(cardVal), bs = board.map(cardSuit);
+  const brc = {};
+  board.forEach(c => { const r = cardVal(c); brc[r] = (brc[r] || 0) + 1; });
+  const made = evalMade(hole, board), top = Math.max(...bv);
+  let ms = 0, ml = '';
+  if (made.rank >= 5)       { ms = 5; ml = made.name; }
+  else if (made.rank === 4) { ms = 4; ml = made.name; }
+  else if (made.rank === 3) { ms = 3; ml = made.name; }
+  else if (made.rank === 2) { if (brc[h1] >= 1 && brc[h2] >= 1) { ms = 3; ml = 'Zwei Paare (beide Hole Cards)'; } else { ms = 2; ml = 'Zwei Paare'; } }
+  else if (made.rank === 1) {
+    if (h1 === h2 && h1 > top)             { ms = 3; ml = 'Überpaar (' + pairN(h1) + ')'; }
+    else if (h1 === h2)                    { ms = 1; ml = 'Taschenpaar (' + pairN(h1) + ')'; }
+    else if (bv.includes(h1) && h1 === top){ ms = 2; ml = 'Top Pair (' + pairN(h1) + ')'; }
+    else if (bv.includes(h2) && h2 === top){ ms = 2; ml = 'Top Pair (' + pairN(h2) + ')'; }
+    else                                   { ms = 1; ml = 'Mittleres / unteres Paar'; }
+  } else { ms = 0; ml = 'High Card / Nichts'; }
 
-  const draws=[];
+  const draws = [];
   /* Flush draws */
-  if(hS1===hS2){
-    const n=bs.filter(s=>s===hS1).length;
-    if(n===2)draws.push({type:'flush_draw',strength:3,outs:9,label:'Flush Draw'});
-    else if(n===1)draws.push({type:'bdoor_fd',strength:1,outs:1,label:'Backdoor Flush Draw'});
-  }else{
-    const f1=bs.filter(s=>s===hS1).length,f2=bs.filter(s=>s===hS2).length;
-    if(f1===3||f2===3)draws.push({type:'flush_draw',strength:3,outs:9,label:'Flush Draw'});
-    else if(f1===2||f2===2)draws.push({type:'bdoor_fd',strength:1,outs:1,label:'Backdoor Flush Draw'});
+  if (hS1 === hS2) {
+    const n = bs.filter(s => s === hS1).length;
+    if (n === 2)      draws.push({ type:'flush_draw', strength:3, outs:9, label:'Flush Draw' });
+    else if (n === 1) draws.push({ type:'bdoor_fd',   strength:1, outs:1, label:'Backdoor Flush Draw' });
+  } else {
+    const f1 = bs.filter(s => s === hS1).length, f2 = bs.filter(s => s === hS2).length;
+    if (f1 === 3 || f2 === 3)      draws.push({ type:'flush_draw', strength:3, outs:9, label:'Flush Draw' });
+    else if (f1 === 2 || f2 === 2) draws.push({ type:'bdoor_fd',   strength:1, outs:1, label:'Backdoor Flush Draw' });
   }
   /* Straight draws */
-  const av=[h1,h2,...bv],uav=[...new Set(av)];
-  const hal=[h1,h2,...(h1===14||h2===14?[1]:[])];
-  const val=uav.includes(14)?[...new Set([...uav,1])]:uav;
-  let hasO=false,hasG=false,hasBs=false;
-  if(made.rank<4){
-    for(let l=1;l<=10;l++){
-      const hi=l+4,inW=val.filter(v=>v>=l&&v<=hi),hIW=hal.filter(v=>v>=l&&v<=hi);
-      if(inW.length===4&&hIW.length>=1){
-        const gap=[l,l+1,l+2,l+3,hi].find(v=>!inW.includes(v));
-        if(gap===l||gap===hi)hasO=true;else hasG=true;
+  const av = [h1, h2, ...bv], uav = [...new Set(av)];
+  const hal = [h1, h2, ...(h1 === 14 || h2 === 14 ? [1] : [])];
+  const val = uav.includes(14) ? [...new Set([...uav, 1])] : uav;
+  let hasO = false, hasG = false, hasBs = false;
+  if (made.rank < 4) {
+    for (let l = 1; l <= 10; l++) {
+      const hi = l + 4;
+      const inW = val.filter(v => v >= l && v <= hi);
+      const hIW = hal.filter(v => v >= l && v <= hi);
+      if (inW.length === 4 && hIW.length >= 1) {
+        const gap = [l, l+1, l+2, l+3, hi].find(v => !inW.includes(v));
+        if (gap === l || gap === hi) hasO = true; else hasG = true;
       }
-      if(!hasO&&!hasG&&inW.length===3&&hIW.length>=1)hasBs=true;
+      if (!hasO && !hasG && inW.length === 3 && hIW.length >= 1) hasBs = true;
     }
   }
-  if(hasO)draws.push({type:'oesd',strength:3,outs:8,label:'OESD (beidseitig offen)'});
-  if(hasG&&!hasO)draws.push({type:'gutshot',strength:2,outs:4,label:'Gutshot (einseitig)'});
-  if(hasBs&&!hasO&&!hasG)draws.push({type:'bdoor_str',strength:1,outs:1,label:'Backdoor Straight Draw'});
-  /* Combine */
-  const fi=draws.findIndex(d=>d.type==='flush_draw'),oi=draws.findIndex(d=>d.type==='oesd'),gi=draws.findIndex(d=>d.type==='gutshot');
-  if(fi>=0&&oi>=0){draws.splice(Math.max(fi,oi),1);draws.splice(Math.min(fi,oi),1);draws.unshift({type:'combo_draw',strength:4,outs:15,label:'Combo Draw (FD + OESD)'});}
-  else if(fi>=0&&gi>=0){draws.splice(Math.max(fi,gi),1);draws.splice(Math.min(fi,gi),1);draws.unshift({type:'combo_draw',strength:3,outs:12,label:'Combo Draw (FD + Gutshot)'});}
-  if(h1===h2&&h1<top&&made.rank<3)draws.push({type:'set_draw',strength:2,outs:2,label:`Set Draw (${pairN(h1)})`});
-  if(made.rank===0){
-    const oc1=!bv.includes(h1)&&h1>top,oc2=!bv.includes(h2)&&h2>top;
-    if(oc1&&oc2)draws.push({type:'overcards',strength:2,outs:6,label:`Zwei Overcards`});
-    else if(oc1)draws.push({type:'overcard',strength:1,outs:3,label:`Overcard (${pairN(h1)})`});
-    else if(oc2)draws.push({type:'overcard',strength:1,outs:3,label:`Overcard (${pairN(h2)})`});
+  if (hasO)              draws.push({ type:'oesd',      strength:3, outs:8, label:'OESD (beidseitig offen)' });
+  if (hasG && !hasO)     draws.push({ type:'gutshot',   strength:2, outs:4, label:'Gutshot (einseitig)' });
+  if (hasBs && !hasO && !hasG) draws.push({ type:'bdoor_str', strength:1, outs:1, label:'Backdoor Straight Draw' });
+  /* Combine draws */
+  const fi = draws.findIndex(d => d.type === 'flush_draw');
+  const oi = draws.findIndex(d => d.type === 'oesd');
+  const gi = draws.findIndex(d => d.type === 'gutshot');
+  if (fi >= 0 && oi >= 0) {
+    draws.splice(Math.max(fi, oi), 1); draws.splice(Math.min(fi, oi), 1);
+    draws.unshift({ type:'combo_draw', strength:4, outs:15, label:'Combo Draw (FD + OESD)' });
+  } else if (fi >= 0 && gi >= 0) {
+    draws.splice(Math.max(fi, gi), 1); draws.splice(Math.min(fi, gi), 1);
+    draws.unshift({ type:'combo_draw', strength:3, outs:12, label:'Combo Draw (FD + Gutshot)' });
   }
-  return{ms,ml,draws,bestMade:made};
+  if (h1 === h2 && h1 < top && made.rank < 3)
+    draws.push({ type:'set_draw', strength:2, outs:2, label:`Set Draw (${pairN(h1)})` });
+  if (made.rank === 0) {
+    const oc1 = !bv.includes(h1) && h1 > top;
+    const oc2 = !bv.includes(h2) && h2 > top;
+    if (oc1 && oc2) draws.push({ type:'overcards', strength:2, outs:6, label:'Zwei Overcards' });
+    else if (oc1)   draws.push({ type:'overcard',  strength:1, outs:3, label:`Overcard (${pairN(h1)})` });
+    else if (oc2)   draws.push({ type:'overcard',  strength:1, outs:3, label:`Overcard (${pairN(h2)})` });
+  }
+  return { ms, ml, draws, bestMade: made };
 }
 
-function analyzeBoard(board){
-  const vals=board.map(cardVal),suits=board.map(cardSuit);
-  const sc={};suits.forEach(s=>{sc[s]=(sc[s]||0)+1;});
-  const mono=Object.values(sc).some(v=>v>=3),twoT=!mono&&Object.values(sc).some(v=>v>=2);
-  const rc={};vals.forEach(v=>{rc[v]=(rc[v]||0)+1;});
-  const paired=Object.values(rc).some(v=>v>=2);
-  const uv=[...new Set(vals)].sort((a,b)=>b-a);
-  const g1=uv[0]-(uv[1]??uv[0]-10),g2=(uv[1]??uv[0]-10)-(uv[2]??uv[0]-20);
-  const minG=Math.min(g1,g2);
-  let danger=0;
-  if(mono)danger+=5;else if(twoT)danger+=2;
-  if(!paired){if(minG<=1&&Math.max(g1,g2)<=1)danger+=uv[0]>=12?3:5;else if(minG<=1)danger+=2;else if(minG<=2)danger+=3;}
-  if(paired)danger-=1;
-  danger=Math.max(0,Math.min(10,danger));
-  return{mono,twoT,paired,connected:!paired&&minG<=1,texture:danger>=4?'wet':danger>=2?'mid':'dry'};
+function analyzeBoard(board) {
+  const vals = board.map(cardVal), suits = board.map(cardSuit);
+  const sc = {};
+  suits.forEach(s => { sc[s] = (sc[s] || 0) + 1; });
+  const mono   = Object.values(sc).some(v => v >= 3);
+  const twoT   = !mono && Object.values(sc).some(v => v >= 2);
+  const rc     = {};
+  vals.forEach(v => { rc[v] = (rc[v] || 0) + 1; });
+  const paired = Object.values(rc).some(v => v >= 2);
+  const uv = [...new Set(vals)].sort((a, b) => b - a);
+  const g1 = uv[0] - (uv[1] ?? uv[0] - 10);
+  const g2 = (uv[1] ?? uv[0] - 10) - (uv[2] ?? uv[0] - 20);
+  const minG = Math.min(g1, g2);
+  let danger = 0;
+  if (mono) danger += 5; else if (twoT) danger += 2;
+  if (!paired) {
+    if (minG <= 1 && Math.max(g1, g2) <= 1) danger += uv[0] >= 12 ? 3 : 5;
+    else if (minG <= 1) danger += 2;
+    else if (minG <= 2) danger += 3;
+  }
+  if (paired) danger -= 1;
+  danger = Math.max(0, Math.min(10, danger));
+  return { mono, twoT, paired, connected: !paired && minG <= 1, texture: danger >= 4 ? 'wet' : danger >= 2 ? 'mid' : 'dry' };
 }
 
-function totalOuts(draws){
-  const md=draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
-  if(md.some(d=>d.type==='combo_draw'))return md.find(d=>d.type==='combo_draw').outs;
-  return md.reduce((s,d)=>s+d.outs,0);
+function totalOuts(draws) {
+  const md = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
+  if (md.some(d => d.type === 'combo_draw')) return md.find(d => d.type === 'combo_draw').outs;
+  return md.reduce((s, d) => s + d.outs, 0);
 }
-function madeEqStr(s){return['~25–40%','~20–35%','~55–70%','~70–80%','~80–90%','~85–95%'][Math.min(s,5)];}
+function madeEqStr(s) { return ['~25–40%','~20–35%','~55–70%','~70–80%','~80–90%','~85–95%'][Math.min(s, 5)]; }
 
-function estEq(hs,street){
-  const{ms,draws}=hs;
-  const mEq=[.25,.32,.62,.74,.85,.91][Math.min(ms,5)];
-  const md=draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
-  if(!md.length)return Math.min(95,Math.round(mEq*100));
-  const best=md.reduce((b,d)=>d.outs>b.outs?d:b,md[0]);
-  const o=best.outs;
-  const pH=street==='flop'?1-((47-o)/47)*((46-o)/46):o/46;
-  const pw={flush_draw:.85,oesd:.82,gutshot:.80,combo_draw:.90,set_draw:.90,overcards:.55,overcard:.50}[best.type]||.80;
-  return Math.min(95,Math.round((pH*pw+(1-pH)*mEq)*100));
+function estEq(hs, street) {
+  const { ms, draws } = hs;
+  const mEq = [.25, .32, .62, .74, .85, .91][Math.min(ms, 5)];
+  const md = draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
+  if (!md.length) return Math.min(95, Math.round(mEq * 100));
+  const best = md.reduce((b, d) => d.outs > b.outs ? d : b, md[0]);
+  const o  = best.outs;
+  const pH = street === 'flop' ? 1 - ((47-o)/47) * ((46-o)/46) : o / 46;
+  const pw = { flush_draw:.85, oesd:.82, gutshot:.80, combo_draw:.90, set_draw:.90, overcards:.55, overcard:.50 }[best.type] || .80;
+  return Math.min(95, Math.round((pH * pw + (1 - pH) * mEq) * 100));
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   TRAINER — RANGES & DEAL
-═══════════════════════════════════════════════════════════════ */
-/* Trainer uses the same RANGES data, rebuilt as arrays for sampling */
+/* ══════════════════════════════════════════════════════════════
+   POSTFLOP TRAINER
+══════════════════════════════════════════════════════════════ */
 const TR = {};
-POS_LIST.forEach(p=>{
-  if(p==='BB'){TR.BB=[...RANGES.BB.b,...RANGES.BB.c,...RANGES.BB.r];}
-  else{TR[p]=[...RANGES[p].b,...RANGES[p].c,...RANGES[p].r];}
+POS_LIST.forEach(p => {
+  if (p === 'BB') TR.BB = [...RANGES.BB.b, ...RANGES.BB.c, ...RANGES.BB.r];
+  else            TR[p] = [...RANGES[p].b, ...RANGES[p].c, ...RANGES[p].r];
 });
 
-const POST_ORDER={SB:0,BB:1,UTG:2,MP:3,CO:4,BTN:5};
-const OPP_WIDTH={UTG:17.6,MP:21.4,CO:27.8,BTN:43.5,SB:37,BB:55};
+const POST_ORDER = { SB:0, BB:1, UTG:2, MP:3, CO:4, BTN:5 };
+const OPP_WIDTH  = { UTG:17.6, MP:21.4, CO:27.8, BTN:43.5, SB:37, BB:55 };
 
-function wRand(opts,ws){let t=ws.reduce((a,b)=>a+b),r=Math.random()*t;for(let i=0;i<opts.length;i++){r-=ws[i];if(r<=0)return opts[i];}return opts[opts.length-1];}
-
-let dealState='idle',curHand=null;
-
-function dealNew(){
-  dealState='preflop';
-  const role=Math.random()<.5?'pfr':'caller';
-  const pfPos=['UTG','MP','CO','BTN','SB'];
-  const position=role==='pfr'?pfPos[Math.floor(Math.random()*pfPos.length)]:'BB';
-  const pool=TR[position];
-  const notation=pool[Math.floor(Math.random()*pool.length)];
-  const holeCards=handToCards(notation,[]);
-  if(!holeCards){dealNew();return;}
-  const deck=shuffleDeck(holeCards);
-  const flop=[deck[0],deck[1],deck[2]],turn=deck[3],river=deck[4];
-  const oppPos=role==='pfr'
-    ?wRand({UTG:['MP','CO','BTN','SB','BB'],MP:['CO','BTN','SB','BB'],CO:['BTN','SB','BB'],BTN:['SB','BB'],SB:['BB']}[position]||['BB'],
-           {UTG:[1,1.5,2,1,2.5],MP:[1.5,2,1,2.5],CO:[2,1,2.5],BTN:[1,3],SB:[1]}[position]||[1])
-    :wRand(['UTG','MP','CO','BTN','SB'],[1,1.5,2,3,1.5]);
-  const ip=role==='pfr'?(POST_ORDER[position]||0)>(POST_ORDER[oppPos]||0):oppPos==='SB';
-  curHand={role,position,ip,holeCards,flop,turn,river,notation,oppPos};
-  updBtns();renderCur();
-}
-function revealFlop(){if(!curHand||dealState!=='preflop')return;dealState='flop';updBtns();renderCur();}
-function revealTurn(){if(!curHand||dealState!=='flop')return;dealState='turn';updBtns();renderCur();}
-function revealRiver(){if(!curHand||dealState!=='turn')return;dealState='river';updBtns();renderCur();}
-
-function updBtns(){
-  document.getElementById('btn-flop').disabled=dealState!=='preflop';
-  document.getElementById('btn-turn').disabled=dealState!=='flop';
-  document.getElementById('btn-river').disabled=dealState!=='turn';
-  const lbl={preflop:'HOLE CARDS',flop:'FLOP',turn:'TURN',river:'RIVER'};
-  const col={preflop:'var(--text)',flop:'var(--blue)',turn:'var(--amber)',river:'var(--purple)'};
-  const ind=document.getElementById('street-indicator');
-  if(ind&&dealState!=='idle')ind.innerHTML=`Street: <span style="color:${col[dealState]}">${lbl[dealState]}</span>`;
+function wRand(opts, ws) {
+  let t = ws.reduce((a, b) => a + b), r = Math.random() * t;
+  for (let i = 0; i < opts.length; i++) { r -= ws[i]; if (r <= 0) return opts[i]; }
+  return opts[opts.length - 1];
 }
 
-const DRAW_EQ={flush_draw:{outs:9,turn:'19%',river:'20%'},oesd:{outs:8,turn:'17%',river:'17%'},gutshot:{outs:4,turn:'9%',river:'9%'},combo_draw:{outs:15,turn:'32%',river:'33%'},set_draw:{outs:2,turn:'4%',river:'4%'},overcards:{outs:6,turn:'13%',river:'13%'},overcard:{outs:3,turn:'6%',river:'7%'}};
+let dealState = 'idle', curHand = null;
 
-function renderCur(){
-  if(!curHand)return;
-  const{role,position,ip,holeCards,flop,turn,river,oppPos}=curHand;
-  const showF=['flop','turn','river'].includes(dealState);
-  const showT=['turn','river'].includes(dealState);
-  const showR=dealState==='river';
-  const vBoard=[...(showF?flop:[]),...(showT?[turn]:[]),...(showR?[river]:[])];
-  let hs=null,bi=null;
-  if(vBoard.length>=3){hs=analyzeHole(holeCards,vBoard);bi=analyzeBoard(vBoard);}
+function dealNew() {
+  dealState = 'preflop';
+  const role      = Math.random() < .5 ? 'pfr' : 'caller';
+  const pfPos     = ['UTG','MP','CO','BTN','SB'];
+  const position  = role === 'pfr' ? pfPos[Math.floor(Math.random() * pfPos.length)] : 'BB';
+  const pool      = TR[position];
+  const notation  = pool[Math.floor(Math.random() * pool.length)];
+  const holeCards = handToCards(notation, []);
+  if (!holeCards) { dealNew(); return; }
+  const deck  = shuffleDeck(holeCards);
+  const flop  = [deck[0], deck[1], deck[2]], turn = deck[3], river = deck[4];
+  const oppPos = role === 'pfr'
+    ? wRand(
+        { UTG:['MP','CO','BTN','SB','BB'], MP:['CO','BTN','SB','BB'], CO:['BTN','SB','BB'], BTN:['SB','BB'], SB:['BB'] }[position] || ['BB'],
+        { UTG:[1,1.5,2,1,2.5], MP:[1.5,2,1,2.5], CO:[2,1,2.5], BTN:[1,3], SB:[1] }[position] || [1]
+      )
+    : wRand(['UTG','MP','CO','BTN','SB'], [1,1.5,2,3,1.5]);
+  const ip = role === 'pfr'
+    ? (POST_ORDER[position] || 0) > (POST_ORDER[oppPos] || 0)
+    : oppPos === 'SB';
+  curHand = { role, position, ip, holeCards, flop, turn, river, notation, oppPos };
+  updBtns();
+  renderCur();
+}
 
-  let texTags='';
-  if(bi){
-    const{texture,paired,connected,mono,twoT}=bi;
-    const tx=texture==='wet'?'wet':texture==='mid'?'mid':'dry';
-    texTags+=`<span class="btag btag-${tx}">${texture==='wet'?'WET':texture==='mid'?'MITTEL':'DRY'}</span>`;
-    if(paired)texTags+=`<span class="btag btag-pair">GEPAIRED</span>`;
-    if(mono)texTags+=`<span class="btag btag-fd">MONOTONE</span>`;
-    else if(twoT)texTags+=`<span class="btag btag-fd">FD MÖGLICH</span>`;
-    if(connected)texTags+=`<span class="btag btag-wet">CONNECTED</span>`;
+function revealFlop()  { if (!curHand || dealState !== 'preflop') return; dealState = 'flop';  updBtns(); renderCur(); }
+function revealTurn()  { if (!curHand || dealState !== 'flop')    return; dealState = 'turn';  updBtns(); renderCur(); }
+function revealRiver() { if (!curHand || dealState !== 'turn')    return; dealState = 'river'; updBtns(); renderCur(); }
+
+function updBtns() {
+  document.getElementById('btn-flop').disabled  = dealState !== 'preflop';
+  document.getElementById('btn-turn').disabled  = dealState !== 'flop';
+  document.getElementById('btn-river').disabled = dealState !== 'turn';
+  const lbl = { preflop:'HOLE CARDS', flop:'FLOP', turn:'TURN', river:'RIVER' };
+  const col = { preflop:'var(--text)', flop:'var(--blue)', turn:'var(--amber)', river:'var(--purple)' };
+  const ind = document.getElementById('street-indicator');
+  if (ind && dealState !== 'idle')
+    ind.innerHTML = `Street: <span style="color:${col[dealState]}">${lbl[dealState]}</span>`;
+}
+
+const DRAW_EQ = {
+  flush_draw: { outs:9,  turn:'19%', river:'20%' },
+  oesd:       { outs:8,  turn:'17%', river:'17%' },
+  gutshot:    { outs:4,  turn:'9%',  river:'9%'  },
+  combo_draw: { outs:15, turn:'32%', river:'33%' },
+  set_draw:   { outs:2,  turn:'4%',  river:'4%'  },
+  overcards:  { outs:6,  turn:'13%', river:'13%' },
+  overcard:   { outs:3,  turn:'6%',  river:'7%'  }
+};
+
+function renderCur() {
+  if (!curHand) return;
+  const { role, position, ip, holeCards, flop, turn, river, oppPos } = curHand;
+  const showF = ['flop','turn','river'].includes(dealState);
+  const showT = ['turn','river'].includes(dealState);
+  const showR = dealState === 'river';
+  const vBoard = [...(showF ? flop : []), ...(showT ? [turn] : []), ...(showR ? [river] : [])];
+  let hs = null, bi = null;
+  if (vBoard.length >= 3) { hs = analyzeHole(holeCards, vBoard); bi = analyzeBoard(vBoard); }
+
+  let texTags = '';
+  if (bi) {
+    const { texture, paired, connected, mono, twoT } = bi;
+    const tx = texture === 'wet' ? 'wet' : texture === 'mid' ? 'mid' : 'dry';
+    texTags += `<span class="btag btag-${tx}">${texture === 'wet' ? 'WET' : texture === 'mid' ? 'MITTEL' : 'DRY'}</span>`;
+    if (paired)    texTags += `<span class="btag btag-pair">GEPAIRED</span>`;
+    if (mono)      texTags += `<span class="btag btag-fd">MONOTONE</span>`;
+    else if (twoT) texTags += `<span class="btag btag-fd">FD MÖGLICH</span>`;
+    if (connected) texTags += `<span class="btag btag-wet">CONNECTED</span>`;
   }
 
-  const flopHtml=showF?flop.map(c=>renderCard(c,false,'flop-card')).join(''):renderCard('',true)+renderCard('',true)+renderCard('',true);
-  const turnHtml=showT?renderCard(turn,false,'turn-card'):renderCard('',true);
-  const rivHtml=showR?renderCard(river,false,'river-card'):renderCard('',true);
+  const flopHtml = showF
+    ? flop.map(c => renderCard(c, false, 'flop-card')).join('')
+    : renderCard('',true) + renderCard('',true) + renderCard('',true);
+  const turnHtml = showT ? renderCard(turn,  false, 'turn-card')  : renderCard('', true);
+  const rivHtml  = showR ? renderCard(river, false, 'river-card') : renderCard('', true);
 
-  let anaHtml='';
-  if(hs){
-    const sc=dealState==='flop'?'strip-flop':dealState==='turn'?'strip-turn':'strip-river';
-    const sl=dealState==='flop'?'FLOP':dealState==='turn'?'TURN':'RIVER';
+  let anaHtml = '';
+  if (hs) {
+    const sc = dealState === 'flop' ? 'strip-flop' : dealState === 'turn' ? 'strip-turn' : 'strip-river';
+    const sl = dealState === 'flop' ? 'FLOP' : dealState === 'turn' ? 'TURN' : 'RIVER';
     let content;
-    if(dealState==='river'){
-      const mc=hs.ms>=3?'var(--green)':hs.ms>=2?'var(--amber)':hs.ms>=1?'var(--gold)':'var(--dim)';
-      const mRow=`<div class="eq-table"><div class="eq-row"><span class="eq-type">${hs.ml}</span><span class="eq-val" style="color:${mc}">${madeEqStr(hs.ms)} vs. Random</span></div></div>`;
-      const stL=['Schwach','Mittel','Stark','Sehr stark','Monster','Nuts'][Math.min(hs.ms,5)];
-      content=`<div class="outs-bar">
+    if (dealState === 'river') {
+      const mc  = hs.ms >= 3 ? 'var(--green)' : hs.ms >= 2 ? 'var(--amber)' : hs.ms >= 1 ? 'var(--accent)' : 'var(--dim)';
+      const stL = ['Schwach','Mittel','Stark','Sehr stark','Monster','Nuts'][Math.min(hs.ms, 5)];
+      content = `<div class="outs-bar">
         <div class="outs-cell"><div class="outs-cell-lbl">Endhand</div><div class="outs-cell-val" style="font-size:15px;color:${mc}">${hs.ml}</div><div class="outs-cell-sub">${stL}</div></div>
         <div class="outs-cell"><div class="outs-cell-lbl">Showdown-Stärke</div><div class="outs-cell-val" style="color:${mc}">${madeEqStr(hs.ms)}</div><div class="outs-cell-sub">vs. Random Hand</div></div>
-      </div>`+mRow;
+      </div>
+      <div class="eq-table"><div class="eq-row"><span class="eq-type">${hs.ml}</span><span class="eq-val" style="color:${mc}">${madeEqStr(hs.ms)} vs. Random</span></div></div>`;
     } else {
-      const rD=hs.draws.filter(d=>!['bdoor_fd','bdoor_str'].includes(d.type));
-      const outs=totalOuts(rD),eq=estEq(hs,dealState);
-      const mc=hs.ms>=3?'var(--green)':hs.ms>=2?'var(--amber)':hs.ms>=1?'var(--gold)':'var(--dim)';
-      const ec=eq>=60?'var(--green)':eq>=40?'var(--amber)':eq>=25?'var(--gold)':'var(--red)';
-      const oc=outs>=12?'var(--amber)':outs>=8?'var(--blue)':outs>=4?'var(--blue)':outs>0?'var(--purple)':'var(--dim)';
-      const rm=dealState==='turn'?2:4;
-      let rows=`<div class="eq-row"><span class="eq-type">${hs.ml}</span><span class="eq-val" style="color:${mc}">${madeEqStr(hs.ms)} Equity</span></div>`;
-      rD.forEach(d=>{const de=DRAW_EQ[d.type];if(!de)return;const dc=d.strength>=4?'var(--amber)':d.strength>=3?'var(--blue)':d.strength===2?'var(--muted)':'var(--purple)';const es=dealState==='turn'?`${de.outs} Outs · River: ${de.river}`:`${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;rows+=`<div class="eq-row"><span class="eq-type" style="color:${dc}">${d.label}</span><span class="eq-val">${es}</span></div>`;});
-      const bdoor=hs.draws.filter(d=>['bdoor_fd','bdoor_str'].includes(d.type));
-      if(bdoor.length&&dealState==='flop'){const bl=bdoor.some(d=>d.type==='bdoor_fd')&&bdoor.some(d=>d.type==='bdoor_str')?'Backdoor FD + Straight':bdoor.some(d=>d.type==='bdoor_fd')?'Backdoor Flush Draw':'Backdoor Straight Draw';rows+=`<div class="eq-row"><span class="eq-type" style="color:var(--purple)">${bl}</span><span class="eq-val">~4–8% — braucht 2 Karten</span></div>`;}
-      const sD=rD.find(d=>d.strength>=3);
-      if(hs.ms>=1&&sD){const cb=hs.ms>=3?'~85–90%':hs.ms===2&&sD.outs>=9?'~70–80%':hs.ms===2?'~65–75%':'~50–60%';rows+=`<div class="eq-row eq-combined"><span class="eq-type">Kombiniert (${hs.ml} + ${sD.label})</span><span class="eq-val" style="color:var(--green)">${cb} Equity</span></div>`;}
-      content=`<div class="outs-bar">
+      const rD   = hs.draws.filter(d => !['bdoor_fd','bdoor_str'].includes(d.type));
+      const outs = totalOuts(rD), eq = estEq(hs, dealState);
+      const mc   = hs.ms >= 3 ? 'var(--green)' : hs.ms >= 2 ? 'var(--amber)' : hs.ms >= 1 ? 'var(--accent)' : 'var(--dim)';
+      const ec   = eq >= 60 ? 'var(--green)' : eq >= 40 ? 'var(--amber)' : eq >= 25 ? 'var(--accent)' : 'var(--red)';
+      const oc   = outs >= 12 ? 'var(--amber)' : outs >= 8 ? 'var(--blue)' : outs >= 4 ? 'var(--blue)' : outs > 0 ? 'var(--purple)' : 'var(--dim)';
+      const rm   = dealState === 'turn' ? 2 : 4;
+      let rows = `<div class="eq-row"><span class="eq-type">${hs.ml}</span><span class="eq-val" style="color:${mc}">${madeEqStr(hs.ms)} Equity</span></div>`;
+      rD.forEach(d => {
+        const de = DRAW_EQ[d.type]; if (!de) return;
+        const dc = d.strength >= 4 ? 'var(--amber)' : d.strength >= 3 ? 'var(--blue)' : d.strength === 2 ? 'var(--text)' : 'var(--purple)';
+        const es = dealState === 'turn'
+          ? `${de.outs} Outs · River: ${de.river}`
+          : `${de.outs} Outs · Turn: ${de.turn} · River: ${de.river}`;
+        rows += `<div class="eq-row"><span class="eq-type" style="color:${dc}">${d.label}</span><span class="eq-val">${es}</span></div>`;
+      });
+      const bdoor = hs.draws.filter(d => ['bdoor_fd','bdoor_str'].includes(d.type));
+      if (bdoor.length && dealState === 'flop') {
+        const bl = bdoor.some(d => d.type === 'bdoor_fd') && bdoor.some(d => d.type === 'bdoor_str')
+          ? 'Backdoor FD + Straight'
+          : bdoor.some(d => d.type === 'bdoor_fd') ? 'Backdoor Flush Draw' : 'Backdoor Straight Draw';
+        rows += `<div class="eq-row"><span class="eq-type" style="color:var(--purple)">${bl}</span><span class="eq-val">~4–8% — braucht 2 Karten</span></div>`;
+      }
+      const sD = rD.find(d => d.strength >= 3);
+      if (hs.ms >= 1 && sD) {
+        const cb = hs.ms >= 3 ? '~85–90%' : hs.ms === 2 && sD.outs >= 9 ? '~70–80%' : hs.ms === 2 ? '~65–75%' : '~50–60%';
+        rows += `<div class="eq-row eq-combined"><span class="eq-type">Kombiniert (${hs.ml} + ${sD.label})</span><span class="eq-val" style="color:var(--green)">${cb} Equity</span></div>`;
+      }
+      content = `<div class="outs-bar">
         <div class="outs-cell"><div class="outs-cell-lbl">Made Hand</div><div class="outs-cell-val" style="color:${mc}">${madeEqStr(hs.ms)}</div><div class="outs-cell-sub">${hs.ml}</div></div>
-        <div class="outs-cell"><div class="outs-cell-lbl">Outs</div><div class="outs-cell-val" style="color:${oc}">${outs>0?outs:'—'}</div><div class="outs-cell-sub">${outs>0?dealState==='turn'?'River':'Turn+River':'Keine Draws'}</div></div>
-        <div class="outs-cell"><div class="outs-cell-lbl">Regel ×${rm}</div><div class="outs-cell-val" style="color:${oc}">${outs>0?'~'+(outs*rm)+'%':'—'}</div><div class="outs-cell-sub">${outs>0?'Näherung':'—'}</div></div>
+        <div class="outs-cell"><div class="outs-cell-lbl">Outs</div><div class="outs-cell-val" style="color:${oc}">${outs > 0 ? outs : '—'}</div><div class="outs-cell-sub">${outs > 0 ? dealState === 'turn' ? 'River' : 'Turn+River' : 'Keine Draws'}</div></div>
+        <div class="outs-cell"><div class="outs-cell-lbl">Regel ×${rm}</div><div class="outs-cell-val" style="color:${oc}">${outs > 0 ? '~' + (outs * rm) + '%' : '—'}</div><div class="outs-cell-sub">${outs > 0 ? 'Näherung' : '—'}</div></div>
         <div class="outs-cell"><div class="outs-cell-lbl">Gesamt-Equity</div><div class="outs-cell-val" style="color:${ec}">${eq}%</div><div class="outs-cell-sub">Made + Draw HU</div></div>
-      </div>${outs>=9?`<div class="equity-note">Hinweis: Regel ×${rm} leicht ungenau bei ${outs}+ Outs</div>`:''}<div class="eq-table">${rows}</div>`;
+      </div>
+      ${outs >= 9 ? `<div class="equity-note">Hinweis: Regel ×${rm} leicht ungenau bei ${outs}+ Outs</div>` : ''}
+      <div class="eq-table">${rows}</div>`;
     }
-    anaHtml=`<div class="hand-analysis"><div class="ha-title"><span class="street-label-strip ${sc}">${sl}</span>&nbsp; Outs &amp; Equity</div>${content}</div>`;
+    anaHtml = `<div class="hand-analysis"><div class="ha-title"><span class="street-label-strip ${sc}">${sl}</span>&nbsp; Outs &amp; Equity</div>${content}</div>`;
   }
 
-  document.getElementById('main-area').innerHTML=`
+  document.getElementById('main-area').innerHTML = `
     <div class="situation">
       <div class="sit-header">
-        <span class="sit-badge ${role}">${role==='pfr'?'AGGRESSOR (PFR)':'CALLER (BB)'}</span>
+        <span class="sit-badge ${role}">${role === 'pfr' ? 'AGGRESSOR (PFR)' : 'CALLER (BB)'}</span>
         <span class="sit-badge pos">${position}</span>
-        <span class="sit-badge ${ip?'ip':'oop'}">${ip?'IN POSITION':'OUT OF POSITION'}</span>
+        <span class="sit-badge ${ip ? 'ip' : 'oop'}">${ip ? 'IN POSITION' : 'OUT OF POSITION'}</span>
         <span class="sit-badge opp">vs ${oppPos} · ${OPP_WIDTH[oppPos].toFixed(1)}% Range</span>
       </div>
       <div class="cards-row">
@@ -912,15 +1130,14 @@ function renderCur(){
         <div><div class="card-group-label">Turn</div><div class="cards-display">${turnHtml}</div></div>
         <div><div class="card-group-label">River</div><div class="cards-display">${rivHtml}</div></div>
       </div>
-      ${texTags?`<div class="board-tags">${texTags}</div>`:''}
+      ${texTags ? `<div class="board-tags">${texTags}</div>` : ''}
     </div>
     ${anaHtml}`;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    INIT
-═══════════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════════════ */
 renderPreflop(true);
 </script>
 </body>
