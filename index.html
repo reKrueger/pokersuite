@@ -368,6 +368,74 @@ body {
 .data-table tr:hover { background: var(--bg3); }
 
 /* ══════════════════════════════════════════════════════════════
+   SCORE BOX (Trainer)
+══════════════════════════════════════════════════════════════ */
+.score-box  { display: flex; gap: 22px; background: var(--bg2); border: 1px solid var(--border); padding: 10px 16px; margin-bottom: 14px; }
+.score-item { display: flex; flex-direction: column; align-items: center; min-width: 54px; }
+.score-val  { font-family: var(--mono); font-size: 18px; font-weight: bold; color: var(--accent); }
+.score-lbl  { font-size: 10px; font-weight: bold; color: var(--dim); font-family: var(--font); text-transform: uppercase; margin-top: 2px; }
+
+/* ══════════════════════════════════════════════════════════════
+   NUMERIC INPUT + DECISION BUTTONS (Trainer)
+══════════════════════════════════════════════════════════════ */
+.num-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 16px;
+  padding: 9px 10px;
+  width: 90px;
+  text-align: center;
+  min-height: 44px;
+}
+.num-input:focus { outline: none; border-color: var(--accent); }
+.decision-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.decision-btn {
+  padding: 0 22px;
+  min-height: 46px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: var(--font);
+  border: 1px solid;
+  cursor: pointer;
+  transition: all .15s;
+}
+.decision-btn:disabled { opacity: .35; cursor: default; }
+.btn-call { border-color: var(--green); background: rgba(39,174,96,.12); color: var(--green); }
+.btn-call:not(:disabled):hover { background: rgba(39,174,96,.25); }
+.btn-fold { border-color: var(--red);   background: rgba(231,76,60,.12); color: var(--red); }
+.btn-fold:not(:disabled):hover { background: rgba(231,76,60,.25); }
+
+/* ══════════════════════════════════════════════════════════════
+   FEEDBACK BOX (Trainer)
+══════════════════════════════════════════════════════════════ */
+.feedback         { padding: 12px 14px; margin-top: 10px; border-left: 4px solid; font-size: 14px; }
+.feedback.correct { border-color: var(--green); background: rgba(39,174,96,.08); }
+.feedback.wrong   { border-color: var(--red);   background: rgba(231,76,60,.08); }
+.feedback-title   { font-weight: bold; margin-bottom: 6px; font-family: var(--font); }
+.feedback-formula { font-family: var(--mono); font-size: 12px; color: var(--text); margin-top: 4px; }
+
+/* ══════════════════════════════════════════════════════════════
+   ODDS COMPARISON BAR (Pot Odds / Hand vs. Pot Odds)
+══════════════════════════════════════════════════════════════ */
+.odds-track  { position: relative; height: 30px; background: var(--bg3); border: 1px solid var(--border); margin: 16px 0 6px; }
+.odds-fill   { position: absolute; top: 0; left: 0; height: 100%; transition: width .25s; }
+.odds-marker { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--text); }
+.odds-marker::after {
+  content: attr(data-label);
+  position: absolute;
+  top: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-family: var(--mono);
+  white-space: nowrap;
+  color: var(--text);
+}
+.odds-legend { display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); font-family: var(--mono); }
+
+/* ══════════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
@@ -402,6 +470,9 @@ body {
   <button class="nav-tab active" onclick="goPage('preflop',this)">Preflop Ranges</button>
   <button class="nav-tab"        onclick="goPage('trainer',this)">Postflop Trainer</button>
   <button class="nav-tab"        onclick="goPage('outs',this)">Outs &amp; Equity</button>
+  <button class="nav-tab"        onclick="goPage('potodds',this)">Pot Odds Trainer</button>
+  <button class="nav-tab"        onclick="goPage('sizing',this)">Raise Sizing</button>
+  <button class="nav-tab"        onclick="goPage('handodds',this)">Hand vs. Pot Odds</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -489,6 +560,61 @@ body {
     </table>
   </div>
   <div style="font-size:11px;color:var(--text);margin-top:8px;text-align:right;font-style:italic;font-family:var(--font);">Turn = N÷47 · River = N÷46 · Flop→River = 1 − (47−N)/47 × (46−N)/46 · ×4 orange/rot = Überschätzung</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     POT ODDS TRAINER
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-potodds">
+  <div class="sec-title">Pot Odds <span>Trainer</span></div>
+  <div class="trainer-topbar">
+    <button class="street-btn btn-new" onclick="poNew()">↺ Neue Situation</button>
+    <div class="pos-rail" style="margin:0">
+      <button class="pos-btn active" id="po-mode-calc"   onclick="poSwitchMode('calc')">Pot Odds berechnen</button>
+      <button class="pos-btn"        id="po-mode-decide" onclick="poSwitchMode('decide')">Call oder Fold</button>
+    </div>
+  </div>
+  <div class="score-box" id="po-score"></div>
+  <div id="po-area">
+    <div class="empty-state">
+      <div class="es-icon">%</div>
+      <div class="es-text">Neue Situation drücken um zu starten</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     RAISE SIZING TRAINER
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-sizing">
+  <div class="sec-title">Raise Sizing <span>Trainer</span></div>
+  <div class="trainer-topbar">
+    <button class="street-btn btn-new" onclick="rsNew()">↺ Neue Situation</button>
+  </div>
+  <div class="score-box" id="rs-score"></div>
+  <div id="rs-area">
+    <div class="empty-state">
+      <div class="es-icon">BB</div>
+      <div class="es-text">Neue Situation drücken um zu starten</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     HAND VS. POT ODDS (PREFLOP)
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-handodds">
+  <div class="sec-title">Hand vs. <span>Pot Odds</span></div>
+  <div class="trainer-topbar">
+    <button class="street-btn btn-new" onclick="hoNew()">↺ Neue Situation</button>
+  </div>
+  <div class="score-box" id="ho-score"></div>
+  <div id="ho-area">
+    <div class="empty-state">
+      <div class="es-icon">♠</div>
+      <div class="es-text">Neue Situation drücken um zu starten</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1136,9 +1262,384 @@ function renderCur() {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   TRAINER SHARED HELPERS
+══════════════════════════════════════════════════════════════ */
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function round1(x) { return Math.round(x * 10) / 10; }
+
+function scoreBoxHtml(score, streak, best) {
+  return `<div class="score-item"><div class="score-val">${score}</div><div class="score-lbl">Richtig</div></div>
+    <div class="score-item"><div class="score-val">${streak}</div><div class="score-lbl">Streak</div></div>
+    <div class="score-item"><div class="score-val">${best}</div><div class="score-lbl">Best Streak</div></div>`;
+}
+
+function oddsBarHtml(equity, required) {
+  const win = equity >= required;
+  const fillColor = win ? 'var(--green)' : 'var(--red)';
+  return `<div class="odds-track">
+      <div class="odds-fill" style="width:${Math.min(100, Math.max(0, equity))}%;background:${fillColor}"></div>
+      <div class="odds-marker" style="left:${Math.min(100, Math.max(0, required))}%" data-label="${required.toFixed(1)}% nötig"></div>
+    </div>
+    <div class="odds-legend"><span>Equity: ${equity.toFixed(1)}%</span><span>Benötigt: ${required.toFixed(1)}%</span></div>`;
+}
+
+const PREFLOP_ORDER = { UTG: 0, MP: 1, CO: 2, BTN: 3, SB: 4, BB: 5 };
+const POS_LIST_OPEN = ['UTG', 'MP', 'CO', 'BTN', 'SB'];
+const OPEN_SIZE      = { UTG: 4, MP: 3.5, CO: 3, BTN: 2, SB: 3 };
+const POS_3BET_WIDTH = { UTG: 5, MP: 6, CO: 7, BTN: 10, SB: 8, BB: 12 };
+
+/* ══════════════════════════════════════════════════════════════
+   POT ODDS TRAINER
+══════════════════════════════════════════════════════════════ */
+let poMode = 'calc', poCur = null;
+let poScore = 0, poStreak = 0, poBest = 0;
+
+const PO_DRAWS = [
+  { outs: 2,  label: 'Set Draw (Pocket Pair)' },
+  { outs: 4,  label: 'Gutshot' },
+  { outs: 6,  label: 'Zwei Overcards' },
+  { outs: 8,  label: 'OESD (beidseitig offen)' },
+  { outs: 9,  label: 'Flush Draw' },
+  { outs: 12, label: 'Flush Draw + Gutshot (Combo Draw)' },
+  { outs: 15, label: 'Flush Draw + OESD (Combo Draw)' }
+];
+
+function poSwitchMode(mode) {
+  poMode = mode;
+  document.getElementById('po-mode-calc').classList.toggle('active', mode === 'calc');
+  document.getElementById('po-mode-decide').classList.toggle('active', mode === 'decide');
+  poNew();
+}
+
+function poRenderScore() {
+  document.getElementById('po-score').innerHTML = scoreBoxHtml(poScore, poStreak, poBest);
+}
+
+function poNew() {
+  const pot = randInt(6, 60);
+  const betPct = [0.33, 0.5, 0.66, 0.75, 1, 1.25][randInt(0, 5)];
+  let bet = Math.max(1, Math.round(pot * betPct * 2) / 2);
+  const reqEq = bet / (pot + bet) * 100;
+  let draw = null, street = null;
+  if (poMode === 'decide') {
+    draw = PO_DRAWS[randInt(0, PO_DRAWS.length - 1)];
+    street = Math.random() < 0.5 ? 'flop' : 'turn';
+  }
+  const equity = draw ? draw.outs * (street === 'flop' ? 4 : 2) : null;
+  const correctAction = draw ? (equity >= reqEq ? 'call' : 'fold') : null;
+  poCur = { pot, bet, reqEq, draw, street, equity, correctAction, answered: false };
+  poRenderScore();
+  poRender();
+}
+
+function poRender() {
+  const { pot, bet, reqEq } = poCur;
+  let html = `<div class="situation">
+    <div class="sit-header">
+      <span class="sit-badge pos">Pot: ${pot} BB</span>
+      <span class="sit-badge opp">Bet: ${bet} BB</span>
+    </div>`;
+  if (poMode === 'calc') {
+    html += `<div style="margin-bottom:12px">Gegner setzt <b>${bet} BB</b> in einen Pot von <b>${pot} BB</b>.
+      Wie viel % Equity brauchst du, um profitabel zu callen?</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <input type="number" class="num-input" id="po-input" placeholder="%" step="0.1">
+        <button class="street-btn btn-flop" onclick="poCheckCalc()">Prüfen</button>
+      </div>`;
+  } else {
+    const { draw, street } = poCur;
+    html += `<div style="margin-bottom:12px">Du hältst einen <b>${draw.label}</b> (${draw.outs} Outs) auf dem
+      <b>${street === 'flop' ? 'Flop' : 'Turn'}</b>. Gegner setzt <b>${bet} BB</b> in einen Pot von <b>${pot} BB</b>.
+      Callst du oder foldest du?</div>
+      <div class="decision-row">
+        <button class="decision-btn btn-call" id="po-btn-call" onclick="poDecide('call')">CALL</button>
+        <button class="decision-btn btn-fold" id="po-btn-fold" onclick="poDecide('fold')">FOLD</button>
+      </div>`;
+  }
+  html += `</div><div id="po-feedback"></div>`;
+  document.getElementById('po-area').innerHTML = html;
+}
+
+function poGrade(isCorrect) {
+  if (isCorrect) { poScore++; poStreak++; poBest = Math.max(poBest, poStreak); }
+  else poStreak = 0;
+  poRenderScore();
+}
+
+function poCheckCalc() {
+  if (poCur.answered) return;
+  poCur.answered = true;
+  const input = document.getElementById('po-input');
+  const val = parseFloat(input.value);
+  const { pot, bet, reqEq } = poCur;
+  const isCorrect = !isNaN(val) && Math.abs(val - reqEq) <= 1.0;
+  poGrade(isCorrect);
+  document.getElementById('po-feedback').innerHTML = `
+    <div class="feedback ${isCorrect ? 'correct' : 'wrong'}">
+      <div class="feedback-title">${isCorrect ? '✓ Richtig!' : '✗ Nicht ganz.'} Benötigte Equity: ${reqEq.toFixed(1)}%</div>
+      <div class="feedback-formula">Bet ÷ (Pot + Bet) × 100 = ${bet} ÷ (${pot} + ${bet}) × 100 = ${reqEq.toFixed(1)}%</div>
+    </div>
+    ${oddsBarHtml(reqEq, reqEq)}`;
+}
+
+function poDecide(action) {
+  if (poCur.answered) return;
+  poCur.answered = true;
+  document.getElementById('po-btn-call').disabled = true;
+  document.getElementById('po-btn-fold').disabled = true;
+  const { reqEq, equity, correctAction, draw, street } = poCur;
+  const isCorrect = action === correctAction;
+  poGrade(isCorrect);
+  const rule = street === 'flop' ? '×4' : '×2';
+  document.getElementById('po-feedback').innerHTML = `
+    <div class="feedback ${isCorrect ? 'correct' : 'wrong'}">
+      <div class="feedback-title">${isCorrect ? '✓ Richtig!' : '✗ Falsch.'} Korrekt: ${correctAction.toUpperCase()}</div>
+      <div class="feedback-formula">${draw.outs} Outs ${rule} = ${equity}% Equity · Benötigt: ${reqEq.toFixed(1)}%</div>
+    </div>
+    ${oddsBarHtml(equity, reqEq)}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RAISE SIZING TRAINER
+   Richtlinien: UTG 4BB · MP 3.5BB · CO 3BB · BTN 2BB · SB 3BB
+   Limper-Regel: +1 BB pro Limper · 3-Bet: IP ×3, OOP ×3.5–4
+   Squeeze: 3× letzter Raise + alle Calls · 4-Bet: ×2.2–2.5 des 3-Bets
+══════════════════════════════════════════════════════════════ */
+let rsCur = null;
+let rsScore = 0, rsStreak = 0, rsBest = 0;
+
+function rsRenderScore() {
+  document.getElementById('rs-score').innerHTML = scoreBoxHtml(rsScore, rsStreak, rsBest);
+}
+
+function rsNew() {
+  const type = ['open', 'open', '3bet', '3bet', 'squeeze', '4bet'][randInt(0, 5)];
+  let data;
+
+  if (type === 'open') {
+    const pos = POS_LIST_OPEN[randInt(0, POS_LIST_OPEN.length - 1)];
+    const limpers = Math.random() < 0.55 ? 0 : randInt(1, 3);
+    const base = OPEN_SIZE[pos];
+    const correct = base + limpers;
+    data = {
+      type, correctMin: correct, correctMax: correct,
+      prompt: `Du eröffnest von <b>${pos}</b>.${limpers ? ` ${limpers} Spieler ${limpers === 1 ? 'hat' : 'haben'} vor dir gelimpt.` : ''} Wie groß sollte dein Open-Raise sein? <span style="color:var(--dim)">(in BB)</span>`,
+      formula: `${base} BB (Standard-Open ${pos})${limpers ? ` + ${limpers} × 1 BB (Limper)` : ''} = <b>${correct} BB</b>`
+    };
+  } else if (type === '3bet') {
+    const openerPos = POS_LIST_OPEN[randInt(0, 3)];
+    const openSize = OPEN_SIZE[openerPos];
+    const candidates = POS_LIST.filter(p => PREFLOP_ORDER[p] > PREFLOP_ORDER[openerPos]);
+    const heroPos = candidates[randInt(0, candidates.length - 1)];
+    const ip = POST_ORDER[heroPos] > POST_ORDER[openerPos];
+    const min = ip ? openSize * 3 : openSize * 3.5;
+    const max = ip ? openSize * 3 : openSize * 4;
+    data = {
+      type, correctMin: min, correctMax: max,
+      prompt: `Spieler auf <b>${openerPos}</b> eröffnet mit <b>${openSize} BB</b>. Du sitzt auf <b>${heroPos}</b>
+        (${ip ? 'IN POSITION' : 'OUT OF POSITION'} zum Opener). Wie groß ist dein 3-Bet? <span style="color:var(--dim)">(in BB)</span>`,
+      formula: ip
+        ? `${openSize} BB × 3 (IP) = <b>${round1(min)} BB</b>`
+        : `${openSize} BB × 3.5–4 (OOP) = <b>${round1(min)}–${round1(max)} BB</b>`
+    };
+  } else if (type === 'squeeze') {
+    const openerPos = POS_LIST_OPEN[randInt(0, 3)];
+    const openSize = OPEN_SIZE[openerPos];
+    const callers = Math.random() < 0.6 ? 1 : 2;
+    const heroPos = Math.random() < 0.5 ? 'SB' : 'BB';
+    const correct = openSize * (3 + callers);
+    data = {
+      type, correctMin: correct, correctMax: correct,
+      prompt: `Spieler auf <b>${openerPos}</b> eröffnet mit <b>${openSize} BB</b>, <b>${callers}</b> Spieler
+        ${callers === 1 ? 'callt' : 'callen'}. Du sitzt im Blind (${heroPos}). Wie groß ist dein Squeeze? <span style="color:var(--dim)">(in BB)</span>`,
+      formula: `3 × ${openSize} BB (letzter Raise) + ${callers} × ${openSize} BB (Calls) = <b>${correct} BB</b>`
+    };
+  } else {
+    const openerPos = POS_LIST_OPEN[randInt(0, 3)];
+    const openSize = OPEN_SIZE[openerPos];
+    const threeBetSize = round1(openSize * (Math.random() < 0.5 ? 3 : 3.75));
+    const min = threeBetSize * 2.2, max = threeBetSize * 2.5;
+    data = {
+      type, correctMin: min, correctMax: max,
+      prompt: `Du hattest von <b>${openerPos}</b> mit <b>${openSize} BB</b> eröffnet. Der Gegner 3-bettet auf <b>${threeBetSize} BB</b>.
+        Wie groß ist dein 4-Bet? <span style="color:var(--dim)">(in BB)</span>`,
+      formula: `${threeBetSize} BB × 2.2–2.5 = <b>${round1(min)}–${round1(max)} BB</b>`
+    };
+  }
+
+  rsCur = data;
+  rsCur.answered = false;
+  rsRenderScore();
+  rsRender();
+}
+
+function rsRender() {
+  document.getElementById('rs-area').innerHTML = `
+    <div class="situation">
+      <div class="sit-header"><span class="sit-badge pos">${{open:'OPEN RAISE', '3bet':'3-BET', squeeze:'SQUEEZE', '4bet':'4-BET'}[rsCur.type]}</span></div>
+      <div style="margin-bottom:12px">${rsCur.prompt}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <input type="number" class="num-input" id="rs-input" placeholder="BB" step="0.5">
+        <button class="street-btn btn-flop" onclick="rsCheck()">Prüfen</button>
+      </div>
+    </div>
+    <div id="rs-feedback"></div>`;
+}
+
+function rsCheck() {
+  if (rsCur.answered) return;
+  rsCur.answered = true;
+  const val = parseFloat(document.getElementById('rs-input').value);
+  const { correctMin, correctMax, formula } = rsCur;
+  const isCorrect = !isNaN(val) && val >= correctMin - 0.3 && val <= correctMax + 0.3;
+  if (isCorrect) { rsScore++; rsStreak++; rsBest = Math.max(rsBest, rsStreak); }
+  else rsStreak = 0;
+  rsRenderScore();
+  document.getElementById('rs-feedback').innerHTML = `
+    <div class="feedback ${isCorrect ? 'correct' : 'wrong'}">
+      <div class="feedback-title">${isCorrect ? '✓ Richtig!' : '✗ Nicht ganz.'}</div>
+      <div class="feedback-formula">${formula}</div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HAND VS. POT ODDS (PREFLOP)
+══════════════════════════════════════════════════════════════ */
+let hoCur = null;
+let hoScore = 0, hoStreak = 0, hoBest = 0;
+
+function hoRenderScore() {
+  document.getElementById('ho-score').innerHTML = scoreBoxHtml(hoScore, hoStreak, hoBest);
+}
+
+/* Grobe Equity-Schätzung nach Handkategorie, da kein Equity-Solver vorhanden ist */
+function handBaseEquity(notation) {
+  const r1 = notation[0], r2 = notation[1];
+  const pair = r1 === r2, suited = notation.endsWith('s');
+  const v1 = RANK_VAL[r1], v2 = RANK_VAL[r2];
+  const hi = Math.max(v1, v2), lo = Math.min(v1, v2), gap = hi - lo;
+
+  if (pair) {
+    if (hi === 14) return 82;
+    if (hi === 13) return 78;
+    if (hi === 12) return 71;
+    if (hi === 11) return 66;
+    if (hi === 10) return 60;
+    if (hi >= 7)   return 51;
+    return 46;
+  }
+  if (hi === 14) {
+    if (lo >= 12) return suited ? 58 : 53;
+    if (lo === 11) return suited ? 54 : 48;
+    if (lo === 10) return suited ? 51 : 45;
+    return suited ? 45 : 34;
+  }
+  if (hi === 13) {
+    if (lo === 12) return suited ? 51 : 46;
+    if (lo === 11) return suited ? 48 : 42;
+    if (lo === 10) return suited ? 46 : 39;
+    return suited ? 38 : 30;
+  }
+  if (hi === 12) {
+    if (lo === 11) return suited ? 47 : 41;
+    if (lo === 10) return suited ? 45 : 38;
+    return suited ? 37 : 29;
+  }
+  if (hi === 11 && lo === 10) return suited ? 46 : 39;
+  if (gap === 1) return suited ? 41 : 34;
+  if (gap === 2) return suited ? 38 : 31;
+  return suited ? 33 : 26;
+}
+
+function estimateEquityVsRange(notation, rangeWidthPct) {
+  const base = handBaseEquity(notation);
+  const adj = (rangeWidthPct - 8) * 0.7;
+  return Math.max(15, Math.min(90, Math.round(base + adj)));
+}
+
+function deadBlinds(heroPos, villainPos) {
+  let dead = 0;
+  if (heroPos !== 'SB' && villainPos !== 'SB') dead += 0.5;
+  if (heroPos !== 'BB' && villainPos !== 'BB') dead += 1;
+  return dead;
+}
+
+function hoNew() {
+  const pos = POS_LIST_OPEN[randInt(0, POS_LIST_OPEN.length - 1)];
+  const pool = TR[pos];
+  const notation = pool[randInt(0, pool.length - 1)];
+  const holeCards = handToCards(notation, []);
+  if (!holeCards) { hoNew(); return; }
+
+  const candidates = POS_LIST.filter(p => PREFLOP_ORDER[p] > PREFLOP_ORDER[pos]);
+  const villainPos = candidates[randInt(0, candidates.length - 1)];
+  const ip = POST_ORDER[pos] > POST_ORDER[villainPos];
+  const openSize = OPEN_SIZE[pos];
+  const mult = ip ? 3 : round1(3.5 + Math.random() * 0.5);
+  const threeBetSize = round1(openSize * mult);
+  const dead = deadBlinds(pos, villainPos);
+  const potBeforeHeroActs = dead + openSize + threeBetSize;
+  const callAmount = round1(threeBetSize - openSize);
+  const reqEq = callAmount / (potBeforeHeroActs + callAmount) * 100;
+  const rangeWidth = POS_3BET_WIDTH[villainPos];
+  const equity = estimateEquityVsRange(notation, rangeWidth);
+
+  hoCur = {
+    pos, notation, holeCards, villainPos, ip, openSize, threeBetSize,
+    potBeforeHeroActs, callAmount, reqEq, rangeWidth, equity,
+    correctAction: equity >= reqEq ? 'call' : 'fold', answered: false
+  };
+  hoRenderScore();
+  hoRender();
+}
+
+function hoRender() {
+  const { pos, notation, holeCards, villainPos, ip, openSize, threeBetSize, callAmount } = hoCur;
+  document.getElementById('ho-area').innerHTML = `
+    <div class="situation">
+      <div class="sit-header">
+        <span class="sit-badge pfr">${pos} ÖFFNET ${openSize} BB</span>
+        <span class="sit-badge opp">3-BET ${villainPos} → ${threeBetSize} BB</span>
+        <span class="sit-badge ${ip ? 'ip' : 'oop'}">${ip ? 'IN POSITION' : 'OUT OF POSITION'}</span>
+      </div>
+      <div class="cards-row">
+        <div><div class="card-group-label">Deine Hand (${notation})</div><div class="cards-display">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div></div>
+      </div>
+      <div style="margin-bottom:12px">Der Gegner 3-bettet dich auf <b>${threeBetSize} BB</b>. Du musst <b>${callAmount} BB</b> callen. Callst du oder foldest du?</div>
+      <div class="decision-row">
+        <button class="decision-btn btn-call" id="ho-btn-call" onclick="hoDecide('call')">CALL</button>
+        <button class="decision-btn btn-fold" id="ho-btn-fold" onclick="hoDecide('fold')">FOLD</button>
+      </div>
+    </div>
+    <div id="ho-feedback"></div>`;
+}
+
+function hoDecide(action) {
+  if (hoCur.answered) return;
+  hoCur.answered = true;
+  document.getElementById('ho-btn-call').disabled = true;
+  document.getElementById('ho-btn-fold').disabled = true;
+  const { reqEq, equity, correctAction, villainPos, rangeWidth, potBeforeHeroActs, callAmount } = hoCur;
+  const isCorrect = action === correctAction;
+  if (isCorrect) { hoScore++; hoStreak++; hoBest = Math.max(hoBest, hoStreak); }
+  else hoStreak = 0;
+  hoRenderScore();
+  document.getElementById('ho-feedback').innerHTML = `
+    <div class="feedback ${isCorrect ? 'correct' : 'wrong'}">
+      <div class="feedback-title">${isCorrect ? '✓ Richtig!' : '✗ Falsch.'} Korrekt: ${correctAction.toUpperCase()}</div>
+      <div class="feedback-formula">Pot Odds: ${callAmount} ÷ (${round1(potBeforeHeroActs)} + ${callAmount}) × 100 = ${reqEq.toFixed(1)}%
+        &nbsp;·&nbsp; Hand-Equity vs. ${villainPos}-3-Bet-Range (~${rangeWidth}%): ~${equity}%</div>
+    </div>
+    ${oddsBarHtml(equity, reqEq)}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════════ */
 renderPreflop(true);
+poRenderScore();
+rsRenderScore();
+hoRenderScore();
 </script>
 </body>
 </html>
