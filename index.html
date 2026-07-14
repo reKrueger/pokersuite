@@ -1594,7 +1594,7 @@ function hoNew() {
 }
 
 function hoRender() {
-  const { pos, notation, holeCards, villainPos, ip, openSize, threeBetSize, callAmount } = hoCur;
+  const { pos, notation, holeCards, villainPos, ip, openSize, threeBetSize, callAmount, equity } = hoCur;
   document.getElementById('ho-area').innerHTML = `
     <div class="situation">
       <div class="sit-header">
@@ -1603,7 +1603,7 @@ function hoRender() {
         <span class="sit-badge ${ip ? 'ip' : 'oop'}">${ip ? 'IN POSITION' : 'OUT OF POSITION'}</span>
       </div>
       <div class="cards-row">
-        <div><div class="card-group-label">Deine Hand (${notation})</div><div class="cards-display">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div></div>
+        <div><div class="card-group-label">Deine Hand (${notation}) — ~${equity}% Equity vs. ${villainPos}-Range</div><div class="cards-display">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div></div>
       </div>
       <div style="margin-bottom:12px">Der Gegner 3-bettet dich auf <b>${threeBetSize} BB</b>. Du musst <b>${callAmount} BB</b> callen. Callst du oder foldest du?</div>
       <div class="decision-row">
