@@ -485,6 +485,7 @@ body {
   <button class="nav-tab"        onclick="goPage('outs',this)">Outs &amp; Equity</button>
   <button class="nav-tab"        onclick="goPage('cheatsheet',this)">Pot Odds Cheatsheet</button>
   <button class="nav-tab"        onclick="goPage('handodds',this)">Hand vs. Pot Odds</button>
+  <button class="nav-tab"        onclick="goPage('handeq',this)">Preflop Equity</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -619,6 +620,25 @@ body {
       <div class="es-icon">♠</div>
       <div class="es-text">Neue Situation drücken um zu starten</div>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PREFLOP EQUITY (2 KARTEN, KEIN BOARD)
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-handeq">
+  <div class="sec-title">Preflop <span>Equity</span></div>
+  <div style="font-size:12px;color:var(--dim);margin-bottom:12px;font-family:var(--font)">
+    Equity nur aus den zwei Hole Cards — kein Board, Heads-Up all-in gegen eine zufällige Gegnerhand.
+    Keine vollständige 169-Hand-Matrix, sondern eine Auswahl: Premium-Pairs, Top-Broadways und mittlere Suited Connectors.
+  </div>
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr><th>Hand</th><th>Typ</th><th>Combos</th><th>Equity vs. Random Hand</th></tr>
+      </thead>
+      <tbody id="handeq-body"></tbody>
+    </table>
   </div>
 </div>
 
@@ -1428,10 +1448,64 @@ function hoDecide(action) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   PREFLOP EQUITY (2 KARTEN, KEIN BOARD)
+══════════════════════════════════════════════════════════════ */
+const HANDEQ_LIST = [
+  { h: 'AA',  typ: 'Premium Pair' },
+  { h: 'KK',  typ: 'Premium Pair' },
+  { h: 'QQ',  typ: 'Premium Pair' },
+  { h: 'JJ',  typ: 'Premium Pair' },
+  { h: 'TT',  typ: 'Premium Pair' },
+  { h: '99',  typ: 'Mittleres Pair' },
+  { h: '88',  typ: 'Mittleres Pair' },
+  { h: '77',  typ: 'Mittleres Pair' },
+  { h: 'AKs', typ: 'Top Suited' },
+  { h: 'AKo', typ: 'Top Offsuit' },
+  { h: 'AQs', typ: 'Top Suited' },
+  { h: 'AQo', typ: 'Top Offsuit' },
+  { h: 'AJs', typ: 'Top Suited' },
+  { h: 'KQs', typ: 'Top Suited' },
+  { h: 'KQo', typ: 'Top Offsuit' },
+  { h: 'KJs', typ: 'Top Suited' },
+  { h: 'QJs', typ: 'Top Suited' },
+  { h: 'JTs', typ: 'Suited Connector' },
+  { h: 'T9s', typ: 'Suited Connector' },
+  { h: '98s', typ: 'Suited Connector' },
+  { h: '87s', typ: 'Suited Connector' },
+  { h: '76s', typ: 'Suited Connector' },
+  { h: '65s', typ: 'Suited Connector' },
+  { h: '54s', typ: 'Suited Connector' }
+];
+
+function renderHandEq() {
+  const rows = HANDEQ_LIST
+    .map(({ h, typ }) => ({ h, typ, eq: handBaseEquity(h), combos: handCombos(h) }))
+    .sort((a, b) => b.eq - a.eq);
+  const body = document.getElementById('handeq-body');
+  body.innerHTML = rows.map(r => {
+    const ec = r.eq >= 65 ? 'font-weight:bold;text-decoration:underline' : r.eq >= 50 ? 'font-weight:bold' : r.eq >= 40 ? 'text-decoration:underline' : 'font-weight:normal';
+    return `<tr>
+      <td style="font-family:var(--mono);font-weight:bold">${r.h}</td>
+      <td>${r.typ}</td>
+      <td>${r.combos}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;min-width:80px;background:var(--bg3);border:1px solid var(--border);height:14px;position:relative">
+            <div style="height:100%;width:${r.eq}%;background:var(--accent)"></div>
+          </div>
+          <span style="${ec};font-family:var(--mono);font-size:12px;min-width:36px;text-align:right">${r.eq}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════════ */
 renderPreflop(true);
 hoRenderScore();
+renderHandEq();
 </script>
 </body>
 </html>
