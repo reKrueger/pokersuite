@@ -398,14 +398,6 @@ body {
 .data-table tr:hover { background: var(--bg3); }
 
 /* ══════════════════════════════════════════════════════════════
-   SCORE BOX (Trainer)
-══════════════════════════════════════════════════════════════ */
-.score-box  { display: flex; gap: 26px; background: var(--bg2); border: 1px solid var(--border); padding: 12px 18px; margin-bottom: 16px; }
-.score-item { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
-.score-val  { font-family: var(--mono); font-size: clamp(19px, 1.1vw, 24px); font-weight: bold; color: var(--text); }
-.score-lbl  { font-size: clamp(10px, 0.5vw, 12px); font-weight: bold; color: var(--dim); font-family: var(--font); text-transform: uppercase; margin-top: 3px; }
-
-/* ══════════════════════════════════════════════════════════════
    NUMERIC INPUT + DECISION BUTTONS (Trainer)
 ══════════════════════════════════════════════════════════════ */
 .num-input {
@@ -437,6 +429,8 @@ body {
 .btn-call:not(:disabled):hover { background: var(--green); }
 .btn-fold { border-color: var(--red);   background: var(--red-bg); }
 .btn-fold:not(:disabled):hover { background: var(--red); }
+.btn-raise { border-color: var(--amber); background: var(--amber-bg); }
+.btn-raise:not(:disabled):hover { background: var(--amber); }
 
 /* ══════════════════════════════════════════════════════════════
    FEEDBACK BOX (Trainer)
@@ -449,24 +443,50 @@ body {
 .feedback-formula { font-family: var(--mono); font-size: clamp(12px, 0.6vw, 14px); color: var(--text); margin-top: 5px; }
 
 /* ══════════════════════════════════════════════════════════════
-   ODDS COMPARISON BAR (Pot Odds / Hand vs. Pot Odds)
+   POKER TABLE (Range Trainer)
 ══════════════════════════════════════════════════════════════ */
-.odds-track  { position: relative; height: clamp(28px, 2vw, 36px); background: var(--bg3); border: 1px solid var(--border); margin: 18px 0 8px; }
-.odds-fill   { position: absolute; top: 0; left: 0; height: 100%; transition: width .25s; }
-.odds-marker { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--text); }
-.odds-marker::after {
-  content: attr(data-label);
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(10px, 0.5vw, 12px);
-  font-family: var(--mono);
-  white-space: nowrap;
-  color: var(--text);
-  font-weight: bold;
+.poker-table {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  aspect-ratio: 4 / 3;
+  margin: 0 auto clamp(16px, 2vw, 26px);
+  background: var(--bg3);
+  border: 2px solid var(--border);
 }
-.odds-legend { display: flex; justify-content: space-between; font-size: clamp(11px, 0.55vw, 13px); color: var(--dim); font-family: var(--mono); }
+.table-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62%;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--dim);
+  font-family: var(--font);
+}
+.seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.seat-pos {
+  font-size: var(--fs-sm);
+  font-weight: bold;
+  font-family: var(--font);
+  color: var(--dim);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  white-space: nowrap;
+}
+.seat-hero .seat-pos { color: var(--text); border-color: var(--accent); background: var(--accent-bg); text-decoration: underline; }
+.seat-cards { display: flex; gap: 4px; }
+.seat-cards .card { width: clamp(38px, 3vw, 56px); height: clamp(54px, 4.2vw, 80px); }
+.seat-cards .card-rank { font-size: clamp(13px, 0.8vw, 16px); }
+.seat-cards .card-suit { font-size: clamp(10px, 0.6vw, 13px); }
 
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE
@@ -485,6 +505,11 @@ body {
   .trainer-topbar { gap: 6px; }
   .street-btn { flex: 1; min-width: 64px; padding: 11px 6px; font-size: 13px; }
   .street-indicator { width: 100%; margin-left: 0; text-align: center; }
+  .seat-pos { font-size: 10px; padding: 3px 7px; }
+  .seat-cards .card { width: 30px; height: 42px; }
+  .seat-cards .card-rank { font-size: 11px; }
+  .seat-cards .card-suit { font-size: 9px; }
+  .table-center { font-size: 11px; width: 74%; }
 }
 @media (max-width: 400px) {
   .rg td { width: 28px; height: 22px; font-size: 8px; }
@@ -502,7 +527,7 @@ body {
   <button class="nav-tab"        onclick="goPage('trainer',this)">Postflop Trainer</button>
   <button class="nav-tab"        onclick="goPage('outs',this)">Outs &amp; Equity</button>
   <button class="nav-tab"        onclick="goPage('cheatsheet',this)">Pot Odds Cheatsheet</button>
-  <button class="nav-tab"        onclick="goPage('handodds',this)">Hand vs. Pot Odds</button>
+  <button class="nav-tab"        onclick="goPage('rangetrainer',this)">Range Trainer</button>
   <button class="nav-tab"        onclick="goPage('handeq',this)">Preflop Equity</button>
 </nav>
 
@@ -625,15 +650,14 @@ body {
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
-     HAND VS. POT ODDS (PREFLOP)
+     RANGE TRAINER (6-MAX TISCH, PREFLOP)
 ══════════════════════════════════════════════════════════ -->
-<div class="page" id="page-handodds">
-  <div class="sec-title">Hand vs. <span>Pot Odds</span></div>
+<div class="page" id="page-rangetrainer">
+  <div class="sec-title">Range <span>Trainer</span></div>
   <div class="trainer-topbar">
-    <button class="street-btn btn-new" onclick="hoNew()">↺ Neue Situation</button>
+    <button class="street-btn btn-new" onclick="rtNew()">↺ Neue Situation</button>
   </div>
-  <div class="score-box" id="ho-score"></div>
-  <div id="ho-area">
+  <div id="rt-area">
     <div class="empty-state">
       <div class="es-icon">♠</div>
       <div class="es-text">Neue Situation drücken um zu starten</div>
@@ -1311,38 +1335,8 @@ function renderCur() {
    TRAINER SHARED HELPERS
 ══════════════════════════════════════════════════════════════ */
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function round1(x) { return Math.round(x * 10) / 10; }
 
-function scoreBoxHtml(score, streak, best) {
-  return `<div class="score-item"><div class="score-val">${score}</div><div class="score-lbl">Richtig</div></div>
-    <div class="score-item"><div class="score-val">${streak}</div><div class="score-lbl">Streak</div></div>
-    <div class="score-item"><div class="score-val">${best}</div><div class="score-lbl">Best Streak</div></div>`;
-}
-
-function oddsBarHtml(equity, required) {
-  const win = equity >= required;
-  const fillColor = win ? 'var(--green)' : 'var(--red)';
-  return `<div class="odds-track">
-      <div class="odds-fill" style="width:${Math.min(100, Math.max(0, equity))}%;background:${fillColor}"></div>
-      <div class="odds-marker" style="left:${Math.min(100, Math.max(0, required))}%" data-label="${required.toFixed(1)}% nötig"></div>
-    </div>
-    <div class="odds-legend"><span>Equity: ${equity.toFixed(1)}%</span><span>Benötigt: ${required.toFixed(1)}%</span></div>`;
-}
-
-const PREFLOP_ORDER = { UTG: 0, MP: 1, CO: 2, BTN: 3, SB: 4, BB: 5 };
-const POS_LIST_OPEN = ['UTG', 'MP', 'CO', 'BTN', 'SB'];
-const OPEN_SIZE      = { UTG: 4, MP: 3.5, CO: 3, BTN: 2, SB: 3 };
-const POS_3BET_WIDTH = { UTG: 5, MP: 6, CO: 7, BTN: 10, SB: 8, BB: 12 };
-
-/* ══════════════════════════════════════════════════════════════
-   HAND VS. POT ODDS (PREFLOP)
-══════════════════════════════════════════════════════════════ */
-let hoCur = null;
-let hoScore = 0, hoStreak = 0, hoBest = 0;
-
-function hoRenderScore() {
-  document.getElementById('ho-score').innerHTML = scoreBoxHtml(hoScore, hoStreak, hoBest);
-}
+const OPEN_SIZE = { UTG: 4, MP: 3.5, CO: 3, BTN: 2, SB: 3 };
 
 /* Grobe Equity-Schätzung nach Handkategorie, da kein Equity-Solver vorhanden ist */
 function handBaseEquity(notation) {
@@ -1383,86 +1377,107 @@ function handBaseEquity(notation) {
   return suited ? 33 : 26;
 }
 
-function estimateEquityVsRange(notation, rangeWidthPct) {
-  const base = handBaseEquity(notation);
-  const adj = (rangeWidthPct - 8) * 0.7;
-  return Math.max(15, Math.min(90, Math.round(base + adj)));
+/* ══════════════════════════════════════════════════════════════
+   RANGE TRAINER — 6-max Tisch, Held immer unten
+   Ziel: Fold/Raise (Open-Positionen) bzw. Fold/Call/Raise (BB)
+   exakt nach den RANGES oben treffen.
+══════════════════════════════════════════════════════════════ */
+const SEAT_ORDER = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
+const SEAT_SLOTS = [
+  { x: 50, y: 88 },  /* Held: unten */
+  { x: 14, y: 68 },  /* unten-links */
+  { x: 14, y: 22 },  /* oben-links */
+  { x: 50, y: 8  },  /* oben */
+  { x: 86, y: 22 },  /* oben-rechts */
+  { x: 86, y: 68 }   /* unten-rechts */
+];
+
+let rtCur = null;
+
+/* Notation (z.B. 'AKs') direkt aus zwei gedealten Karten ableiten */
+function classifyHeroHand(c1, c2) {
+  const r1 = cardRank(c1), r2 = cardRank(c2);
+  if (r1 === r2) return r1 + r2;
+  const suited = cardSuit(c1) === cardSuit(c2);
+  const hi = cardVal(c1) >= cardVal(c2) ? r1 : r2;
+  const lo = cardVal(c1) >= cardVal(c2) ? r2 : r1;
+  return hi + lo + (suited ? 's' : 'o');
 }
 
-function deadBlinds(heroPos, villainPos) {
-  let dead = 0;
-  if (heroPos !== 'SB' && villainPos !== 'SB') dead += 0.5;
-  if (heroPos !== 'BB' && villainPos !== 'BB') dead += 1;
-  return dead;
+/* Korrekte Aktion laut RANGES: Open-Positionen kennen nur Raise/Fold
+   (kein Limp), BB verteidigt gegen einen BTN-Open mit Call/Raise/Fold */
+function rangeCorrectAction(pos, hand) {
+  const R = RANGES[pos];
+  const inB = R.b.includes(hand), inC = R.c.includes(hand), inR = R.r.includes(hand);
+  if (pos === 'BB') {
+    if (inB || inR) return 'raise';
+    if (inC)         return 'call';
+    return 'fold';
+  }
+  return (inB || inC || inR) ? 'raise' : 'fold';
 }
 
-function hoNew() {
-  const pos = POS_LIST_OPEN[randInt(0, POS_LIST_OPEN.length - 1)];
-  const pool = TR[pos];
-  const notation = pool[randInt(0, pool.length - 1)];
-  const holeCards = handToCards(notation, []);
-  if (!holeCards) { hoNew(); return; }
-
-  const candidates = POS_LIST.filter(p => PREFLOP_ORDER[p] > PREFLOP_ORDER[pos]);
-  const villainPos = candidates[randInt(0, candidates.length - 1)];
-  const ip = POST_ORDER[pos] > POST_ORDER[villainPos];
-  const openSize = OPEN_SIZE[pos];
-  const mult = ip ? 3 : round1(3.5 + Math.random() * 0.5);
-  const threeBetSize = round1(openSize * mult);
-  const dead = deadBlinds(pos, villainPos);
-  const potBeforeHeroActs = dead + openSize + threeBetSize;
-  const callAmount = round1(threeBetSize - openSize);
-  const reqEq = callAmount / (potBeforeHeroActs + callAmount) * 100;
-  const rangeWidth = POS_3BET_WIDTH[villainPos];
-  const equity = estimateEquityVsRange(notation, rangeWidth);
-
-  hoCur = {
-    pos, notation, holeCards, villainPos, ip, openSize, threeBetSize,
-    potBeforeHeroActs, callAmount, reqEq, rangeWidth, equity,
-    correctAction: equity >= reqEq ? 'call' : 'fold', answered: false
+function rtNew() {
+  const heroPos   = SEAT_ORDER[randInt(0, 5)];
+  const deck      = shuffleDeck();
+  const holeCards = [deck[0], deck[1]];
+  const notation  = classifyHeroHand(holeCards[0], holeCards[1]);
+  rtCur = {
+    heroPos, holeCards, notation,
+    canCall: heroPos === 'BB',
+    correctAction: rangeCorrectAction(heroPos, notation),
+    answered: false
   };
-  hoRenderScore();
-  hoRender();
+  rtRenderTable();
 }
 
-function hoRender() {
-  const { pos, notation, holeCards, villainPos, ip, openSize, threeBetSize, callAmount, equity } = hoCur;
-  document.getElementById('ho-area').innerHTML = `
+function rtRenderTable() {
+  const { heroPos, holeCards, notation, canCall } = rtCur;
+  const heroIdx = SEAT_ORDER.indexOf(heroPos);
+  let seatsHtml = '';
+  for (let i = 0; i < 6; i++) {
+    const pos    = SEAT_ORDER[(heroIdx + i) % 6];
+    const slot   = SEAT_SLOTS[i];
+    const isHero = i === 0;
+    seatsHtml += `<div class="seat${isHero ? ' seat-hero' : ''}" style="left:${slot.x}%;top:${slot.y}%">
+      <div class="seat-pos">${pos}</div>
+      ${isHero ? `<div class="seat-cards">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div>` : ''}
+    </div>`;
+  }
+  const context = heroPos === 'BB'
+    ? `Alle folden bis BTN.<br><b>BTN raist auf ${OPEN_SIZE.BTN} BB.</b><br>Du bist BB.`
+    : `Alle vor dir haben gefoldet.<br>Du bist <b>${heroPos}</b> und als Erster am Zug.`;
+
+  document.getElementById('rt-area').innerHTML = `
+    <div class="poker-table">${seatsHtml}<div class="table-center">${context}</div></div>
     <div class="situation">
       <div class="sit-header">
-        <span class="sit-badge pfr">${pos} ÖFFNET ${openSize} BB</span>
-        <span class="sit-badge opp">3-BET ${villainPos} → ${threeBetSize} BB</span>
-        <span class="sit-badge ${ip ? 'ip' : 'oop'}">${ip ? 'IN POSITION' : 'OUT OF POSITION'}</span>
+        <span class="sit-badge pos">${heroPos}</span>
+        <span class="sit-badge opp">Deine Hand: ${notation}</span>
       </div>
-      <div class="cards-row">
-        <div><div class="card-group-label">Deine Hand (${notation}) — ~${equity}% Equity vs. ${villainPos}-Range</div><div class="cards-display">${renderCard(holeCards[0])}${renderCard(holeCards[1])}</div></div>
-      </div>
-      <div style="margin-bottom:12px">Der Gegner 3-bettet dich auf <b>${threeBetSize} BB</b>. Du musst <b>${callAmount} BB</b> callen. Callst du oder foldest du?</div>
       <div class="decision-row">
-        <button class="decision-btn btn-call" id="ho-btn-call" onclick="hoDecide('call')">CALL</button>
-        <button class="decision-btn btn-fold" id="ho-btn-fold" onclick="hoDecide('fold')">FOLD</button>
+        <button class="decision-btn btn-fold"  id="rt-btn-fold"  onclick="rtDecide('fold')">FOLD</button>
+        <button class="decision-btn btn-call"  id="rt-btn-call"  onclick="rtDecide('call')" ${canCall ? '' : 'disabled title="Hier nur Raise oder Fold — kein Limp"'}>CALL</button>
+        <button class="decision-btn btn-raise" id="rt-btn-raise" onclick="rtDecide('raise')">RAISE</button>
       </div>
     </div>
-    <div id="ho-feedback"></div>`;
+    <div id="rt-feedback"></div>`;
 }
 
-function hoDecide(action) {
-  if (hoCur.answered) return;
-  hoCur.answered = true;
-  document.getElementById('ho-btn-call').disabled = true;
-  document.getElementById('ho-btn-fold').disabled = true;
-  const { reqEq, equity, correctAction, villainPos, rangeWidth, potBeforeHeroActs, callAmount } = hoCur;
+function rtDecide(action) {
+  if (!rtCur || rtCur.answered) return;
+  if (action === 'call' && !rtCur.canCall) return;
+  rtCur.answered = true;
+  document.getElementById('rt-btn-fold').disabled  = true;
+  document.getElementById('rt-btn-call').disabled  = true;
+  document.getElementById('rt-btn-raise').disabled = true;
+  const { correctAction, heroPos, notation } = rtCur;
   const isCorrect = action === correctAction;
-  if (isCorrect) { hoScore++; hoStreak++; hoBest = Math.max(hoBest, hoStreak); }
-  else hoStreak = 0;
-  hoRenderScore();
-  document.getElementById('ho-feedback').innerHTML = `
+  document.getElementById('rt-feedback').innerHTML = `
     <div class="feedback ${isCorrect ? 'correct' : 'wrong'}">
       <div class="feedback-title">${isCorrect ? '✓ Richtig!' : '✗ Falsch.'} Korrekt: ${correctAction.toUpperCase()}</div>
-      <div class="feedback-formula">Pot Odds: ${callAmount} ÷ (${round1(potBeforeHeroActs)} + ${callAmount}) × 100 = ${reqEq.toFixed(1)}%
-        &nbsp;·&nbsp; Hand-Equity vs. ${villainPos}-3-Bet-Range (~${rangeWidth}%): ~${equity}%</div>
-    </div>
-    ${oddsBarHtml(equity, reqEq)}`;
+      <div class="feedback-formula">${notation} in ${heroPos} → laut Range: ${correctAction.toUpperCase()}</div>
+    </div>`;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1560,7 +1575,6 @@ function renderHandEq() {
    INIT
 ══════════════════════════════════════════════════════════════ */
 renderPreflop(true);
-hoRenderScore();
 renderHandEq();
 </script>
 </body>
