@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Hintergrund: grüner Filz -->
+  <defs>
+    <radialGradient id="felt" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#2a8a5a"/>
+      <stop offset="100%" stop-color="#0f4a2e"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#felt)"/>
+  <!-- Pokerchip -->
+  <circle cx="256" cy="256" r="178" fill="#c23b32"/>
+  <circle cx="256" cy="256" r="178" fill="none" stroke="#f4f1e8" stroke-width="34" stroke-dasharray="56 37"/>
+  <circle cx="256" cy="256" r="122" fill="#f4f1e8"/>
+  <circle cx="256" cy="256" r="122" fill="none" stroke="#e0b23a" stroke-width="8"/>
+  <!-- Pik-Symbol -->
+  <path d="M256 160 C 230 200, 180 225, 180 268 C 180 300, 215 316, 244 296 C 240 320, 230 338, 212 350 L 300 350 C 282 338, 272 320, 268 296 C 297 316, 332 300, 332 268 C 332 225, 282 200, 256 160 Z" fill="#151515"/>
+</svg>
